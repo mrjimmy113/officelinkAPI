@@ -1,2 +1,8 @@
 
 officelink/\.project
+
+officelink/\.classpath
+
+officelink/bin/
+
+officelink/\.settings/

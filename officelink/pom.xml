@@ -11,6 +11,7 @@
 	<groupId>com.fpt</groupId>
 	<artifactId>officelink</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>officelink</name>
 	<description>API Project for Office Link</description>
 
