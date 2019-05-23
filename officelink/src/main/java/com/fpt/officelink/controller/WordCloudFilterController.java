@@ -54,7 +54,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
 	}
 	
-	@GetMapping
+	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<WordCloudFilterDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
 		HttpStatus status = null;
 		PageSearchDTO<WordCloudFilterDTO> res = new PageSearchDTO<WordCloudFilterDTO>();
