@@ -28,11 +28,11 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	
 	@Override
 	public void addNewFilter(WordCloudFilter filter) {
-		WordCloudFilter saved = filterRep.saveAndFlush(filter);
-		saved.getWordList().forEach(element -> {
-			element.setFilter(saved);
-			wlRep.save(element);
-		});
+//		WordCloudFilter saved = filterRep.saveAndFlush(filter);
+//		saved.getWordList().forEach(element -> {
+//			element.setFilter(saved);
+//			wlRep.save(element);
+//		});
 	}
 
 	@Override

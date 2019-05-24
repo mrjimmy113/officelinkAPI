@@ -100,7 +100,7 @@ public class WordCloudFilterController {
 				BeanUtils.copyProperties(element,tmp,"filter");
 				wordList.add(tmp);
 			});
-			entity.setWordList(wordList);
+//			entity.setWordList(wordList);
 			service.addNewFilter(entity);
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
