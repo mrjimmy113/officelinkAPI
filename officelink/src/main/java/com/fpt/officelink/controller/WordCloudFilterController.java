@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.WordCloudFilterDTO;
+import com.fpt.officelink.dto.WordDTO;
+import com.fpt.officelink.entity.Word;
 import com.fpt.officelink.entity.WordCloudFilter;
 import com.fpt.officelink.service.WordCloudFilterService;
 
@@ -40,14 +42,21 @@ public class WordCloudFilterController {
 			List<WordCloudFilterDTO> resultList = new ArrayList<WordCloudFilterDTO>();
 			result.getContent().forEach(element -> {
 				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
+				List<WordDTO> tmpList = new ArrayList<WordDTO>();
+				element.getWordList().forEach(e -> {
+					WordDTO tmpW = new WordDTO();
+					BeanUtils.copyProperties(e, tmpW,"filter");
+					tmpList.add(tmpW);
+				});
 				BeanUtils.copyProperties(element, tmp);
+				tmp.setWordList(tmpList);
 				resultList.add(tmp);
 			});
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			
+			System.out.println(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
@@ -84,7 +93,14 @@ public class WordCloudFilterController {
 		HttpStatus status = null;
 		try {
 			WordCloudFilter entity = new WordCloudFilter();
+			List<Word> wordList = new ArrayList<Word>();
 			BeanUtils.copyProperties(dto, entity);
+			dto.getWordList().forEach(element -> {
+				Word tmp = new Word();
+				BeanUtils.copyProperties(element,tmp,"filter");
+				wordList.add(tmp);
+			});
+			entity.setWordList(wordList);
 			service.addNewFilter(entity);
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
