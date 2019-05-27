@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -29,7 +30,7 @@ public class WordCloudFilter implements Serializable {
 	private String language;
 	
 	@OneToMany(mappedBy = "filter")
-	private List<Word> wordList;
+	private List<Word> wordList = new ArrayList<Word>();
 
 	public Integer getId() {
 		return id;
@@ -54,5 +55,14 @@ public class WordCloudFilter implements Serializable {
 	public void setLanguage(String language) {
 		this.language = language;
 	}
+
+	public List<Word> getWordList() {
+		return wordList;
+	}
+
+	public void setWordList(List<Word> wordList) {
+		this.wordList = wordList;
+	}
+	
 	
 }
