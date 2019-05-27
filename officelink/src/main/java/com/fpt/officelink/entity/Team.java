@@ -22,6 +22,9 @@ public class Team implements Serializable{
 	
 	@Column
 	private String name;
+	
+	@Column
+	private boolean isDeleted;
 
 	public Integer getId() {
 		return id;
@@ -37,6 +40,14 @@ public class Team implements Serializable{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 	
 }
