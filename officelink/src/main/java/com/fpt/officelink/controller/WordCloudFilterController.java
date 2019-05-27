@@ -54,30 +54,30 @@ public class WordCloudFilterController {
 		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
 	}
 	
-	@GetMapping
-	public ResponseEntity<PageSearchDTO<WordCloudFilterDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
-		HttpStatus status = null;
-		PageSearchDTO<WordCloudFilterDTO> res = new PageSearchDTO<WordCloudFilterDTO>();
-		try {
-			//Call Service
-			Page<WordCloudFilter> result = service.searchWithPagination(term, page);
-			//Convert to DTO
-			List<WordCloudFilterDTO> resultList = new ArrayList<WordCloudFilterDTO>();
-			result.getContent().forEach(element -> {
-				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
-				BeanUtils.copyProperties(element, tmp);
-				resultList.add(tmp);
-			});
-			res.setMaxPage(result.getTotalPages());
-			res.setObjList(resultList);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
-	}
+//	@GetMapping
+//	public ResponseEntity<PageSearchDTO<WordCloudFilterDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
+//		HttpStatus status = null;
+//		PageSearchDTO<WordCloudFilterDTO> res = new PageSearchDTO<WordCloudFilterDTO>();
+//		try {
+//			//Call Service
+//			Page<WordCloudFilter> result = service.searchWithPagination(term, page);
+//			//Convert to DTO
+//			List<WordCloudFilterDTO> resultList = new ArrayList<WordCloudFilterDTO>();
+//			result.getContent().forEach(element -> {
+//				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
+//				BeanUtils.copyProperties(element, tmp);
+//				resultList.add(tmp);
+//			});
+//			res.setMaxPage(result.getTotalPages());
+//			res.setObjList(resultList);
+//			status = HttpStatus.OK;
+//		} catch (Exception e) {
+//			
+//			status = HttpStatus.BAD_REQUEST;
+//		}
+//		
+//		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
+//	}
 	
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody WordCloudFilterDTO dto) {
