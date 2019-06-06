@@ -19,7 +19,7 @@ public class TeamServiceImpl implements TeamService{
 	@Override
 	public Page<Team> searchWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return teamRep.findAllByName(term, pageRequest);
+		return teamRep.findAllByNameContaining(term, pageRequest);
 	}
 
 	@Override

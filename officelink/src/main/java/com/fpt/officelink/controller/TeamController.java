@@ -56,7 +56,7 @@ public class TeamController {
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
 	
-	@GetMapping
+	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
