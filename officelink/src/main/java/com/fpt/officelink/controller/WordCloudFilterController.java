@@ -87,6 +87,7 @@ public class WordCloudFilterController {
 		
 		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
 	}
+
 	
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody WordCloudFilterDTO dto) {
