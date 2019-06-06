@@ -1,14 +1,15 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Word implements Serializable {
@@ -28,9 +29,8 @@ public class Word implements Serializable {
 	@Column
 	private boolean isExclude;
 	
-	@ManyToOne
-	@JoinColumn(name = "filterId")
-	private WordCloudFilter filter;
+	@ManyToMany(mappedBy = "wordList")
+	private Set<WordCloudFilter> filters = new HashSet<WordCloudFilter>();
 
 	public Integer getId() {
 		return id;
@@ -48,12 +48,12 @@ public class Word implements Serializable {
 		this.name = name;
 	}
 
-	public WordCloudFilter getFilter() {
-		return filter;
+	public Set<WordCloudFilter> getFilters() {
+		return filters;
 	}
 
-	public void setFilter(WordCloudFilter filter) {
-		this.filter = filter;
+	public void setFilters(Set<WordCloudFilter> filters) {
+		this.filters = filters;
 	}
 
 	public boolean isExclude() {
