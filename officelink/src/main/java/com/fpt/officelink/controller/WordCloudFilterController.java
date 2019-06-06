@@ -101,8 +101,7 @@ public class WordCloudFilterController {
 				BeanUtils.copyProperties(element,tmp,"filter");
 				wordList.add(tmp);
 			});
-			entity.setWordList(wordList);
-			service.addNewFilter(entity);
+			service.addNewFilter(entity, wordList);
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
@@ -115,9 +114,16 @@ public class WordCloudFilterController {
 		HttpStatus status = null;
 		try {
 			WordCloudFilter entity = new WordCloudFilter();
+			List<Word> wordList = new ArrayList<Word>();
 			BeanUtils.copyProperties(dto, entity);
-			service.modifyFilter(entity);
-			status = HttpStatus.CREATED;
+			
+			dto.getWordList().forEach(element -> {
+				Word tmp = new Word();
+				BeanUtils.copyProperties(element,tmp,"filter");
+				wordList.add(tmp);
+			});
+			service.modifyFilter(entity,wordList);
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

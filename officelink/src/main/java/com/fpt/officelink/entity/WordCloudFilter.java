@@ -1,15 +1,17 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class WordCloudFilter implements Serializable {
@@ -22,15 +24,17 @@ public class WordCloudFilter implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private String language;
-	
-	@OneToMany(mappedBy = "filter")
-	private List<Word> wordList = new ArrayList<Word>();
+
+	@ManyToMany
+	@JoinTable(name = "filter_word", joinColumns = { @JoinColumn(name = "filterId") }, inverseJoinColumns = {
+			@JoinColumn(name = "wordId") })
+	private Set<Word> wordList = new HashSet<Word>();
 
 	public Integer getId() {
 		return id;
@@ -56,13 +60,12 @@ public class WordCloudFilter implements Serializable {
 		this.language = language;
 	}
 
-	public List<Word> getWordList() {
+	public Set<Word> getWordList() {
 		return wordList;
 	}
 
-	public void setWordList(List<Word> wordList) {
+	public void setWordList(Set<Word> wordList) {
 		this.wordList = wordList;
 	}
-	
-	
+
 }
