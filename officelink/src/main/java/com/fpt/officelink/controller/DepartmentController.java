@@ -55,7 +55,7 @@ public class DepartmentController {
 		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
 	}
 	
-	@GetMapping
+	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
@@ -87,8 +87,12 @@ public class DepartmentController {
 		try {
 			Department entity = new Department();
 			BeanUtils.copyProperties(dto, entity);
-			depService.addNewDepartment(entity);
-			status = HttpStatus.CREATED;
+			boolean isSucceed = depService.addNewDepartment(entity);
+			if (isSucceed) {
+				status = HttpStatus.CREATED;				
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

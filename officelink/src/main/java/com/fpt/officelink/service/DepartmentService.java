@@ -8,9 +8,9 @@ public interface DepartmentService {
 	
 	Page<Department> searchWithPagination(String term, int pageNum);
 	
-	void addNewDepartment(Department dep);
+	boolean addNewDepartment(Department dep);
 	
-	void modifyDepartment(Department dep);
+	boolean modifyDepartment(Department dep);
 	
-	void removeDepartment(int id);
+	boolean removeDepartment(int id);
 }
