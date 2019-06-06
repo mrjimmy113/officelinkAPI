@@ -12,10 +12,14 @@ import java.util.Date;
  * @author Thai Phu Cuong
  */
 public class LocationDTO {
+    
+    private int id;
 
     private Date dateCreated;
+    
+    private Date dateModified;
 
-    private String name;
+    private String county;
 
     private String city;
 
@@ -23,6 +27,8 @@ public class LocationDTO {
 
     private String address;
 
+    private boolean isDeleted;
+    
     //Getter and Setter
     public Date getDateCreated() {
         return dateCreated;
@@ -40,14 +46,39 @@ public class LocationDTO {
         this.workplaceId = workplaceId;
     }
 
-    public String getName() {
-        return name;
+    public int getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(int id) {
+        this.id = id;
     }
 
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public boolean isIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    
     public String getCity() {
         return city;
     }

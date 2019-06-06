@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Thai Phu Cuong
  */
+@Service
 public class LocationServiceImpl implements LocationService {
 
     private static final int MAXPAGESIZE = 9;
@@ -26,7 +28,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return locationRep.findAllByName(term, pageRequest);
+        return locationRep.findAllByAddress(term, pageRequest);
     }
 
     @Override
