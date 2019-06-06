@@ -90,8 +90,12 @@ public class TeamController {
 		try {
 			Team entity = new Team();
 			BeanUtils.copyProperties(dto, entity);
-			teamService.addNewTeam(entity);
-			status = HttpStatus.CREATED;
+			boolean isSucceed = teamService.addNewTeam(entity);
+			if (isSucceed) {
+				status = HttpStatus.CREATED;				
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

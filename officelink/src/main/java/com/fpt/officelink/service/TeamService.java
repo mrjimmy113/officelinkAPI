@@ -8,9 +8,9 @@ public interface TeamService {
 	
 	Page<Team> searchWithPagination(String term, int pageNum);
 	
-	void addNewTeam(Team team);
+	boolean addNewTeam(Team team);
 	
-	void modifyTeam(Team team);
+	boolean modifyTeam(Team team);
 	
-	void removeTeam(int id);
+	boolean removeTeam(int id);
 }
