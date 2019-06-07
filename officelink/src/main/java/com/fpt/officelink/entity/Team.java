@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Team implements Serializable{
@@ -25,6 +27,10 @@ public class Team implements Serializable{
 	
 	@Column
 	private boolean isDeleted;
+	
+	@ManyToOne
+	@JoinColumn(name = "department_id", nullable = false)
+	private Department department;
 
 	public Integer getId() {
 		return id;
@@ -50,4 +56,11 @@ public class Team implements Serializable{
 		this.isDeleted = isDeleted;
 	}
 	
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
 }

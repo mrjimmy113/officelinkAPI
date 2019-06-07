@@ -1,10 +1,14 @@
 package com.fpt.officelink.dto;
 
+import java.util.List;
+
 public class DepartmentDTO {
 	
 	private Integer id;
 	
 	private String name;
+	
+	private List<TeamDTO> teams;
 
 	public Integer getId() {
 		return id;
@@ -22,4 +26,11 @@ public class DepartmentDTO {
 		this.name = name;
 	}
 
+	public List<TeamDTO> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(List<TeamDTO> teams) {
+		this.teams = teams;
+	}
 }

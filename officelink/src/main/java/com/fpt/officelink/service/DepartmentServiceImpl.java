@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,11 @@ public class DepartmentServiceImpl implements DepartmentService{
 	
 	@Autowired
 	DepartmentRespository depRep;
+	
+	public List<Department> getAll() {
+		List<Department> result = depRep.findAll();
+		return result;
+	}
 	
 	@Override
 	public Page<Department> searchWithPagination(String term, int pageNum) {

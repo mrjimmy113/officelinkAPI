@@ -29,6 +29,31 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService depService;
 	
+	@GetMapping(value = "/getAll")
+	public ResponseEntity<List<DepartmentDTO>> getAll(){
+		HttpStatus status = null;
+		List<DepartmentDTO> res = new ArrayList<DepartmentDTO>();
+		
+		try {
+			//
+			List<Department> result = depService.getAll();
+			//
+			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
+			result.forEach(element -> {
+				DepartmentDTO dto = new DepartmentDTO();
+				BeanUtils.copyProperties(element, dto);
+				resultList.add(dto);
+			});
+			//
+			res.addAll(resultList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<List<DepartmentDTO>>(res, status);
+	}
+	
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<DepartmentDTO>> search(@RequestParam("term") String term){
 		HttpStatus status = null;

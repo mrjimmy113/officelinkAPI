@@ -1,14 +1,14 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.hibernate.annotations.GeneratorType;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Department implements Serializable{
@@ -27,6 +27,9 @@ public class Department implements Serializable{
 	
 	@Column
 	private boolean isDeleted;
+	
+	@OneToMany(mappedBy = "department")
+	private Set<Team> teams;
 
 	public Integer getId() {
 		return id;
@@ -52,4 +55,11 @@ public class Department implements Serializable{
 		this.isDeleted = isDeleted;
 	}
 	
+	public Set<Team> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams;
+	}
 }
