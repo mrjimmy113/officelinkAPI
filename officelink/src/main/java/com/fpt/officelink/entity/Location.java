@@ -33,15 +33,6 @@ public class Location implements Serializable {
     @Column
     private String county;
 
-    @Column
-    private String address;
-    
-    @Column
-    private String city;
-    
-    @Column
-    private Date date_created;
-
 //    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 //    @JsonIgnore
 //    @JoinTable(
@@ -72,31 +63,6 @@ public class Location implements Serializable {
 
     public void setCounty(String county) {
         this.county = county;
-    }
-
-    
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public Date getDate_created() {
-        return date_created;
-    }
-
-    public void setDate_created(Date date_created) {
-        this.date_created = date_created;
     }
 
 //    public Set<Department> getDepartment() {
