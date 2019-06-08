@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.DepartmentRespository;
 
 @Service
@@ -22,7 +21,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 	DepartmentRespository depRep;
 	
 	public List<Department> getAll() {
-		List<Department> result = depRep.findAll();
+		List<Department> result = depRep.findAllByIsDeleted(false);
 		return result;
 	}
 	
