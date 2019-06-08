@@ -33,6 +33,19 @@ public class Location implements Serializable {
     @Column
     private String county;
 
+    @Column 
+    private String address;
+    
+    @Column
+    private String city;
+    
+    @Column
+    private Date dateCreated;
+    
+    @Column 
+    private Date dateModified;
+    
+    
 //    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
 //    @JsonIgnore
 //    @JoinTable(
@@ -63,23 +76,7 @@ public class Location implements Serializable {
 
     public void setCounty(String county) {
         this.county = county;
-    }
-
-//    public Set<Department> getDepartment() {
-//        return department;
-//    }
-//
-//    public void setDepartment(Set<Department> department) {
-//        this.department = department;
-//    }
-//
-//    public int getWorkplace() {
-//        return workplace;
-//    }
-//
-//    public void setWorkplace(int workplace) {
-//        this.workplace = workplace;
-//    }    
+    } 
 
     public boolean isIsDeleted() {
         return isDeleted;
@@ -87,6 +84,38 @@ public class Location implements Serializable {
 
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
     }
     
     

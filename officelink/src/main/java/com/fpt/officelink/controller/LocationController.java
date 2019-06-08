@@ -43,7 +43,6 @@ public class LocationController {
         try {
             //Call Service
             Page<Location> result = service.searchWithPagination(term, 0);
-
             //Convert to DTO
             List<LocationDTO> resultList = new ArrayList<LocationDTO>();
             result.getContent().forEach(element -> {
@@ -55,7 +54,6 @@ public class LocationController {
             res.setObjList(resultList);
             status = HttpStatus.OK;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             status = HttpStatus.BAD_REQUEST;
         }
 

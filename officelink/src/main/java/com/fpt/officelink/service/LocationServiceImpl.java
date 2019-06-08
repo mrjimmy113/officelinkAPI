@@ -28,7 +28,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return locationRep.findAllByCountyContainingAndIsDeleted(term, false, pageRequest);
+        return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
     @Override

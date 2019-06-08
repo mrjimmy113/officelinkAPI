@@ -17,6 +17,14 @@ public class LocationDTO {
 
     private String county;
 
+    private String address;
+    
+    private String city;
+    
+    private Date dateCreated;
+    
+    private Date dateModified;
+    
     private boolean isDeleted;
     
     //Getter and Setter
@@ -43,6 +51,38 @@ public class LocationDTO {
 
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
     }
 
     
