@@ -19,86 +19,100 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.service.TeamService;
+import com.fpt.officelink.service.DepartmentService;
 
 @RestController
-@RequestMapping("/team")
-public class TeamController {
+@RequestMapping("/department")
+public class DepartmentController {
 	
 	@Autowired
-	TeamService teamService;
+	DepartmentService depService;
 	
-	@GetMapping
-	public ResponseEntity<PageSearchDTO<TeamDTO>> search(@RequestParam("term") String term){
+	@GetMapping(value = "/getAll")
+	public ResponseEntity<List<DepartmentDTO>> getAll(){
 		HttpStatus status = null;
-		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
+		List<DepartmentDTO> res = new ArrayList<DepartmentDTO>();
 		
 		try {
 			//
-			Page<Team> result = teamService.searchWithPagination(term, 0);
+			List<Department> result = depService.getAll();
 			//
-			List<TeamDTO> resultList = new ArrayList<TeamDTO>();
-			result.getContent().forEach(element -> {
-				DepartmentDTO depDTO = new DepartmentDTO();
-				TeamDTO teamDTO = new TeamDTO();
-				BeanUtils.copyProperties(element.getDepartment(), depDTO);
-				BeanUtils.copyProperties(element, teamDTO);
-				teamDTO.setDepartment(depDTO);
-				resultList.add(teamDTO);
+			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
+			result.forEach(element -> {
+				DepartmentDTO dto = new DepartmentDTO();
+				BeanUtils.copyProperties(element, dto);
+				resultList.add(dto);
 			});
-			
+			//
+			res.addAll(resultList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<List<DepartmentDTO>>(res, status);
+	}
+	
+	@GetMapping
+	public ResponseEntity<PageSearchDTO<DepartmentDTO>> search(@RequestParam("term") String term){
+		HttpStatus status = null;
+		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
+		
+		try {
+			//
+			Page<Department> result = depService.searchWithPagination(term, 0);
+			//
+			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
+			result.getContent().forEach(element -> {
+				DepartmentDTO dto = new DepartmentDTO();
+				BeanUtils.copyProperties(element, dto);
+				resultList.add(dto);
+			});
+			//
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
-		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
+		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
 	}
 	
 	@GetMapping(value = "/getPage")
-	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
+	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
-		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
+		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
 		
 		try {
 			//
-			Page<Team> result = teamService.searchWithPagination(term, page);
+			Page<Department> result = depService.searchWithPagination(term, page);
 			//
-			List<TeamDTO> resultList = new ArrayList<TeamDTO>();
+			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
 			result.getContent().forEach(element -> {
-				TeamDTO temp = new TeamDTO();
-				BeanUtils.copyProperties(element, temp);
-				resultList.add(temp);
+				DepartmentDTO dto = new DepartmentDTO();
+				BeanUtils.copyProperties(element, dto);
+				resultList.add(dto);
 			});
-			
+			//
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
-		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
+		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status); 
 	}
 	
 	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto){
+	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto){
 		HttpStatus status = null;
-		
 		try {
-			Team teamEntity = new Team();
-			Department depEntity = new Department();
-			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
-			BeanUtils.copyProperties(dto, teamEntity);
-			teamEntity.setDepartment(depEntity);
-			boolean isSucceed = teamService.addNewTeam(teamEntity);
+			Department entity = new Department();
+			BeanUtils.copyProperties(dto, entity);
+			boolean isSucceed = depService.addNewDepartment(entity);
 			if (isSucceed) {
 				status = HttpStatus.CREATED;				
 			} else {
@@ -112,16 +126,12 @@ public class TeamController {
 	}
 	
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto){
+	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto){
 		HttpStatus status = null;
-		
 		try {
-			Department depEntity = new Department();
-			Team teamEntity = new Team();
-			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
-			BeanUtils.copyProperties(dto, teamEntity);
-			teamEntity.setDepartment(depEntity);
-			teamService.modifyTeam(teamEntity);
+			Department entity = new Department();
+			BeanUtils.copyProperties(dto, entity);
+			depService.modifyDepartment(entity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
@@ -133,13 +143,13 @@ public class TeamController {
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id){
 		HttpStatus status = null;
-		
 		try {
-			teamService.removeTeam(id);
+			depService.removeDepartment(id);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
+		
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }
