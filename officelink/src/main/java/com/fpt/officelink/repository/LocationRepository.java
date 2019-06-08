@@ -18,5 +18,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Integer>{
-    Page<Location> findAllByCountyContaining(String county, Pageable page);
+    Page<Location> findAllByCountyContainingAndIsDeleted(String county, Boolean isDeleted, Pageable page);
 }
