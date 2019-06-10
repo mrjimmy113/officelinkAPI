@@ -8,6 +8,8 @@ import com.fpt.officelink.entity.Department;
 
 public interface DepartmentService {
 	
+	Department getDepartmentWithTeams(int depId);
+	
 	List<Department> getAll();
 	
 	Page<Department> searchWithPagination(String term, int pageNum);

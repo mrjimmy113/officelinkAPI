@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.service.DepartmentService;
 
@@ -29,6 +30,35 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService depService;
 	
+	
+	@GetMapping(value = "/getDep")
+	public ResponseEntity<DepartmentDTO> getDep(@RequestParam("depId") Integer depId){
+		HttpStatus status = null;
+		DepartmentDTO res = new DepartmentDTO();
+		
+		try {
+			//
+			Department result = depService.getDepartmentWithTeams(depId);
+			List<TeamDTO> listTeamDTO = new ArrayList<TeamDTO>();
+			//
+			BeanUtils.copyProperties(result, res);
+			
+			result.getTeams().forEach(t -> {
+				TeamDTO teamDTO = new TeamDTO();
+				BeanUtils.copyProperties(t, teamDTO);
+				listTeamDTO.add(teamDTO);
+			});
+			
+			//
+			res.setTeams(listTeamDTO);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<DepartmentDTO>(res, status);
+	}
+
 	@GetMapping(value = "/getAll")
 	public ResponseEntity<List<DepartmentDTO>> getAll(){
 		HttpStatus status = null;

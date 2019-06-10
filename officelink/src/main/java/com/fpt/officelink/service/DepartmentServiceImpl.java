@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.repository.DepartmentRespository;
+import com.fpt.officelink.repository.DepartmentRepository;;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService{
@@ -19,7 +19,12 @@ public class DepartmentServiceImpl implements DepartmentService{
 	private static final int MAXPAGESIZE = 9;
 	
 	@Autowired
-	DepartmentRespository depRep;
+	DepartmentRepository depRep;
+	
+	public Department getDepartmentWithTeams(int depId) {
+	
+		return depRep.getDepartmentWithTeam(depId);
+	}
 	
 	public List<Department> getAll() {
 		List<Department> result = depRep.findAllByIsDeleted(false);

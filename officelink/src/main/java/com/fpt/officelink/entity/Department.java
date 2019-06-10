@@ -40,7 +40,7 @@ public class Department implements Serializable{
 	@Column
 	private boolean isDeleted;
 	
-	@OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "department")
 	private Set<Team> teams;
 	
 	@ManyToMany
