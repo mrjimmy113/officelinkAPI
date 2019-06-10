@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (opDep.isPresent()) {
 			return false;
 		} else {
+			dep.setDateCreated(new Date());
 			depRep.save(dep);
 			return true;
 		}

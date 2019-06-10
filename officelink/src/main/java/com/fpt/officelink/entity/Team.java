@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,12 +27,19 @@ public class Team implements Serializable{
 	private String name;
 	
 	@Column
+	private Date dateCreated;
+	
+	@Column
+	private Date dateModified;
+
+	@Column
 	private boolean isDeleted;
 	
 	@ManyToOne
 	@JoinColumn(name = "department_id", nullable = false)
 	private Department department;
 
+	// Getter Setter
 	public Integer getId() {
 		return id;
 	}
@@ -46,6 +54,22 @@ public class Team implements Serializable{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
 	}
 
 	public boolean isDeleted() {
