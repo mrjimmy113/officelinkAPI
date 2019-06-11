@@ -7,6 +7,7 @@ package com.fpt.officelink.service;
 
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.repository.LocationRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,17 +33,39 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public void saveLocation(Location location) {
-        locationRep.save(location);
+    public boolean addLocation(Location location) {
+        Optional<Location> loc = locationRep.findByAddressAndCountyAndCityAndIsDeleted(location.getAddress(), location.getCounty(), location.getCity(), Boolean.FALSE);
+        if (loc.isPresent()) {
+            return false;
+        } else {
+            locationRep.save(location);
+            return true;
+        }
     }
 
     @Override
-    public void removeLocation(int id) {
+    public boolean editLocation(Location location) {
+        try {
+            locationRep.save(location);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean removeLocation(int id) {
         Location loc = locationRep.findById(id).get();
         if (loc != null) {
-            loc.setIsDeleted(true);
-            locationRep.save(loc);
+            try {
+                loc.setIsDeleted(true);
+                locationRep.save(loc);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
         }
+        return true;
     }
 
 }
