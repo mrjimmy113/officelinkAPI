@@ -86,27 +86,36 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<Integer> create(@RequestBody LocationDTO dto) {
+    public ResponseEntity<Integer> add(@RequestBody LocationDTO dto) {
         HttpStatus status = null;
         try {
             Location location = new Location();
             BeanUtils.copyProperties(dto, location);
-            service.saveLocation(location);
-            status = HttpStatus.CREATED;
+            if (service.addLocation(location)) {
+                status = HttpStatus.CREATED;
+            } else {
+                status = HttpStatus.CONFLICT;
+            }
+
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
         }
+
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
     @PutMapping
-    public ResponseEntity<Integer> update(@RequestBody LocationDTO dto) {
+    public ResponseEntity<Integer> edit(@RequestBody LocationDTO dto) {
         HttpStatus status = null;
         try {
             Location location = new Location();
             BeanUtils.copyProperties(dto, location);
-            service.saveLocation(location);
-            status = HttpStatus.CREATED;
+            if (service.editLocation(location)) {
+                status = HttpStatus.OK;
+            } else {
+                status = HttpStatus.CONFLICT;
+            }
+
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
         }
@@ -114,11 +123,15 @@ public class LocationController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
+    public ResponseEntity<Integer> remove(@RequestParam("id") int id) {
         HttpStatus status = null;
         try {
-            service.removeLocation(id);
-            status = HttpStatus.OK;
+            if (service.removeLocation(id)) {
+                status = HttpStatus.OK;
+            } else {
+                status = HttpStatus.CONFLICT;
+            }
+
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
         }

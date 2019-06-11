@@ -16,8 +16,10 @@ public interface LocationService {
 
     Page<Location> searchWithPagination(String term, int pageNum);
 
-    void saveLocation(Location location);
+    boolean addLocation(Location location);
+    
+    boolean editLocation(Location location);
 
-    void removeLocation(int id);
+    boolean removeLocation(int id);
 
 }
