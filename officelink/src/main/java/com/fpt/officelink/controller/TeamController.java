@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.TeamDTO;
+import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.service.TeamService;
 
@@ -40,9 +42,12 @@ public class TeamController {
 			//
 			List<TeamDTO> resultList = new ArrayList<TeamDTO>();
 			result.getContent().forEach(element -> {
-				TeamDTO temp = new TeamDTO();
-				BeanUtils.copyProperties(element, temp);
-				resultList.add(temp);
+				DepartmentDTO depDTO = new DepartmentDTO();
+				TeamDTO teamDTO = new TeamDTO();
+				BeanUtils.copyProperties(element.getDepartment(), depDTO);
+				BeanUtils.copyProperties(element, teamDTO);
+				teamDTO.setDepartment(depDTO);
+				resultList.add(teamDTO);
 			});
 			
 			res.setMaxPage(result.getTotalPages());
@@ -88,9 +93,12 @@ public class TeamController {
 		HttpStatus status = null;
 		
 		try {
-			Team entity = new Team();
-			BeanUtils.copyProperties(dto, entity);
-			boolean isSucceed = teamService.addNewTeam(entity);
+			Team teamEntity = new Team();
+			Department depEntity = new Department();
+			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
+			BeanUtils.copyProperties(dto, teamEntity);
+			teamEntity.setDepartment(depEntity);
+			boolean isSucceed = teamService.addNewTeam(teamEntity);
 			if (isSucceed) {
 				status = HttpStatus.CREATED;				
 			} else {
@@ -108,9 +116,12 @@ public class TeamController {
 		HttpStatus status = null;
 		
 		try {
-			Team entity = new Team();
-			BeanUtils.copyProperties(dto, entity);
-			teamService.modifyTeam(entity);
+			Department depEntity = new Department();
+			Team teamEntity = new Team();
+			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
+			BeanUtils.copyProperties(dto, teamEntity);
+			teamEntity.setDepartment(depEntity);
+			teamService.modifyTeam(teamEntity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;

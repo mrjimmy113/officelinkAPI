@@ -2,12 +2,14 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -37,21 +39,15 @@ public class Location implements Serializable {
     @Column 
     private Date dateModified;
     
+    @Column
+    private boolean isDeleted;
     
-//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
-//    @JsonIgnore
-//    @JoinTable(
-//            name = "department_in_location",
-//            joinColumns = @JoinColumn(name = "location_id"),
-//            inverseJoinColumns = @JoinColumn(name = "department_id"))
-//    private Set<Department> department;
+    @ManyToMany(mappedBy = "locations")
+    private List<Department> departments;
 //
 //    @ManyToOne
 //    @JoinColumn(name = "workplace_id")
 //    private int workplace;
-
-    @Column
-    private boolean isDeleted;
     
     //Getter and Setter
     public Integer getId() {
@@ -110,6 +106,20 @@ public class Location implements Serializable {
         this.dateModified = dateModified;
     }
     
+    public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
     
+    public List<Department> getDepartments() {
+		return departments;
+	}
+
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
+	}
     
 }

@@ -2,17 +2,22 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
-public class Team implements Serializable{
+public class Department implements Serializable{
 
 	/**
 	 * 
@@ -31,13 +36,18 @@ public class Team implements Serializable{
 	
 	@Column
 	private Date dateModified;
-
+	
 	@Column
 	private boolean isDeleted;
 	
-	@ManyToOne
-	@JoinColumn(name = "department_id", nullable = false)
-	private Department department;
+	@OneToMany(mappedBy = "department")
+	private Set<Team> teams;
+	
+	@ManyToMany
+	@JoinTable(name = "department_in_location",
+	joinColumns = {@JoinColumn(name = "departmentId")},
+	inverseJoinColumns = {@JoinColumn(name = "locationId")})
+	private List<Location> locations;
 
 	// Getter Setter
 	public Integer getId() {
@@ -80,11 +90,19 @@ public class Team implements Serializable{
 		this.isDeleted = isDeleted;
 	}
 	
-	public Department getDepartment() {
-		return department;
+	public Set<Team> getTeams() {
+		return teams;
 	}
 
-	public void setDepartment(Department department) {
-		this.department = department;
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams;
+	}
+	
+	public List<Location> getLocations() {
+		return locations;
+	}
+
+	public void setLocations(List<Location> locations) {
+		this.locations = locations;
 	}
 }
