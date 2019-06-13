@@ -23,4 +23,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	//
 	@Query(value = "SELECT d FROM Department d left join fetch d.teams t WHERE d.id = :depId AND t.isDeleted= false")
 	Department getDepartmentWithTeam(@Param("depId") Integer depId);
+        
+        @Query(value= "SELECT d FROM Department d WHERE d.id = ?1")
+        Department findDepartmentById(int depId);
 }

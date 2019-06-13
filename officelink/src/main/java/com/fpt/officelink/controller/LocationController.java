@@ -7,10 +7,12 @@ package com.fpt.officelink.controller;
 
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.service.LocationService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,31 @@ public class LocationController {
 
     @Autowired
     LocationService service;
+
+    @GetMapping(value = "/list")
+    public ResponseEntity<List<LocationDTO>> getDep(@RequestParam("depId") Integer depId) {
+        HttpStatus status = null;
+        List<LocationDTO> res = new ArrayList<LocationDTO>();
+
+        try {
+            //
+            Department dep = service.getDepartmentById(depId);
+            List<Location> loc = new ArrayList<>();
+            //		
+            BeanUtils.copyProperties(loc, res);
+            dep.getLocations().forEach(l -> {
+                LocationDTO locationDTO = new LocationDTO();
+                BeanUtils.copyProperties(l, locationDTO);
+                res.add(locationDTO);
+            });
+            BeanUtils.copyProperties(loc, res);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<List<LocationDTO>>(res, status);
+    }
 
     @GetMapping
     public ResponseEntity<PageSearchDTO<LocationDTO>> search(@RequestParam("term") String term) {

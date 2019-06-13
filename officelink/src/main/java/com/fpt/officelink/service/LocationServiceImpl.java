@@ -5,8 +5,11 @@
  */
 package com.fpt.officelink.service;
 
+import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,14 @@ public class LocationServiceImpl implements LocationService {
 
     @Autowired
     LocationRepository locationRep;
+    
+    @Autowired
+    DepartmentRepository departmentRep;
+
+    @Override
+    public Department getDepartmentById(int depId) {        
+        return departmentRep.findDepartmentById(depId);
+    }
 
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
