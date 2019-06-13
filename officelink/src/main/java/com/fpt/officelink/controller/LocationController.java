@@ -64,7 +64,7 @@ public class LocationController {
     }
 
     @GetMapping(value = "/list")
-    public ResponseEntity<List<LocationDTO>> getDep(@RequestParam("depId") Integer depId) {
+    public ResponseEntity<List<LocationDTO>> getLocationByDepartmentId(@RequestParam("depId") Integer depId) {
         HttpStatus status = null;
         List<LocationDTO> res = new ArrayList<LocationDTO>();
 
