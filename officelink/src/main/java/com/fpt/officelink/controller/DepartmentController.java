@@ -38,7 +38,7 @@ public class DepartmentController {
 		
 		try {
 			//
-			Department result = depService.getDepartmentWithTeams(depId);
+			Department result = depService.getDepartment(depId);
 			List<TeamDTO> listTeamDTO = new ArrayList<TeamDTO>();
 			//
 			BeanUtils.copyProperties(result, res);
@@ -53,6 +53,7 @@ public class DepartmentController {
 			res.setTeams(listTeamDTO);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		

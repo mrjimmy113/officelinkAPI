@@ -22,5 +22,5 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	List<Department> findAllByIsDeleted(Boolean isDeleted); 
 	//
 	@Query(value = "SELECT d FROM Department d left join fetch d.teams t WHERE d.id = :depId AND t.isDeleted= false")
-	Department getDepartmentWithTeam(@Param("depId") Integer depId);
+	Department getDepartmentWithTeam(@Param("depId") int depId);
 }

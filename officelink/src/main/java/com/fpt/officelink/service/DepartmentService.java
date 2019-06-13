@@ -8,7 +8,7 @@ import com.fpt.officelink.entity.Department;
 
 public interface DepartmentService {
 	
-	Department getDepartmentWithTeams(int depId);
+	Department getDepartment(int depId);
 	
 	List<Department> getAll();
 	

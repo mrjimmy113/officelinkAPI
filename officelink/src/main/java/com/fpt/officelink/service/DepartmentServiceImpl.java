@@ -21,9 +21,16 @@ public class DepartmentServiceImpl implements DepartmentService{
 	@Autowired
 	DepartmentRepository depRep;
 	
-	public Department getDepartmentWithTeams(int depId) {
-	
-		return depRep.getDepartmentWithTeam(depId);
+	public Department getDepartment(int depId) {
+		Department result = depRep.getDepartmentWithTeam(depId);
+		if (result == null) {
+			Optional<Department> opDep = depRep.findById(depId);
+			if (opDep.isPresent()) {
+				result = opDep.get();
+			}
+		}
+		
+		return result; 
 	}
 	
 	public List<Department> getAll() {
