@@ -28,12 +28,19 @@ public class LocationServiceImpl implements LocationService {
 
     @Autowired
     LocationRepository locationRep;
-    
+
     @Autowired
     DepartmentRepository departmentRep;
 
+    
     @Override
-    public Department getDepartmentById(int depId) {        
+    public List<Location> getAllLocation() {
+        List<Location> result = locationRep.findAllByIsDeleted(false);
+        return result;
+    }
+
+    @Override
+    public Department getDepartmentById(int depId) {
         return departmentRep.findDepartmentById(depId);
     }
 

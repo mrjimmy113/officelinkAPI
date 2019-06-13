@@ -26,5 +26,7 @@ public interface LocationService {
     boolean removeLocation(int id);
     
     Department getDepartmentById(int depId);
+    
+    List<Location> getAllLocation();
 
 }

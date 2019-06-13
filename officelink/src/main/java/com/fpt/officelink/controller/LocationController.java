@@ -38,6 +38,31 @@ public class LocationController {
     @Autowired
     LocationService service;
 
+    @GetMapping(value = "/listAll")
+    public ResponseEntity<List<LocationDTO>> getAllLocation() {
+        HttpStatus status = null;
+        List<LocationDTO> res = new ArrayList<LocationDTO>();
+
+        try {
+            //
+            List<Location> result = service.getAllLocation();
+            //
+            List<LocationDTO> resultList = new ArrayList<LocationDTO>();
+            result.forEach(element -> {
+                LocationDTO dto = new LocationDTO();
+                BeanUtils.copyProperties(element, dto);
+                resultList.add(dto);
+            });
+            //
+            res.addAll(resultList);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<List<LocationDTO>>(res, status);
+    }
+
     @GetMapping(value = "/list")
     public ResponseEntity<List<LocationDTO>> getDep(@RequestParam("depId") Integer depId) {
         HttpStatus status = null;
@@ -52,7 +77,9 @@ public class LocationController {
             dep.getLocations().forEach(l -> {
                 LocationDTO locationDTO = new LocationDTO();
                 BeanUtils.copyProperties(l, locationDTO);
-                res.add(locationDTO);
+                if (locationDTO.isIsDeleted() == false) {
+                    res.add(locationDTO);
+                }
             });
             BeanUtils.copyProperties(loc, res);
             status = HttpStatus.OK;

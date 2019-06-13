@@ -28,5 +28,7 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     //check city has existed and be deleted
     Optional<Location> findByAddressAndCountyAndCityAndIsDeleted(String address, String county, String city, Boolean isDeleted);
    
+    //find all location which not be deleted
+    List<Location> findAllByIsDeleted(Boolean isDeleted); 
     
 }
