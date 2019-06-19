@@ -21,6 +21,7 @@ import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.service.DepartmentService;
 
 @RestController
@@ -142,7 +143,16 @@ public class DepartmentController {
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
+//			List<Location> locations = new ArrayList<Location>();
 			BeanUtils.copyProperties(dto, entity);
+			
+//			dto.getLocations().forEach(element -> {
+//				Location location = new Location();
+//				BeanUtils.copyProperties(element, location);
+//				locations.add(location);
+//			});
+//			entity.setLocations(locations);
+			
 			boolean isSucceed = depService.addNewDepartment(entity);
 			if (isSucceed) {
 				status = HttpStatus.CREATED;				
@@ -161,7 +171,16 @@ public class DepartmentController {
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
+//			List<Location> locations = new ArrayList<Location>();
 			BeanUtils.copyProperties(dto, entity);
+			
+//			dto.getLocations().forEach(element -> {
+//				Location location = new Location();
+//				BeanUtils.copyProperties(element, location);
+//				locations.add(location);
+//			});
+//			entity.setLocations(locations);
+			
 			depService.modifyDepartment(entity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {

@@ -63,32 +63,32 @@ public class LocationController {
         return new ResponseEntity<List<LocationDTO>>(res, status);
     }
 
-    @GetMapping(value = "/list")
-    public ResponseEntity<List<LocationDTO>> getLocationByDepartmentId(@RequestParam("depId") Integer depId) {
-        HttpStatus status = null;
-        List<LocationDTO> res = new ArrayList<LocationDTO>();
-
-        try {
-            //
-            Department dep = service.getDepartmentById(depId);
-            List<Location> loc = new ArrayList<>();
-            //		
-            BeanUtils.copyProperties(loc, res);
-            dep.getLocations().forEach(l -> {
-                LocationDTO locationDTO = new LocationDTO();
-                BeanUtils.copyProperties(l, locationDTO);
-                if (locationDTO.isIsDeleted() == false) {
-                    res.add(locationDTO);
-                }
-            });
-            BeanUtils.copyProperties(loc, res);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            status = HttpStatus.BAD_REQUEST;
-        }
-
-        return new ResponseEntity<List<LocationDTO>>(res, status);
-    }
+//    @GetMapping(value = "/list")
+//    public ResponseEntity<List<LocationDTO>> getLocationByDepartmentId(@RequestParam("depId") Integer depId) {
+//        HttpStatus status = null;
+//        List<LocationDTO> res = new ArrayList<LocationDTO>();
+//
+//        try {
+//            //
+//            Department dep = service.getDepartmentById(depId);
+//            List<Location> loc = new ArrayList<>();
+//            //		
+//            BeanUtils.copyProperties(loc, res);
+//            dep.getLocations().forEach(l -> {
+//                LocationDTO locationDTO = new LocationDTO();
+//                BeanUtils.copyProperties(l, locationDTO);
+//                if (locationDTO.isIsDeleted() == false) {
+//                    res.add(locationDTO);
+//                }
+//            });
+//            BeanUtils.copyProperties(loc, res);
+//            status = HttpStatus.OK;
+//        } catch (Exception e) {
+//            status = HttpStatus.BAD_REQUEST;
+//        }
+//
+//        return new ResponseEntity<List<LocationDTO>>(res, status);
+//    }
 
     @GetMapping
     public ResponseEntity<PageSearchDTO<LocationDTO>> search(@RequestParam("term") String term) {

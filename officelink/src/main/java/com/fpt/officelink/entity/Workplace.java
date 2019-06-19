@@ -2,21 +2,15 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 @Entity
-public class Department implements Serializable{
+public class Workplace implements Serializable {
 
 	/**
 	 * 
@@ -25,7 +19,7 @@ public class Department implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private int id;
 	
 	@Column
 	private String name;
@@ -38,22 +32,13 @@ public class Department implements Serializable{
 	
 	@Column
 	private boolean isDeleted;
-	
-	@OneToMany(mappedBy = "department")
-	private Set<Team> teams;
-	
-//	@ManyToMany
-//	@JoinTable(name = "department_in_location",
-//	joinColumns = {@JoinColumn(name = "departmentId")},
-//	inverseJoinColumns = {@JoinColumn(name = "locationId")})
-//	private List<Location> locations;
 
-	// Getter Setter
-	public Integer getId() {
+	//Getter setter
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -64,7 +49,7 @@ public class Department implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -89,19 +74,5 @@ public class Department implements Serializable{
 		this.isDeleted = isDeleted;
 	}
 	
-	public Set<Team> getTeams() {
-		return teams;
-	}
-
-	public void setTeams(Set<Team> teams) {
-		this.teams = teams;
-	}
 	
-//	public List<Location> getLocations() {
-//		return locations;
-//	}
-//
-//	public void setLocations(List<Location> locations) {
-//		this.locations = locations;
-//	}
 }
