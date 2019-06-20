@@ -29,6 +29,9 @@ public class WorkplaceServiceImpl implements WorkplaceService{
 	
 	@Override
 	public Page<Workplace> searchWithPagination(String term, int pageNum) {
+		if (pageNum > 0) {
+			pageNum = pageNum - 1;
+		}
 		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
 		
 		return workpRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);

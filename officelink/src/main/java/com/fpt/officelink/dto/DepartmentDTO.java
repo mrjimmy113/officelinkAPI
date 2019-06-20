@@ -10,7 +10,7 @@ public class DepartmentDTO {
 	
 	private List<TeamDTO> teams;
 	
-	private List<LocationDTO> locations;
+//	private List<LocationDTO> locations;
 	
 	//Getter setter	
 	public Integer getId() {
@@ -37,11 +37,11 @@ public class DepartmentDTO {
 		this.teams = teams;
 	}
 	
-	public List<LocationDTO> getLocations() {
-		return locations;
-	}
-
-	public void setLocations(List<LocationDTO> locations) {
-		this.locations = locations;
-	}
+//	public List<LocationDTO> getLocations() {
+//		return locations;
+//	}
+//
+//	public void setLocations(List<LocationDTO> locations) {
+//		this.locations = locations;
+//	}
 }

@@ -72,9 +72,12 @@ public class TeamController {
 			//
 			List<TeamDTO> resultList = new ArrayList<TeamDTO>();
 			result.getContent().forEach(element -> {
-				TeamDTO temp = new TeamDTO();
-				BeanUtils.copyProperties(element, temp);
-				resultList.add(temp);
+				DepartmentDTO depDTO = new DepartmentDTO();
+				TeamDTO teamDTO = new TeamDTO();
+				BeanUtils.copyProperties(element.getDepartment(), depDTO);
+				BeanUtils.copyProperties(element, teamDTO);
+				teamDTO.setDepartment(depDTO);
+				resultList.add(teamDTO);
 			});
 			
 			res.setMaxPage(result.getTotalPages());

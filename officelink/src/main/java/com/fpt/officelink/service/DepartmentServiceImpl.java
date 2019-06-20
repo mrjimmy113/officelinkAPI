@@ -40,6 +40,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 	
 	@Override
 	public Page<Department> searchWithPagination(String term, int pageNum) {
+		if (pageNum > 0) {
+			pageNum = pageNum - 1;
+		}
 		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
 		
 		return depRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);

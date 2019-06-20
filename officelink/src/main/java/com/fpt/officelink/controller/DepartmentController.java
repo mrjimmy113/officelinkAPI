@@ -21,7 +21,6 @@ import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.service.DepartmentService;
 
 @RestController
