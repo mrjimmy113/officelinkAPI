@@ -21,9 +21,16 @@ public class DepartmentServiceImpl implements DepartmentService{
 	@Autowired
 	DepartmentRepository depRep;
 	
-	public Department getDepartmentWithTeams(int depId) {
-	
-		return depRep.getDepartmentWithTeam(depId);
+	public Department getDepartment(int depId) {
+		Department result = depRep.getDepartmentWithTeam(depId);
+		if (result == null) {
+			Optional<Department> opDep = depRep.findById(depId);
+			if (opDep.isPresent()) {
+				result = opDep.get();
+			}
+		}
+		
+		return result; 
 	}
 	
 	public List<Department> getAll() {
@@ -33,6 +40,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 	
 	@Override
 	public Page<Department> searchWithPagination(String term, int pageNum) {
+		if (pageNum > 0) {
+			pageNum = pageNum - 1;
+		}
 		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
 		
 		return depRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);

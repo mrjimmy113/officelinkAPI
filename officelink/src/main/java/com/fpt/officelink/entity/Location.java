@@ -43,9 +43,9 @@ public class Location implements Serializable {
     @Column
     private boolean isDeleted;
     
-    @ManyToMany(mappedBy = "locations")
-    @JsonIgnore
-    private List<Department> departments;
+//    @ManyToMany(mappedBy = "locations")
+//    @JsonIgnore
+//    private List<Department> departments;
 //
 //    @ManyToOne
 //    @JoinColumn(name = "workplace_id")
@@ -116,12 +116,12 @@ public class Location implements Serializable {
 		this.isDeleted = isDeleted;
 	}
     
-    public List<Department> getDepartments() {
-		return departments;
-	}
-
-	public void setDepartments(List<Department> departments) {
-		this.departments = departments;
-	}
+//    public List<Department> getDepartments() {
+//		return departments;
+//	}
+//
+//	public void setDepartments(List<Department> departments) {
+//		this.departments = departments;
+//	}
     
 }

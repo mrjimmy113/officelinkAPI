@@ -38,7 +38,7 @@ public class DepartmentController {
 		
 		try {
 			//
-			Department result = depService.getDepartmentWithTeams(depId);
+			Department result = depService.getDepartment(depId);
 			List<TeamDTO> listTeamDTO = new ArrayList<TeamDTO>();
 			//
 			BeanUtils.copyProperties(result, res);
@@ -53,6 +53,7 @@ public class DepartmentController {
 			res.setTeams(listTeamDTO);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
@@ -141,7 +142,16 @@ public class DepartmentController {
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
+//			List<Location> locations = new ArrayList<Location>();
 			BeanUtils.copyProperties(dto, entity);
+			
+//			dto.getLocations().forEach(element -> {
+//				Location location = new Location();
+//				BeanUtils.copyProperties(element, location);
+//				locations.add(location);
+//			});
+//			entity.setLocations(locations);
+			
 			boolean isSucceed = depService.addNewDepartment(entity);
 			if (isSucceed) {
 				status = HttpStatus.CREATED;				
@@ -160,7 +170,16 @@ public class DepartmentController {
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
+//			List<Location> locations = new ArrayList<Location>();
 			BeanUtils.copyProperties(dto, entity);
+			
+//			dto.getLocations().forEach(element -> {
+//				Location location = new Location();
+//				BeanUtils.copyProperties(element, location);
+//				locations.add(location);
+//			});
+//			entity.setLocations(locations);
+			
 			depService.modifyDepartment(entity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {

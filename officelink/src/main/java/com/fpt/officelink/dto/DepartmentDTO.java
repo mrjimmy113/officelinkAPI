@@ -9,7 +9,10 @@ public class DepartmentDTO {
 	private String name;
 	
 	private List<TeamDTO> teams;
-
+	
+//	private List<LocationDTO> locations;
+	
+	//Getter setter	
 	public Integer getId() {
 		return id;
 	}
@@ -33,4 +36,12 @@ public class DepartmentDTO {
 	public void setTeams(List<TeamDTO> teams) {
 		this.teams = teams;
 	}
+	
+//	public List<LocationDTO> getLocations() {
+//		return locations;
+//	}
+//
+//	public void setLocations(List<LocationDTO> locations) {
+//		this.locations = locations;
+//	}
 }
