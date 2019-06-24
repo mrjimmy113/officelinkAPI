@@ -5,7 +5,10 @@
  */
 package com.fpt.officelink.service;
 
+import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 
 /**
@@ -21,5 +24,9 @@ public interface LocationService {
     boolean editLocation(Location location);
 
     boolean removeLocation(int id);
+    
+    Department getDepartmentById(int depId);
+    
+    List<Location> getAllLocation();
 
 }

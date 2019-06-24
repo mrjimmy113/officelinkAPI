@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public Page<Team> searchWithPagination(String term, int pageNum) {
+		if (pageNum > 0) {
+			pageNum = pageNum - 1;
+		}
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
 		return teamRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
@@ -30,6 +34,7 @@ public class TeamServiceImpl implements TeamService {
 		if (opTeam.isPresent()) {
 			return false;
 		} else {
+			team.setDateCreated(new Date());
 			teamRep.save(team);
 			return true;
 		}
@@ -37,6 +42,7 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public boolean modifyTeam(Team team) {
+		team.setDateModified(new Date());
 		teamRep.save(team);
 		return true;
 	}

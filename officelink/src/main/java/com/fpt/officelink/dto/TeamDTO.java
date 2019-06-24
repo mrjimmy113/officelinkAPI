@@ -5,6 +5,8 @@ public class TeamDTO {
 	private int id;
 	
 	private String name;
+	
+	private DepartmentDTO department; 
 
 	public int getId() {
 		return id;
@@ -22,4 +24,11 @@ public class TeamDTO {
 		this.name = name;
 	}
 	
+	public DepartmentDTO getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(DepartmentDTO department) {
+		this.department = department;
+	}
 }
