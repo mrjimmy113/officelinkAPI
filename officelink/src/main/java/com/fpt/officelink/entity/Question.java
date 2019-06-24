@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,19 +25,22 @@ public class Question implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column
 	private String question;
-	
-	@ManyToOne
+
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "type_id", nullable = false)
 	private TypeQuestion type;
-	
+
 	@OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
 	private Set<AnswerOption> options;
-	
+
 	@OneToMany(mappedBy = "question")
 	private Set<SurveyQuestion> surveyQuestions;
+
+	@Column
+	private boolean isDeleted;
 
 	public Integer getId() {
 		return id;
@@ -77,5 +81,13 @@ public class Question implements Serializable {
 	public void setSurveyQuestions(Set<SurveyQuestion> surveyQuestions) {
 		this.surveyQuestions = surveyQuestions;
 	}
-	
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 }

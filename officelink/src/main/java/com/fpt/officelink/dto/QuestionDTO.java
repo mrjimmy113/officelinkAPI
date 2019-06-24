@@ -5,12 +5,14 @@ import java.util.List;
 
 public class QuestionDTO {
 	private Integer id;
-	
+
 	private String question;
-	
-	private Integer typeId;
-	
+
+	private TypeQuestionDTO type;
+
 	private List<AnswerOptionDTO> options = new ArrayList<AnswerOptionDTO>();
+
+	private boolean isDeleted;
 
 	public Integer getId() {
 		return id;
@@ -28,12 +30,12 @@ public class QuestionDTO {
 		this.question = question;
 	}
 
-	public Integer getTypeId() {
-		return typeId;
+	public TypeQuestionDTO getType() {
+		return type;
 	}
 
-	public void setTypeId(Integer typeId) {
-		this.typeId = typeId;
+	public void setType(TypeQuestionDTO type) {
+		this.type = type;
 	}
 
 	public List<AnswerOptionDTO> getOptions() {
@@ -43,7 +45,13 @@ public class QuestionDTO {
 	public void setOptions(List<AnswerOptionDTO> options) {
 		this.options = options;
 	}
-	
-	
-	
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
 }

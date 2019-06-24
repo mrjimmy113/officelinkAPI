@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,11 +31,20 @@ public class WordCloudFilter implements Serializable {
 
 	@Column
 	private String language;
+	
+	@Column
+	private boolean isDeleted;
 
 	@ManyToMany
 	@JoinTable(name = "filter_word", joinColumns = { @JoinColumn(name = "filterId") }, inverseJoinColumns = {
 			@JoinColumn(name = "wordId") })
 	private Set<Word> wordList = new HashSet<Word>();
+	
+	@Column(name = "date_created")
+	private Date dateCreated;
+	
+	@Column(name = "date_modified")
+	private Date dateModified;
 
 	public Integer getId() {
 		return id;
@@ -68,4 +78,31 @@ public class WordCloudFilter implements Serializable {
 		this.wordList = wordList;
 	}
 
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+	
+	
+	
+	
 }

@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -33,6 +34,15 @@ public class Survey implements Serializable {
 	
 	@OneToMany(mappedBy = "survey")
 	private Set<SurveyQuestion> surveyQuestions;
+	
+	@Column
+	private Date dateCreated;
+	
+	@Column
+	private Date dateModified;
+	
+	@Column
+	private boolean isDeleted;
 
 	public Integer getId() {
 		return id;
@@ -65,6 +75,37 @@ public class Survey implements Serializable {
 	public void setShared(boolean isShared) {
 		this.isShared = isShared;
 	}
-	
+
+	public Set<SurveyQuestion> getSurveyQuestions() {
+		return surveyQuestions;
+	}
+
+	public void setSurveyQuestions(Set<SurveyQuestion> surveyQuestions) {
+		this.surveyQuestions = surveyQuestions;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 	
 }
