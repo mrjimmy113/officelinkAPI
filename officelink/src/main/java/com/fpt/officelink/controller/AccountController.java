@@ -4,9 +4,9 @@ package com.fpt.officelink.controller;
 import com.fpt.officelink.dto.AccountDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.service.AccountService;
 import com.fpt.officelink.service.JwtService;
-import com.fpt.officelink.service.SendMail;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/account")
@@ -25,8 +23,10 @@ public class AccountController {
     @Autowired
     AccountService service;
 
+
+
     @Autowired
-    SendMail sendMail;
+    MailService mailService;
 
 
     @Autowired
@@ -79,6 +79,7 @@ public class AccountController {
 
         }catch (Exception ex){
             status = HttpStatus.BAD_REQUEST;
+
         }
 
         return new ResponseEntity<Optional<Account>>(account, status);
@@ -150,24 +151,29 @@ public class AccountController {
     @GetMapping(value = "/sendMail")
     public ResponseEntity<Integer> sendMail(@RequestParam("emailTo") String[] emailTo, @RequestParam("role") String role){
         HttpStatus status = null;
+        Map<String, Object> model = new HashMap<>();
+
+
+
         try {
             String token = null;
             for (int i = 0 ; i < emailTo.length; i++){
                 token = jwt.createTokenWithEmail(emailTo[i]);
             }
 
+
+            model.put("link", "http://localhost:4200/login-form/" + token);
             if(role.contentEquals("employee")){
-                String contentMess = "Please go http://localhost:4200/join";
-                sendMail.sendMail(emailTo, contentMess);
+
+                mailService.sendMail(emailTo,"email-invite-temp.ftl",null);
             }
             else{
-                String contentMess = "Please go http://localhost:4200/login-form/" + token + " to join ";
 
+                mailService.sendMail(emailTo,"email-temp.ftl",model);
 
-                sendMail.sendMail(emailTo, contentMess);
             }
 
-            System.out.println(role);
+
             status = HttpStatus.OK;
         }catch (Exception ex){
             status = HttpStatus.BAD_REQUEST;

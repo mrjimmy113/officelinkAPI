@@ -83,9 +83,12 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-context:5.1.7.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework.boot:spring-boot-starter-mail:2.0.1.RELEASE" />
           <element id="library" level="project" name="Maven: com.sun.mail:javax.mail:1.6.2" />
+          <element id="library" level="project" name="Maven: org.springframework.boot:spring-boot-starter-freemarker:1.1.7.RELEASE" />
+          <element id="library" level="project" name="Maven: org.freemarker:freemarker:2.3.28" />
           <element id="library" level="project" name="Maven: org.springframework.security:spring-security-web:5.1.5.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-aop:5.1.7.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-expression:5.1.7.RELEASE" />
+          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.18.2" />
         </element>
       </element>
       <element id="directory" name="META-INF">
