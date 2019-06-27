@@ -31,6 +31,7 @@ public class TeamServiceImpl implements TeamService {
 			pageNum = pageNum - 1;
 		}
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+
 		return teamRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
 
@@ -63,4 +64,19 @@ public class TeamServiceImpl implements TeamService {
 		return true;
 	}
 
+	@Override
+	public List<Team> getTeams() {
+		return teamRep.findAllByIsDeleted(false);
+	}
+
+	@Override
+	public Team getTeam(int id) {
+		Team team = null;
+		Optional<Team> opTeams = teamRep.findById(id);
+		
+		if(opTeams.isPresent()) {
+			team = opTeams.get();
+		}
+		return team;
+	}
 }

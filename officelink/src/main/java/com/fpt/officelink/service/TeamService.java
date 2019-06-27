@@ -8,6 +8,10 @@ import com.fpt.officelink.entity.Team;
 
 public interface TeamService {
 	
+	Team getTeam(int id);
+	
+	List<Team> getTeams();
+	
 	Page<Team> searchWithPagination(String term, int pageNum);
 	
 	boolean addNewTeam(Team team);
