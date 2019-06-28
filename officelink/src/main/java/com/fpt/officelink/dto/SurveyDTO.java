@@ -16,7 +16,7 @@ public class SurveyDTO {
 	
 	private boolean isActive;
 	
-	private List<Question> questions = new ArrayList<Question>();
+	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
 
 	public Integer getId() {
 		return id;
@@ -58,13 +58,15 @@ public class SurveyDTO {
 		this.isActive = isActive;
 	}
 
-	public List<Question> getQuestions() {
+	public List<QuestionDTO> getQuestions() {
 		return questions;
 	}
 
-	public void setQuestions(List<Question> questions) {
+	public void setQuestions(List<QuestionDTO> questions) {
 		this.questions = questions;
 	}
+
+	
 	
 	
 }

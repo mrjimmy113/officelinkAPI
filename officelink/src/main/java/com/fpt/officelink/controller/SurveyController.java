@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
@@ -170,5 +172,45 @@ public class SurveyController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<List<QuestionDTO>>(res,status);
+	}
+	
+	@GetMapping("/take")
+	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
+		HttpStatus status = null;
+		SurveyDTO res = null;
+		try {
+			res = ser.getTakeSurvey(token);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<SurveyDTO>(res,status);
+	}
+	
+	@GetMapping("/sendOut")
+	public ResponseEntity<Number> sendOutSurvey(@RequestParam("id") Integer surveyId) {
+		HttpStatus status = null;
+		try {
+			ser.sendOutSurvey(surveyId);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Number>(status.value(),status);
+		
+	}
+	
+	@PostMapping("/answer")
+	public ResponseEntity<Number> answer(@RequestBody List<AnswerDTO> answers) {
+		HttpStatus status = null;
+		try {
+			ser.saveAnswer(answers);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Number>(status.value(),status);
 	}
 }

@@ -13,6 +13,8 @@ public class QuestionDTO {
 	private List<AnswerOptionDTO> options = new ArrayList<AnswerOptionDTO>();
 
 	private boolean isDeleted;
+	
+	private Integer questionIdentity;
 
 	public Integer getId() {
 		return id;
@@ -53,5 +55,15 @@ public class QuestionDTO {
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
+
+	public Integer getQuestionIdentity() {
+		return questionIdentity;
+	}
+
+	public void setQuestionIdentity(Integer questionIdentity) {
+		this.questionIdentity = questionIdentity;
+	}
+	
+	
 
 }

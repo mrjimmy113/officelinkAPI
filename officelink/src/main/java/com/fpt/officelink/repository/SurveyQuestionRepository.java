@@ -1,5 +1,7 @@
 package com.fpt.officelink.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +15,7 @@ public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, 
 	@Modifying
 	@Query("DELETE FROM SurveyQuestion sq WHERE sq.survey.id = :id")
 	void deleteBySurveyId(@Param("id") Integer id);
+	
+	@Query("SELECT sq FROM SurveyQuestion sq WHERE sq.survey.id = :id")
+	List<SurveyQuestion> findAllBySurveyId(@Param("id") Integer id);
 }

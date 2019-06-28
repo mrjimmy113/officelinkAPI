@@ -54,6 +54,16 @@ public class Answer implements Serializable {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	public SurveyQuestion getSurveyQuestions() {
+		return surveyQuestions;
+	}
+
+	public void setSurveyQuestions(SurveyQuestion surveyQuestions) {
+		this.surveyQuestions = surveyQuestions;
+	}
+	
+	
 	
 	
 
