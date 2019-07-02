@@ -1,10 +1,11 @@
 package com.fpt.officelink.service;
 
-import com.fpt.officelink.entity.Account;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-import java.util.Optional;
+import com.fpt.officelink.dto.AuthDTO;
+import com.fpt.officelink.entity.Account;
 
 public interface AccountService {
 
@@ -21,4 +22,7 @@ public interface AccountService {
 
 
     Optional<Account> getAccountByEmail(String email);
+
+
+	AuthDTO getAuthenticationInfor(String email, String password);
 }

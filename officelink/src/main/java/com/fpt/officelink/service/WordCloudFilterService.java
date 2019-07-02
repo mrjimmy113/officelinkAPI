@@ -16,4 +16,8 @@ public interface WordCloudFilterService {
 	void addNewFilter(WordCloudFilter filter, List<Word> wordList);
 
 	void modifyFilter(WordCloudFilter filter, List<Word> wordList);
+
+	void delete(Integer id);
+
+	boolean isExisted(String name, String language);
 }

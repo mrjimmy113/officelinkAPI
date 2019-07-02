@@ -1,14 +1,13 @@
 package com.fpt.officelink.repository;
 
-import com.fpt.officelink.entity.Account;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.fpt.officelink.entity.Account;
 
 @Repository
 public interface AccountRespository extends CrudRepository<Account, Integer> {
@@ -18,4 +17,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 
     Optional<Account> findAccountByEmailAndWorkspacename(String email, String worksapcename);
 
+    Optional<Account> findByEmail(String email);
+    
+    Optional<Account> findByEmailAndPassword(String email, String password);
 }
