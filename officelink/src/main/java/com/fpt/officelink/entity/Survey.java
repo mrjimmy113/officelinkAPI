@@ -2,7 +2,6 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -10,12 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
-public class WordCloudFilter implements Serializable {
+public class Survey implements Serializable {
 
 	/**
 	 * 
@@ -25,26 +22,27 @@ public class WordCloudFilter implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
+	
 	@Column
 	private String name;
-
+	
+	@Column(name = "is_active")
+	private boolean isActive;
+	
+	@Column(name = "is_shared")
+	private boolean isShared;
+	
+	@OneToMany(mappedBy = "survey")
+	private Set<SurveyQuestion> surveyQuestions;
+	
 	@Column
-	private String language;
+	private Date dateCreated;
+	
+	@Column
+	private Date dateModified;
 	
 	@Column
 	private boolean isDeleted;
-
-	@ManyToMany
-	@JoinTable(name = "filter_word", joinColumns = { @JoinColumn(name = "filterId") }, inverseJoinColumns = {
-			@JoinColumn(name = "wordId") })
-	private Set<Word> wordList = new HashSet<Word>();
-	
-	@Column(name = "date_created")
-	private Date dateCreated;
-	
-	@Column(name = "date_modified")
-	private Date dateModified;
 
 	public Integer getId() {
 		return id;
@@ -62,28 +60,28 @@ public class WordCloudFilter implements Serializable {
 		this.name = name;
 	}
 
-	public String getLanguage() {
-		return language;
+	public boolean isActive() {
+		return isActive;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
-	public Set<Word> getWordList() {
-		return wordList;
+	public boolean isShared() {
+		return isShared;
 	}
 
-	public void setWordList(Set<Word> wordList) {
-		this.wordList = wordList;
+	public void setShared(boolean isShared) {
+		this.isShared = isShared;
 	}
 
-	public boolean isDeleted() {
-		return isDeleted;
+	public Set<SurveyQuestion> getSurveyQuestions() {
+		return surveyQuestions;
 	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
+	public void setSurveyQuestions(Set<SurveyQuestion> surveyQuestions) {
+		this.surveyQuestions = surveyQuestions;
 	}
 
 	public Date getDateCreated() {
@@ -101,8 +99,13 @@ public class WordCloudFilter implements Serializable {
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
 	}
-	
-	
-	
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 	
 }
