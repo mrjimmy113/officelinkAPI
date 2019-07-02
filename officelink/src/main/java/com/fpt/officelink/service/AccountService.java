@@ -12,7 +12,7 @@ public interface AccountService {
     Page<Account> searchWithPagination(String term, int pageNum);
 
 
-    boolean addNewAccount(Account account);
+    boolean addNewAccount(Account account, String workplaceName);
 
     void modifyAccount(Account account);
 

@@ -58,10 +58,13 @@ public class WorkplaceServiceImpl implements WorkplaceService{
 	@Override
 	public boolean removeWorkplace(int id) {
 		Workplace workp = workpRep.findById(id).get();
-		if (workp != null) {
-			workp.setDeleted(true);
-			workpRep.save(workp);
+		if (workp == null) {
+			return false;
 		}
+		
+		workp.setDateModified(new Date());
+		workp.setDeleted(true);
+		workpRep.save(workp);
 		return true;
 	}
 

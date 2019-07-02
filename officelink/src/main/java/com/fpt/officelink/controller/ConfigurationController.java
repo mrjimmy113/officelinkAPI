@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,18 +21,30 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.entity.Configuration;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.ConfigurationService;
+import com.fpt.officelink.service.WorkplaceService;
 
 @RestController
 @RequestMapping("/configuration")
 public class ConfigurationController {
-
+	
+	private CustomUser user;
+	
+	private CustomUser getUserContext() {
+		return (CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
+	
 	@Autowired
 	ConfigurationService configService;
+	
+	@Autowired
+	WorkplaceService workplaceService;
 
 	@GetMapping(value = "/getConfig")
 	public ResponseEntity<ConfigurationDTO> getConfig(@RequestParam("id") Integer id) {
+		
 		HttpStatus status = null;
 		ConfigurationDTO res = new ConfigurationDTO();
 
@@ -55,14 +68,14 @@ public class ConfigurationController {
 	 * 
 	 * */
 	@GetMapping(value = "/workplaceConfigs")
-	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> getAllByWorkplace(
-			@RequestParam("workplaceId") Integer workplaceId, @RequestParam("page") int page) {
+	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> getAllByWorkplace(@RequestParam("page") int page) {
+		this.user = this.getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<ConfigurationDTO> res = new PageSearchDTO<ConfigurationDTO>();
-
+		
 		try {
 			//
-			Page<Configuration> result = configService.getWithPagination(workplaceId, page);
+			Page<Configuration> result = configService.getWithPagination(user.getWorkplaceId(), page);
 			//
 			List<ConfigurationDTO> resultList = new ArrayList<ConfigurationDTO>();
 			result.forEach(element -> {
@@ -86,13 +99,15 @@ public class ConfigurationController {
 
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
+		this.user = this.getUserContext();
 		HttpStatus status = null;
+		
 		try {
 			Configuration entity = new Configuration();
 			Workplace wEntity = new Workplace();
 			BeanUtils.copyProperties(dto, entity);
 			
-			wEntity.setId(dto.getWorkplaceId());
+			wEntity.setId(user.getWorkplaceId());
 			entity.setWorkplace(wEntity);
 
 			boolean isSucceed = configService.addNewConfig(entity);

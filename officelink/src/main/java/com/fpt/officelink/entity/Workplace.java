@@ -2,7 +2,7 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +26,7 @@ public class Workplace implements Serializable {
 	@Column
 	private String name;
 	
-	@Column
+	@Column(updatable = false)
 	private Date dateCreated;
 	
 	@Column
@@ -36,7 +36,13 @@ public class Workplace implements Serializable {
 	private boolean isDeleted;
 	
 	@OneToMany(mappedBy = "workplace")
-	private List<Configuration> configuration;
+	private Set<Configuration> configurations;
+	
+	@OneToMany(mappedBy = "workplace")
+	private Set<Account> accounts;
+	
+	@OneToMany(mappedBy = "workplace")
+	private Set<Department> departments;
 
 	//Getter setter
 	public int getId() {
@@ -79,11 +85,28 @@ public class Workplace implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 	
-	public List<Configuration> getConfiguration() {
-		return configuration;
+	public Set<Configuration> getConfigurations() {
+		return configurations;
 	}
 
-	public void setConfiguration(List<Configuration> configuration) {
-		this.configuration = configuration;
+	public void setConfigurations(Set<Configuration> configurations) {
+		this.configurations = configurations;
 	}
+
+	public Set<Account> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(Set<Account> accounts) {
+		this.accounts = accounts;
+	}
+	
+	public Set<Department> getDepartments() {
+		return departments;
+	}
+
+	public void setDepartments(Set<Department> departments) {
+		this.departments = departments;
+	}
+
 }

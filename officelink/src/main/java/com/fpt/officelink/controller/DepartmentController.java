@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,54 +20,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.dto.TeamDTO;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.DepartmentService;
 
 @RestController
 @RequestMapping("/department")
 public class DepartmentController {
-	
-	@Autowired
-	DepartmentService depService;
-	
-	@GetMapping(value = "/getDep")
-	public ResponseEntity<DepartmentDTO> getDep(@RequestParam("depId") Integer depId){
-		HttpStatus status = null;
-		DepartmentDTO res = new DepartmentDTO();
-		
-		try {
-			//
-			Department result = depService.getDepartment(depId);
-			List<TeamDTO> listTeamDTO = new ArrayList<TeamDTO>();
-			//
-			BeanUtils.copyProperties(result, res);
-			
-			result.getTeams().forEach(t -> {
-				TeamDTO teamDTO = new TeamDTO();
-				BeanUtils.copyProperties(t, teamDTO);
-				listTeamDTO.add(teamDTO);
-			});
-			
-			//
-			res.setTeams(listTeamDTO);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<DepartmentDTO>(res, status);
+
+	private CustomUser user;
+
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
+	@Autowired
+	DepartmentService depService;
+
 	@GetMapping(value = "/getAll")
-	public ResponseEntity<List<DepartmentDTO>> getAll(){
+	public ResponseEntity<List<DepartmentDTO>> getAll() {
+		this.user = getUserContext();
 		HttpStatus status = null;
 		List<DepartmentDTO> res = new ArrayList<DepartmentDTO>();
-		
+
 		try {
 			//
-			List<Department> result = depService.getAll();
+			List<Department> result = depService.getAll(user.getWorkplaceId());
 			//
 			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
 			result.forEach(element -> {
@@ -80,18 +60,19 @@ public class DepartmentController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<List<DepartmentDTO>>(res, status);
 	}
-	
+
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<DepartmentDTO>> search(@RequestParam("term") String term){
+	public ResponseEntity<PageSearchDTO<DepartmentDTO>> search(@RequestParam("term") String term) {
+		this.user = getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
-		
+
 		try {
 			//
-			Page<Department> result = depService.searchWithPagination(term, 0);
+			Page<Department> result = depService.searchWithPagination(term, user.getWorkplaceId(), 0);
 			//
 			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
 			result.getContent().forEach(element -> {
@@ -106,18 +87,20 @@ public class DepartmentController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
 	}
-	
+
 	@GetMapping(value = "/getPage")
-	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
+	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
+		this.user = getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
-		
+
 		try {
 			//
-			Page<Department> result = depService.searchWithPagination(term, page);
+			Page<Department> result = depService.searchWithPagination(term, user.getWorkplaceId(), page);
 			//
 			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
 			result.getContent().forEach(element -> {
@@ -132,64 +115,58 @@ public class DepartmentController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status); 
+
+		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto){
+	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto) {
+		user = getUserContext();
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
-//			List<Location> locations = new ArrayList<Location>();
+			Workplace wEntity = new Workplace(); 
+			
 			BeanUtils.copyProperties(dto, entity);
-			
-//			dto.getLocations().forEach(element -> {
-//				Location location = new Location();
-//				BeanUtils.copyProperties(element, location);
-//				locations.add(location);
-//			});
-//			entity.setLocations(locations);
-			
+			wEntity.setId(user.getWorkplaceId());
+
+			entity.setWorkplace(wEntity);
 			boolean isSucceed = depService.addNewDepartment(entity);
 			if (isSucceed) {
-				status = HttpStatus.CREATED;				
+				status = HttpStatus.CREATED;
 			} else {
 				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto){
+	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto) {
+		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
-//			List<Location> locations = new ArrayList<Location>();
+			Workplace wEntity = new Workplace(); 
+			
 			BeanUtils.copyProperties(dto, entity);
+			wEntity.setId(user.getWorkplaceId());
 			
-//			dto.getLocations().forEach(element -> {
-//				Location location = new Location();
-//				BeanUtils.copyProperties(element, location);
-//				locations.add(location);
-//			});
-//			entity.setLocations(locations);
-			
+			entity.setWorkplace(wEntity);
 			depService.modifyDepartment(entity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@DeleteMapping
-	public ResponseEntity<Integer> delete(@RequestParam("id") int id){
+	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;
 		try {
 			depService.removeDepartment(id);
@@ -197,7 +174,7 @@ public class DepartmentController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }

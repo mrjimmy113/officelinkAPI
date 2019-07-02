@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +29,12 @@ public class Configuration implements Serializable{
     @Column
     private String scheduleTime;
     
+	@Column(updatable = false)
+	private Date dateCreated;
+	
+	@Column
+	private Date dateModified;
+    
     @Column
 	private boolean isDeleted;
 
@@ -50,6 +57,22 @@ public class Configuration implements Serializable{
 
 	public void setScheduleTime(String scheduleTime) {
 		this.scheduleTime = scheduleTime;
+	}
+	
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateModified() {
+		return dateModified;
+	}
+
+	public void setDateModified(Date dateModified) {
+		this.dateModified = dateModified;
 	}
 
 	public boolean isDeleted() {

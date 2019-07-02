@@ -25,18 +25,18 @@ public class TeamServiceImpl implements TeamService {
 	}
 	
 	@Override
-	public Page<Team> searchWithPagination(String term, int pageNum) {
+	public Page<Team> searchWithPagination(String term, int workplaceId, int pageNum) {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
 		PageRequest pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 
-		return teamRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return teamRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
 	}
 
 	@Override
 	public boolean addNewTeam(Team team) {
-		Optional<Team> opTeam = teamRep.findByNameAndIsDeleted(team.getName(), false);
+		Optional<Team> opTeam = teamRep.findByNameAndIsDeleted(team.getName(), team.getDepartment().getWorkplace().getId() , false);
 		if (opTeam.isPresent()) {
 			return false;
 		} else {
@@ -59,6 +59,8 @@ public class TeamServiceImpl implements TeamService {
 		if (team != null) {
 			team.setDeleted(true);
 		}
+		
+		team.setDateModified(new Date());
 		teamRep.save(team);
 		return true;
 	}

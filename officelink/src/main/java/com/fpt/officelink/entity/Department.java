@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -26,7 +28,7 @@ public class Department implements Serializable{
 	@Column
 	private String name;
 	
-	@Column
+	@Column(updatable = false)
 	private Date dateCreated;
 	
 	@Column
@@ -37,6 +39,10 @@ public class Department implements Serializable{
 	
 	@OneToMany(mappedBy = "department")
 	private Set<Team> teams;
+	
+	@ManyToOne
+	@JoinColumn(name = "workplace_id", nullable = false)
+	private Workplace workplace;
 	
 //	@ManyToMany
 //	@JoinTable(name = "department_in_location",
@@ -92,12 +98,13 @@ public class Department implements Serializable{
 	public void setTeams(Set<Team> teams) {
 		this.teams = teams;
 	}
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
 	
-//	public List<Location> getLocations() {
-//		return locations;
-//	}
-//
-//	public void setLocations(List<Location> locations) {
-//		this.locations = locations;
-//	}
 }

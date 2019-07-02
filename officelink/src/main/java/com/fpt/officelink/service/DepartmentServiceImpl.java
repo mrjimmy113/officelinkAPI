@@ -32,24 +32,24 @@ public class DepartmentServiceImpl implements DepartmentService{
 		return result; 
 	}
 	
-	public List<Department> getAll() {
-		List<Department> result = depRep.findAllByIsDeleted(false);
+	public List<Department> getAll(int workplaceId) {
+		List<Department> result = depRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false);
 		return result;
 	}
 	
 	@Override
-	public Page<Department> searchWithPagination(String term, int pageNum) {
+	public Page<Department> searchWithPagination(String term, int workplaceId, int pageNum) {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 		
-		return depRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return depRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
 	}
 
 	@Override
 	public boolean addNewDepartment(Department dep) {
-		Optional<Department> opDep = depRep.findByNameAndIsDeleted(dep.getName(), false);
+		Optional<Department> opDep = depRep.findByNameAndIsDeletedAndWorkplaceId(dep.getName(), false, dep.getWorkplace().getId());
 		if (opDep.isPresent()) {
 			return false;
 		} else {
@@ -73,6 +73,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 			return false;
 		}
 		
+		dep.setDateModified(new Date());
 		dep.setDeleted(true);
 		depRep.save(dep);
 		

@@ -1,8 +1,8 @@
 package com.fpt.officelink.service;
 
+import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,21 +25,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private List<Configuration> configurationList;
 	
-	
-	/**
-     * Loads not deleted configurations from Database regardless of workplace, use for Scheduler 
-     */
-    @PostConstruct
-    public void loadConfigurations() {
-        configurationList = configRep.findAllByIsDeleted(false);
-    }
-    
     /**
      * Get all configs regardless of workplace
      */
     @Override
     public List<Configuration> getConfigurations() {
-    	List<Configuration> configs = configRep.findAll();
+    	List<Configuration> configs = configRep.findAllByIsDeleted(false);
     	return configs;
     }
     
@@ -85,6 +76,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			return false;
 		}
 		
+		config.setDateModified(new Date());
 		config.setDeleted(true);
 		configRep.save(config);
 		// update schedule

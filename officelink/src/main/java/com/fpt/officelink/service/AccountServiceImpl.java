@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AuthDTO;
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.AccountRespository;
 
 @Service
@@ -22,6 +24,9 @@ public class AccountServiceImpl implements AccountService {
     AccountRespository accountRespository;
     
     @Autowired
+    WorkplaceService workplaceService; 
+    
+    @Autowired
     JwtService jwtSer;
 
     @Override
@@ -31,11 +36,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean addNewAccount(Account account) {
-        Optional<Account> optionalAccount = accountRespository.findAccountByEmailAndWorkspacename( account.getEmail(), account.getWorkspacename());
+    public boolean addNewAccount(Account account, String workplaceName) {
+        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( account.getEmail());
         if(optionalAccount.isPresent()){
             return false;
         }else{
+        	// create workplace
+        	Workplace workplace = new Workplace();
+        	workplace.setName(workplaceName);
+        	workplace.setDateCreated(new Date());
+        	workplaceService.addNewWorkplace(workplace);
+        	
+        	// create account with the new workplace
+        	account.setWorkplace(workplace);
             accountRespository.save(account);
             return true;
         }

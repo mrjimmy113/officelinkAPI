@@ -8,8 +8,6 @@ import com.fpt.officelink.entity.Configuration;
 
 public interface ConfigurationService {
 	
-	public void loadConfigurations();
-	
 	public List<Configuration> getConfigurations();
 	
 	Page<Configuration> getWithPagination(int workplaceId, int pageNum);

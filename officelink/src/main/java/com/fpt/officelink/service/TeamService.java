@@ -12,7 +12,7 @@ public interface TeamService {
 	
 	List<Team> getTeams();
 	
-	Page<Team> searchWithPagination(String term, int pageNum);
+	Page<Team> searchWithPagination(String term, int workplaceId, int pageNum);
 	
 	boolean addNewTeam(Team team);
 	
