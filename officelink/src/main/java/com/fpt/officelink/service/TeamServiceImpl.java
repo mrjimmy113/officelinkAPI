@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.TeamRepository;
+import com.fpt.officelink.utils.Constants;
 
 @Service
 public class TeamServiceImpl implements TeamService {
-
-	private static final int PAGEMAXSIZE = 9;
 
 	@Autowired
 	TeamRepository teamRep;
@@ -30,7 +29,7 @@ public class TeamServiceImpl implements TeamService {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
-		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+		PageRequest pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 
 		return teamRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}

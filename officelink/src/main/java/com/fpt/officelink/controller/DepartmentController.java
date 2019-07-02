@@ -30,7 +30,6 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService depService;
 	
-	
 	@GetMapping(value = "/getDep")
 	public ResponseEntity<DepartmentDTO> getDep(@RequestParam("depId") Integer depId){
 		HttpStatus status = null;

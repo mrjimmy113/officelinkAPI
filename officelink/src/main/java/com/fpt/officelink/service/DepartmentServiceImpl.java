@@ -11,12 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.repository.DepartmentRepository;;
+import com.fpt.officelink.repository.DepartmentRepository;
+import com.fpt.officelink.utils.Constants;;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService{
-
-	private static final int MAXPAGESIZE = 9;
 	
 	@Autowired
 	DepartmentRepository depRep;
@@ -43,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
-		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
+		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 		
 		return depRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
@@ -63,16 +62,20 @@ public class DepartmentServiceImpl implements DepartmentService{
 	@Override
 	public boolean modifyDepartment(Department dep) {
 		depRep.save(dep);
+		
 		return true;
 	}
 
 	@Override
 	public boolean removeDepartment(int id) {
 		Department dep = depRep.findById(id).get();
-		if (dep != null) {
-			dep.setDeleted(true);
-			depRep.save(dep);
+		if (dep == null) {
+			return false;
 		}
+		
+		dep.setDeleted(true);
+		depRep.save(dep);
+		
 		return true;
 	}
 
