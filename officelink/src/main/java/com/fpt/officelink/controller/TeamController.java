@@ -27,15 +27,15 @@ import com.fpt.officelink.service.TeamService;
 @RestController
 @RequestMapping("/team")
 public class TeamController {
-	
+
 	@Autowired
 	TeamService teamService;
-	
+
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<TeamDTO>> search(@RequestParam("term") String term){
+	public ResponseEntity<PageSearchDTO<TeamDTO>> search(@RequestParam("term") String term) {
 		HttpStatus status = null;
 		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
-		
+
 		try {
 			//
 			Page<Team> result = teamService.searchWithPagination(term, 0);
@@ -49,23 +49,24 @@ public class TeamController {
 				teamDTO.setDepartment(depDTO);
 				resultList.add(teamDTO);
 			});
-			
+
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			
+
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
-	
+
 	@GetMapping(value = "/getPage")
-	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
+	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
 		HttpStatus status = null;
 		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
-		
+
 		try {
 			//
 			Page<Team> result = teamService.searchWithPagination(term, page);
@@ -79,22 +80,44 @@ public class TeamController {
 				teamDTO.setDepartment(depDTO);
 				resultList.add(teamDTO);
 			});
-			
+
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			
+
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
-	
-	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto){
+
+	@GetMapping("dep")
+	public ResponseEntity<List<TeamDTO>> findByDepId(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
-		
+		List<TeamDTO> res = new ArrayList<TeamDTO>();
+		try {
+			List<Team> result = teamService.getTeamByDepartmentId(id);
+			result.forEach(element -> {
+				DepartmentDTO depDTO = new DepartmentDTO();
+				TeamDTO teamDTO = new TeamDTO();
+				BeanUtils.copyProperties(element.getDepartment(), depDTO);
+				BeanUtils.copyProperties(element, teamDTO);
+				teamDTO.setDepartment(depDTO);
+				res.add(teamDTO);
+			});
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return new ResponseEntity<List<TeamDTO>>(res, status);
+	}
+
+	@PostMapping
+	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto) {
+		HttpStatus status = null;
+
 		try {
 			Team teamEntity = new Team();
 			Department depEntity = new Department();
@@ -103,21 +126,21 @@ public class TeamController {
 			teamEntity.setDepartment(depEntity);
 			boolean isSucceed = teamService.addNewTeam(teamEntity);
 			if (isSucceed) {
-				status = HttpStatus.CREATED;				
+				status = HttpStatus.CREATED;
 			} else {
 				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto){
+	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto) {
 		HttpStatus status = null;
-		
+
 		try {
 			Department depEntity = new Department();
 			Team teamEntity = new Team();
@@ -129,14 +152,14 @@ public class TeamController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@DeleteMapping
-	public ResponseEntity<Integer> delete(@RequestParam("id") int id){
+	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;
-		
+
 		try {
 			teamService.removeTeam(id);
 			status = HttpStatus.OK;

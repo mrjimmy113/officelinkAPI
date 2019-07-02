@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,6 +38,7 @@ public class WordCloudFilterController {
 		PageSearchDTO<WordCloudFilterDTO> res = new PageSearchDTO<WordCloudFilterDTO>();
 		try {
 			//Call Service
+			
 			Page<WordCloudFilter> result = service.searchWithPagination(term, 0);
 			//Convert to DTO
 			List<WordCloudFilterDTO> resultList = new ArrayList<WordCloudFilterDTO>();
@@ -56,7 +58,6 @@ public class WordCloudFilterController {
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
@@ -128,6 +129,32 @@ public class WordCloudFilterController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
+	}
+	
+	@DeleteMapping
+	public ResponseEntity<Integer> delete(@RequestParam("id") Integer id) {
+		HttpStatus status = null;
+		try {
+			service.delete(id);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<Integer>(status.value(),status);
+	}
+	
+	@GetMapping("/existed")
+	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name, @RequestParam("language") String language) {
+		HttpStatus status = null;
+		Boolean res = null;
+		try {
+			res = service.isExisted(name, language);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Boolean>(res,status);
 	}
 	
 }

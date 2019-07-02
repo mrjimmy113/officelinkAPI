@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,11 @@ public class TeamServiceImpl implements TeamService {
 	@Autowired
 	TeamRepository teamRep;
 
+	@Override
+	public List<Team> getTeamByDepartmentId(Integer id) {
+		return teamRep.findAllByDepartmentId(id);
+	}
+	
 	@Override
 	public Page<Team> searchWithPagination(String term, int pageNum) {
 		if (pageNum > 0) {
