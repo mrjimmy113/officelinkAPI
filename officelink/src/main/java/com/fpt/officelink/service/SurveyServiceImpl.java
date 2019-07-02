@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
+import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Answer;
@@ -199,9 +201,102 @@ public class SurveyServiceImpl implements SurveyService {
 		answers.forEach(a -> {
 			Answer entity = new Answer();
 			entity.setContent(a.getContent());
-			entity.setSurveyQuestions(surQuestRep.findById(a.getQuestionIdentity()).get());
+			entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
 			entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 			answerRep.save(entity);
+		});
+	}
+	
+	private List<AnswerReportDTO> getWordCloudDetail(String text, Integer filterId) {
+		List<AnswerReportDTO> details = new ArrayList<AnswerReportDTO>();
+		String[] words = text.split(" ");
+		boolean isFound;
+		for(int i = 0; i< words.length; i++) {
+			isFound = false;
+			for (AnswerReportDTO d : details) {
+				if(d.getTerm().equalsIgnoreCase(words[i])) {
+					d.setWeight(d.getWeight() + 1);
+					isFound = true;
+					break;
+				}
+			}
+			if(!isFound) details.add(new AnswerReportDTO(words[i],1));
+		}
+		return details;
+	}
+	
+	private List<AnswerReportDTO> combineWordCloudDetail(List<AnswerReportDTO> details) {
+		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		boolean isFound;
+		for (AnswerReportDTO d : details) {
+			isFound = false;
+			for (AnswerReportDTO r : result) {
+				if(d.getTerm().equalsIgnoreCase(r.getTerm())) {
+					r.setWeight(r.getWeight() + d.getWeight());
+					isFound = true;
+					break;
+				}
+			}
+			if(!isFound) result.add(d);
+		}
+		return result;
+	}
+	
+	private List<AnswerReportDTO> getSingleChoiceReport(List<Answer> answers) {
+		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		boolean isFound;
+		for (Answer answer : answers) {
+			isFound = false;
+			for (AnswerReportDTO AnswerReportDTO : result) {
+				if(answer.getContent().equalsIgnoreCase(AnswerReportDTO.getTerm())) {
+					AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
+					isFound = true;
+				}
+			}
+			if(!isFound) result.add(new AnswerReportDTO(answer.getContent(), 1));
+		}
+		return result;
+	}
+	
+	private List<AnswerReportDTO> getMutipleChoiceReport(List<Answer> answers) {
+		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		boolean isFound;
+		for (Answer answer : answers) {
+			String[] options = answer.getContent().split(" ");
+			for(int i =0 ; i < options.length;i++) {
+				isFound = false;
+				for (AnswerReportDTO AnswerReportDTO : result) {
+					if(options[i].equalsIgnoreCase(AnswerReportDTO.getTerm())) {
+						AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
+						isFound = true;
+					}
+				}
+				if(!isFound) result.add(new AnswerReportDTO(options[i],1));
+			}
+		}
+		return result;
+	}
+	
+	public void getReport(Integer id) {
+		List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
+		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
+		sqList.forEach(sq -> {
+			QuestionReportDTO qr = new QuestionReportDTO();
+			//Change Question to Question DTO
+			// Set Question
+			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
+			switch (sq.getQuestion().getType().getType()) {
+			case MULTIPLE:
+				arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				break;
+			case SINGLE:
+				arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				break;
+			case TEXT :
+				//getFreeTextReport
+				break;
+				
+			}
 		});
 	}
 

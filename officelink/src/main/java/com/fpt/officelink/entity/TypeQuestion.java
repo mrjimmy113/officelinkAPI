@@ -5,11 +5,15 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fpt.officelink.enumaration.TypeEnum;
 
 @Entity
 @Table(name = "type_question")
@@ -24,8 +28,8 @@ public class TypeQuestion implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@Column
-	private String type;
+	@Enumerated(EnumType.STRING)
+	private TypeEnum type;
 	
 	@OneToMany(mappedBy = "type")
 	private Set<Question> questions;
@@ -38,11 +42,13 @@ public class TypeQuestion implements Serializable {
 		this.id = id;
 	}
 
-	public String getType() {
+	
+
+	public TypeEnum getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(TypeEnum type) {
 		this.type = type;
 	}
 
@@ -56,3 +62,5 @@ public class TypeQuestion implements Serializable {
 
 	
 }
+
+

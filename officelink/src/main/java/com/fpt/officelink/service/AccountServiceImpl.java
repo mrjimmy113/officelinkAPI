@@ -72,6 +72,7 @@ public class AccountServiceImpl implements AccountService {
     	if(acc.isPresent()) {
     		result = new AuthDTO();
     		result.setRole(acc.get().getRole());
+    		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());
     		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
     	}
     	return result;

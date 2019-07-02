@@ -8,7 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Answer implements Serializable {
@@ -28,8 +29,9 @@ public class Answer implements Serializable {
 	@Column
 	private String content;
 	
-	@OneToOne(mappedBy = "answer")
-	private SurveyQuestion surveyQuestions;
+	@ManyToOne
+	@JoinColumn(name = "question_identity")
+	private SurveyQuestion surveyQuestion;
 
 	public Integer getId() {
 		return id;
@@ -55,17 +57,14 @@ public class Answer implements Serializable {
 		this.content = content;
 	}
 
-	public SurveyQuestion getSurveyQuestions() {
-		return surveyQuestions;
+	public SurveyQuestion getSurveyQuestion() {
+		return surveyQuestion;
 	}
 
-	public void setSurveyQuestions(SurveyQuestion surveyQuestions) {
-		this.surveyQuestions = surveyQuestions;
+	public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
+		this.surveyQuestion = surveyQuestion;
 	}
-	
-	
-	
-	
 
 	
+
 }

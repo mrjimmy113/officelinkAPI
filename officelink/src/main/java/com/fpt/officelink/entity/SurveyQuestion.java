@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,7 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,9 +25,8 @@ public class SurveyQuestion implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@OneToOne
-	@JoinColumn(name = "answer_id")
-	private Answer answer;
+	@OneToMany(mappedBy = "surveyQuestion")
+	private Set<Answer> answers;
 	
 	@ManyToOne
 	@JoinColumn(name = "survey_id")
@@ -59,6 +59,13 @@ public class SurveyQuestion implements Serializable {
 	public void setQuestion(Question question) {
 		this.question = question;
 	}
-	
-	
+
+	public Set<Answer> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(Set<Answer> answers) {
+		this.answers = answers;
+	}
+
 }

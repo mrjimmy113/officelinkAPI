@@ -1,9 +1,11 @@
 package com.fpt.officelink.dto;
 
+import com.fpt.officelink.enumaration.TypeEnum;
+
 public class TypeQuestionDTO {
 	private Integer id;
 	
-	private String type;
+	private TypeEnum type;
 
 	public Integer getId() {
 		return id;
@@ -13,13 +15,15 @@ public class TypeQuestionDTO {
 		this.id = id;
 	}
 
-	public String getType() {
+	public TypeEnum getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(TypeEnum type) {
 		this.type = type;
 	}
+
+	
 	
 	
 }

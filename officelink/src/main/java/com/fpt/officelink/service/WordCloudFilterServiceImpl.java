@@ -3,6 +3,7 @@ package com.fpt.officelink.service;
 import java.security.cert.PKIXRevocationChecker.Option;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.aspectj.weaver.patterns.IfPointcut.IfFalsePointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Word;
+import com.fpt.officelink.entity.Answer;
+import com.fpt.officelink.entity.AnswerReport;
+import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.WordCloudFilter;
 import com.fpt.officelink.repository.WordCloudFilterRepository;
 import com.fpt.officelink.repository.WordListRepository;
@@ -103,5 +108,8 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 			return true;
 		return false;
 	}
-
+	
+	
+	
+	
 }
