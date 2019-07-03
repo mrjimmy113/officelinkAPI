@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.entity.Configuration;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.ConfigurationService;
 import com.fpt.officelink.service.WorkplaceService;
@@ -29,22 +31,22 @@ import com.fpt.officelink.service.WorkplaceService;
 @RestController
 @RequestMapping("/configuration")
 public class ConfigurationController {
-	
+
 	private CustomUser user;
-	
+
 	private CustomUser getUserContext() {
-		return (CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
-	
+
 	@Autowired
 	ConfigurationService configService;
-	
+
 	@Autowired
 	WorkplaceService workplaceService;
 
 	@GetMapping(value = "/getConfig")
 	public ResponseEntity<ConfigurationDTO> getConfig(@RequestParam("id") Integer id) {
-		
+
 		HttpStatus status = null;
 		ConfigurationDTO res = new ConfigurationDTO();
 
@@ -72,7 +74,7 @@ public class ConfigurationController {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<ConfigurationDTO> res = new PageSearchDTO<ConfigurationDTO>();
-		
+
 		try {
 			//
 			Page<Configuration> result = configService.getWithPagination(user.getWorkplaceId(), page);
@@ -80,9 +82,14 @@ public class ConfigurationController {
 			List<ConfigurationDTO> resultList = new ArrayList<ConfigurationDTO>();
 			result.forEach(element -> {
 				ConfigurationDTO dto = new ConfigurationDTO();
+				SurveyDTO surveyDto = new SurveyDTO();
 
 				BeanUtils.copyProperties(element, dto);
+				if (element.getSurvey() != null) {
+					BeanUtils.copyProperties(element.getSurvey(), surveyDto);
+				}
 
+				dto.setSurvey(surveyDto);
 				dto.setWorkplaceId(element.getWorkplace().getId());
 				resultList.add(dto);
 			});
@@ -91,6 +98,7 @@ public class ConfigurationController {
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -101,14 +109,20 @@ public class ConfigurationController {
 	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
-		
+
 		try {
 			Configuration entity = new Configuration();
 			Workplace wEntity = new Workplace();
+			Survey sEntity = new Survey();
+
 			BeanUtils.copyProperties(dto, entity);
-			
+			if (dto.getSurvey() != null) {
+				BeanUtils.copyProperties(dto.getSurvey(), sEntity);
+			}
+
 			wEntity.setId(user.getWorkplaceId());
 			entity.setWorkplace(wEntity);
+			entity.setSurvey(sEntity);
 
 			boolean isSucceed = configService.addNewConfig(entity);
 			if (isSucceed) {
@@ -129,11 +143,17 @@ public class ConfigurationController {
 		try {
 			Configuration entity = new Configuration();
 			Workplace wEntity = new Workplace();
+			Survey sEntity = new Survey();
+
 			BeanUtils.copyProperties(dto, entity);
-			
+			if (dto.getSurvey() != null) {
+				BeanUtils.copyProperties(dto.getSurvey(), sEntity);
+			}
+
 			wEntity.setId(dto.getWorkplaceId());
 			entity.setWorkplace(wEntity);
-			
+			entity.setSurvey(sEntity);
+
 			configService.modifyConfig(entity);
 			status = HttpStatus.OK;
 		} catch (Exception e) {

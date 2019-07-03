@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerDTO;
@@ -181,18 +182,18 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	public void sendOutSurvey(Integer surveyId) throws JOSEException {
+	public boolean sendOutSurvey(Integer surveyId) throws JOSEException {
 		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
 		Survey survey = opSurvey.get();
 		survey.setActive(true);
 		surveyRep.save(survey);
-		String token = jwtSer.createSurveyToken("quangnguyenvietminh@gmail.com", surveyId);
+		String token = jwtSer.createSurveyToken("duongphse62746@fpt.edu.vn", surveyId);
 		List<String> emailList = new ArrayList<String>();
-		emailList.add("quangnguyenvietminh@gmail.com");
+		emailList.add("duongphse62746@fpt.edu.vn");
 		Map<String, Object> model = new HashMap<>();
 		model.put("link", "http://localhost:4200/take/" + token);
 		mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
-
+		return true;
 	}
 
 	@Transactional
@@ -298,6 +299,12 @@ public class SurveyServiceImpl implements SurveyService {
 				
 			}
 		});
+	}
+
+	@Override
+	public List<Survey> getWorkplaceSurvey(int workplaceId) {
+		
+		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
 	}
 
 }

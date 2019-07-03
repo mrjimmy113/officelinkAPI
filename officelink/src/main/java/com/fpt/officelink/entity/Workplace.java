@@ -43,6 +43,9 @@ public class Workplace implements Serializable {
 	
 	@OneToMany(mappedBy = "workplace")
 	private Set<Department> departments;
+	
+	@OneToMany(mappedBy = "workplace")
+	private Set<Survey> surveys;
 
 	//Getter setter
 	public int getId() {
@@ -107,6 +110,14 @@ public class Workplace implements Serializable {
 
 	public void setDepartments(Set<Department> departments) {
 		this.departments = departments;
+	}
+
+	public Set<Survey> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(Set<Survey> surveys) {
+		this.surveys = surveys;
 	}
 
 }

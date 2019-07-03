@@ -6,6 +6,10 @@ public class ConfigurationDTO {
 	private String scheduleTime;
 	
 	private int workplaceId;
+	
+	private boolean isActive;
+
+	private SurveyDTO survey;
 
 	// Getter setter
 	public int getId() {
@@ -32,4 +36,19 @@ public class ConfigurationDTO {
 		this.workplaceId = workplaceId;
 	}
 	
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+	
+	public SurveyDTO getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(SurveyDTO survey) {
+		this.survey = survey;
+	}
 }

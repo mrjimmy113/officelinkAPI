@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,12 +38,19 @@ public class Configuration implements Serializable{
     
     @Column
 	private boolean isDeleted;
+    
+    @Column
+	private boolean isActive;
 
-    @ManyToOne
+	@ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
     private Workplace workplace;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "survey_id")
+    private Survey survey;
 
-    //Getter setter
+	//Getter setter
 	public int getId() {
 		return id;
 	}
@@ -78,6 +86,14 @@ public class Configuration implements Serializable{
 	public boolean isDeleted() {
 		return isDeleted;
 	}
+	
+    public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
 
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
@@ -89,5 +105,13 @@ public class Configuration implements Serializable{
 
 	public void setWorkplace(Workplace workplace) {
 		this.workplace = workplace;
+	}
+	
+    public Survey getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(Survey survey) {
+		this.survey = survey;
 	}
 }
