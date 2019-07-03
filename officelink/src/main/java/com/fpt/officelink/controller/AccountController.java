@@ -1,6 +1,7 @@
 package com.fpt.officelink.controller;
 
 
+import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.fpt.officelink.dto.AccountDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.entity.Account;
@@ -175,6 +176,52 @@ public class AccountController {
 
 
         return new ResponseEntity<Number>(status.value(), status);
+    }
+
+    @PostMapping(value = "/confirm")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken ){
+        HttpStatus status = null;
+        try{
+            AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
+
+            Account entity = new Account();
+            BeanUtils.copyProperties(accountDTO,entity);
+            boolean res = service.addNewAccount(entity);
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
+
+    @GetMapping(value = "/confirm")
+    public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken){
+
+        HttpStatus status = null;
+        AccountDTO accountDTO = new AccountDTO();
+        try{
+             accountDTO = jwt.getAccountByToken(accountToken);
+             status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<AccountDTO>(accountDTO, status);
+
     }
 
 

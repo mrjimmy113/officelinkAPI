@@ -3,6 +3,7 @@ package com.fpt.officelink.service;
 import java.text.ParseException;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.officelink.dto.AccountDTO;
 import org.springframework.stereotype.Service;
 
@@ -128,6 +129,25 @@ public class JwtService {
     }
     return email;
   }
+
+  public AccountDTO getAccountByToken(String token) {
+    Object account = null;
+    AccountDTO newAccount = new AccountDTO();
+    try {
+      JWTClaimsSet claims = getClaimsFromToken(token);
+      account = claims.getClaim(DTO);
+      ObjectMapper mapper = new ObjectMapper();
+
+         newAccount = mapper.readValue(account.toString(), AccountDTO.class);
+
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return newAccount;
+  }
+
+
 
   private byte[] generateShareSecret() {
     // Generate 256-bit (32-byte) shared secret
