@@ -12,7 +12,7 @@ public class Account implements Serializable {
     private Integer id;
 
     @Column
-    private boolean isDelete;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
@@ -34,6 +34,8 @@ public class Account implements Serializable {
     @Column
     private String role;
 
+
+
     public String getRole() {
         return role;
     }
@@ -42,12 +44,12 @@ public class Account implements Serializable {
         this.role = role;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public boolean isIsDeleted() {
+        return isDeleted;
     }
 
-    public void setDelete(boolean isDelete) {
-        this.isDelete = isDelete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public Integer getId() {

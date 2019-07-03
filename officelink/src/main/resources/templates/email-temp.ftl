@@ -16,17 +16,19 @@
 <h2 style="align-content: center; color: darkturquoise">OFFICE LINK</h2><br/>
 
 <span>Hello!</span><br/>
-<span>Congratulations, your account has successfully activated, please select the button below:</span><br/>
-<a  rel="link" style="background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
+<span>You have just created a workspace, please click the button below to confirm:</span><br/>
+<a  rel="link" style="display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;"  href="${link}">Go OFFICE LINK</a> <br/>
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;"  href="${link}">Go Confirm</a> <br/>
 
 <span>or Go to ${link}</span>
 
