@@ -38,13 +38,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
      * Get config with paging for UI display
      */
     @Override
-	public Page<Configuration> getWithPagination(int workplaceId, int pageNum) {
+	public Page<Configuration> searchWithPagination(int workplaceId, String term, int pageNum) {
     	if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 		
-		return configRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false, pageRequest);
+		return configRep.searchBySurveyName(workplaceId, term, false, pageRequest);
 	}
 
     public Configuration getConfigById(int configId) {

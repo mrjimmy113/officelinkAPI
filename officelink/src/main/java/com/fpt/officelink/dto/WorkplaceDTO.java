@@ -1,9 +1,14 @@
 package com.fpt.officelink.dto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class WorkplaceDTO {
 	
+	@NotNull
 	private Integer id;
 	
+	@NotEmpty
 	private String name;
 	
 	

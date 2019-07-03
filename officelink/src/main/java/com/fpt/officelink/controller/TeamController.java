@@ -3,6 +3,8 @@ package com.fpt.officelink.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -126,7 +128,7 @@ public class TeamController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto) {
+	public ResponseEntity<Integer> create(@Valid @RequestBody TeamDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 
@@ -155,7 +157,7 @@ public class TeamController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto) {
+	public ResponseEntity<Integer> update(@Valid @RequestBody TeamDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 

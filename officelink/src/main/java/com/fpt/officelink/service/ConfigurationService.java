@@ -10,7 +10,7 @@ public interface ConfigurationService {
 	
 	public List<Configuration> getConfigurations();
 	
-	Page<Configuration> getWithPagination(int workplaceId, int pageNum);
+	Page<Configuration> searchWithPagination(int workplaceId, String term, int pageNum);
 	
 	public Configuration getConfigById(int configId);
 	

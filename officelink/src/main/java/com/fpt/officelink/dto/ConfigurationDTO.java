@@ -1,14 +1,21 @@
 package com.fpt.officelink.dto;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 public class ConfigurationDTO {
+	@NotNull
 	private int id;
 	
+	@NotNull
 	private String scheduleTime;
 	
 	private int workplaceId;
 	
 	private boolean isActive;
-
+	
+    @NotNull
 	private SurveyDTO survey;
 
 	// Getter setter

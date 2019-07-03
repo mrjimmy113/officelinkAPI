@@ -3,6 +3,8 @@ package com.fpt.officelink.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,15 +71,15 @@ public class ConfigurationController {
 	/*
 	 * 
 	 * */
-	@GetMapping(value = "/workplaceConfigs")
-	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> getAllByWorkplace(@RequestParam("page") int page) {
+	@GetMapping(value = "/searchGetPage")
+	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<ConfigurationDTO> res = new PageSearchDTO<ConfigurationDTO>();
 
 		try {
 			//
-			Page<Configuration> result = configService.getWithPagination(user.getWorkplaceId(), page);
+			Page<Configuration> result = configService.searchWithPagination(user.getWorkplaceId(), term, page);
 			//
 			List<ConfigurationDTO> resultList = new ArrayList<ConfigurationDTO>();
 			result.forEach(element -> {
@@ -106,7 +108,7 @@ public class ConfigurationController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
+	public ResponseEntity<Integer> create(@Valid @RequestBody ConfigurationDTO dto) {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
 
@@ -138,7 +140,7 @@ public class ConfigurationController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody ConfigurationDTO dto) {
+	public ResponseEntity<Integer> update(@Valid @RequestBody ConfigurationDTO dto) {
 		HttpStatus status = null;
 		try {
 			Configuration entity = new Configuration();

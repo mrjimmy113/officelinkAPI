@@ -2,12 +2,18 @@ package com.fpt.officelink.dto;
 
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class DepartmentDTO {
 	
+	@NotNull
 	private Integer id;
 	
+	@NotEmpty
 	private String name;
 	
+	@NotNull
 	private List<TeamDTO> teams;
 	
 //	private List<LocationDTO> locations;

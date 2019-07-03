@@ -3,6 +3,8 @@ package com.fpt.officelink.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -120,7 +122,7 @@ public class DepartmentController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto) {
+	public ResponseEntity<Integer> create(@Valid @RequestBody DepartmentDTO dto) {
 		user = getUserContext();
 		HttpStatus status = null;
 		try {
@@ -145,7 +147,7 @@ public class DepartmentController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto) {
+	public ResponseEntity<Integer> update(@Valid @RequestBody DepartmentDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
