@@ -67,24 +67,24 @@ public class AccountController {
         return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
     }
 
-    @GetMapping(value = "/getAccountByEmail")
-    public ResponseEntity<Optional<Account>> getAccountByEmail(@RequestParam("emailToken") String emailToken){
-        HttpStatus status = null;
-        Optional<Account> account = null;
-
-        try{
-            String email = jwt.getEmailFromToken(emailToken);
-
-            account = service.getAccountByEmail(email);
-            status = HttpStatus.OK;
-
-        }catch (Exception ex){
-            status = HttpStatus.BAD_REQUEST;
-
-        }
-
-        return new ResponseEntity<Optional<Account>>(account, status);
-    }
+//    @GetMapping(value = "/getAccountByEmail")
+//    public ResponseEntity<Optional<Account>> getAccountByEmail(@RequestParam("emailToken") String emailToken){
+//        HttpStatus status = null;
+//        Optional<Account> account = null;
+//
+//        try{
+//            String email = jwt.getEmailFromToken(emailToken);
+//
+//            account = service.getAccountByEmail(email);
+//            status = HttpStatus.OK;
+//
+//        }catch (Exception ex){
+//            status = HttpStatus.BAD_REQUEST;
+//
+//        }
+//
+//        return new ResponseEntity<Optional<Account>>(account, status);
+//    }
 
 
     @GetMapping(value = "/getAccount")
@@ -163,9 +163,6 @@ public class AccountController {
 
                 token = jwt.createTokenWithAccount(dto);
                 model.put("link", "http://localhost:4200/confirm/" + token);
-                model.put("dto", dto);
-
-
 
                 mailService.sendMail(emailTo, role , model);
 
@@ -204,6 +201,28 @@ public class AccountController {
 
     }
 
+    @PostMapping(value = "/sendInvite")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo ){
+        HttpStatus status = null;
+        try{
+                for(int i = 0 ; i < emailTo.length ; i++){
+                    mailService.sendMail(emailTo[i], "employee", null);
+                }
+
+
+
+                status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
 
     @GetMapping(value = "/confirm")
     public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken){
@@ -223,6 +242,9 @@ public class AccountController {
         return new ResponseEntity<AccountDTO>(accountDTO, status);
 
     }
+
+
+
 
 
     @PutMapping
