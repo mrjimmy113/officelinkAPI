@@ -24,7 +24,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Page<Account> searchWithPagination(String term, int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
-        return accountRespository.findAllByFirstnameContainingAndIsDelete(term, false,  pageable);
+        return accountRespository.findAllByFirstnameContainingAndIsDeleted(term, false,  pageable);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
     public void removeAccount(int id) {
         Account account = accountRespository.findById(id).get();
         if(account != null){
-            account.setDelete(true);
+            account.setDeleted(true);
         }
         accountRespository.save(account);
     }

@@ -68,10 +68,6 @@ public class Location implements Serializable {
         this.county = county;
     } 
 
-    public boolean isIsDeleted() {
-        return isDeleted;
-    }
-
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }

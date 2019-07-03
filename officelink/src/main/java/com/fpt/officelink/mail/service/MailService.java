@@ -25,20 +25,32 @@ public class MailService {
         @Autowired
         private Configuration config;
 
-        public void sendMail(String[] to,String temp , Map<String , Object> model){
+        public void sendMail(String to, String role , Map<String , Object> model){
 
                 MimeMessage message = sender.createMimeMessage();
                 try{
                         MimeMessageHelper helper = new  MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+                        if(role == "employee"){
+                                Template template = config.getTemplate("email-invite-temp.ftl");
+                                String html = FreeMarkerTemplateUtils.processTemplateIntoString(template,null);
+                                helper.setSubject("OfficeLink ");
+                                helper.setTo(to);
+                                helper.setText(html, true);
+                                helper.setFrom("officelinksup@gmail.com");
+                                sender.send(message);
 
 
-                        Template template = config.getTemplate(temp);
-                        String html = FreeMarkerTemplateUtils.processTemplateIntoString(template,model);
-                        helper.setSubject("OfficeLink ");
-                        helper.setTo(to);
-                        helper.setText(html, true);
-                        helper.setFrom("officelinksup@gmail.com");
-                        sender.send(message);
+                        }else{
+                                Template template = config.getTemplate("email-temp.ftl");
+                                String html = FreeMarkerTemplateUtils.processTemplateIntoString(template,model);
+                                helper.setSubject("OfficeLink ");
+                                helper.setTo(to);
+                                helper.setText(html, true);
+                                helper.setFrom("officelinksup@gmail.com");
+                                sender.send(message);
+
+                        }
+
 
 
 

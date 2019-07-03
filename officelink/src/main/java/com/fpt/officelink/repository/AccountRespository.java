@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface AccountRespository extends CrudRepository<Account, Integer> {
     Page<Account> findAllByFirstname(String firstname, Pageable pageable);
-    Page<Account> findAllByFirstnameContainingAndIsDelete(String firstname , Boolean isDelete , Pageable pageable);
+    Page<Account> findAllByFirstnameContainingAndIsDeleted(String firstname , Boolean isDeleted , Pageable pageable);
     Optional<Account> findAccountByEmail( String email);
 
     Optional<Account> findAccountByEmailAndWorkspacename(String email, String worksapcename);

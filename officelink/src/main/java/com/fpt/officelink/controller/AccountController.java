@@ -148,8 +148,8 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
-    @GetMapping(value = "/sendMail")
-    public ResponseEntity<Integer> sendMail(@RequestParam("emailTo") String[] emailTo, @RequestParam("role") String role){
+    @PostMapping(value = "/sendMail")
+    public ResponseEntity<Number> sendMail(@RequestBody AccountDTO dto){
         HttpStatus status = null;
         Map<String, Object> model = new HashMap<>();
 
@@ -157,22 +157,16 @@ public class AccountController {
 
         try {
             String token = null;
-            for (int i = 0 ; i < emailTo.length; i++){
-                token = jwt.createTokenWithEmail(emailTo[i]);
-            }
+            String emailTo = dto.getEmail();
+            String role = dto.getRole();
+
+                token = jwt.createTokenWithAccount(dto);
+                model.put("link", "http://localhost:4200/confirm/" + token);
+                model.put("dto", dto);
 
 
-            model.put("link", "http://localhost:4200/login-form/" + token);
-            if(role.contentEquals("employee")){
 
-                mailService.sendMail(emailTo,"email-invite-temp.ftl",null);
-            }
-            else{
-
-                mailService.sendMail(emailTo,"email-temp.ftl",model);
-
-            }
-
+                mailService.sendMail(emailTo, role , model);
 
             status = HttpStatus.OK;
         }catch (Exception ex){
@@ -180,7 +174,7 @@ public class AccountController {
         }
 
 
-        return new ResponseEntity<Integer>(status.value(), status);
+        return new ResponseEntity<Number>(status.value(), status);
     }
 
 

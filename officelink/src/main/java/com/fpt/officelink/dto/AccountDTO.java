@@ -11,7 +11,7 @@ public class AccountDTO implements Serializable {
     private String firstname;
     private String lastname;
     private String address;
-    private boolean isDelete ;
+    private boolean isDeleted ;
     private String role;
     private String workspacename;
 
@@ -54,26 +54,25 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDelete, String role, String workspacename) {
+    public AccountDTO(Integer id, String password, String email, String firstname, boolean isDeleted, String lastname, String address, String role, String workspacename) {
         this.id = id;
         this.password = password;
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
-        this.isDelete = isDelete;
+        this.isDeleted = isDeleted;
         this.role = role;
         this.workspacename = workspacename;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public boolean isIsDeleted() {
+        return isDeleted;
     }
 
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
-
 
     public Integer getId() {
         return id;

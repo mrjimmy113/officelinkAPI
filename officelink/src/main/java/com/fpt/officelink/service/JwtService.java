@@ -1,5 +1,7 @@
 package com.fpt.officelink.service;
 import java.util.Date;
+
+import com.fpt.officelink.dto.AccountDTO;
 import org.springframework.stereotype.Service;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -13,6 +15,7 @@ import com.nimbusds.jwt.SignedJWT;
 public class JwtService {
   public static final String USERNAME = "username";
   public static final String EMAIL = "email";
+  public static final String DTO = "dto";
   public static final String ROLE = "role";
   public static final String SECRET_KEY = "11111111111111111111111111111111";
   public static final int EXPIRE_TIME = 86400000;
@@ -35,24 +38,47 @@ public class JwtService {
     return token;
   }
 
-  public String createTokenWithEmail(String email) {
+//  public String createTokenWithEmail(String email) {
+//    String token = null;
+//    try {
+//      // Create HMAC signer
+//      JWSSigner signer = new MACSigner(generateShareSecret());
+//      JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+//      builder.claim(EMAIL, email);
+//
+//      builder.expirationTime(generateExpirationDate());
+//      JWTClaimsSet claimsSet = builder.build();
+//      SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+//      signedJWT.sign(signer);
+//      token = signedJWT.serialize();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//    return token;
+//  }
+
+  public String createTokenWithAccount (AccountDTO dto){
     String token = null;
-    try {
-      // Create HMAC signer
+    try{
       JWSSigner signer = new MACSigner(generateShareSecret());
       JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
-      builder.claim(EMAIL, email);
+      builder.claim(DTO, dto);
 
       builder.expirationTime(generateExpirationDate());
       JWTClaimsSet claimsSet = builder.build();
       SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
       signedJWT.sign(signer);
       token = signedJWT.serialize();
-    } catch (Exception e) {
-      e.printStackTrace();
+
+    }catch (Exception ex){
+      ex.printStackTrace();
     }
+
+
     return token;
   }
+
+
 
   private JWTClaimsSet getClaimsFromToken(String token) {
     JWTClaimsSet claims = null;
