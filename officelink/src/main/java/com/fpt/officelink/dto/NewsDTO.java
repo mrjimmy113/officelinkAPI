@@ -28,8 +28,6 @@ public class NewsDTO {
     private Date dateModified;
     
     private boolean isDeleted;
-    
-    private Date dateDeleted;
 
     //Getter and Setter
     
@@ -96,14 +94,5 @@ public class NewsDTO {
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-
-    public Date getDateDeleted() {
-        return dateDeleted;
-    }
-
-    public void setDateDeleted(Date dateDeleted) {
-        this.dateDeleted = dateDeleted;
-    }
-    
     
 }

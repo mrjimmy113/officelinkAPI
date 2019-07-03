@@ -30,8 +30,6 @@ public class ImageNewsDTO {
     private boolean isDeleted;
 
     private byte[] byte_image;
-    
-    private Date dateDeleted;
     //Getter and Setter
 
     public int getId() {
@@ -105,13 +103,4 @@ public class ImageNewsDTO {
     public void setByte_image(byte[] byte_image) {
         this.byte_image = byte_image;
     }
-
-    public Date getDateDeleted() {
-        return dateDeleted;
-    }
-
-    public void setDateDeleted(Date dateDeleted) {
-        this.dateDeleted = dateDeleted;
-    }
-  
 }
