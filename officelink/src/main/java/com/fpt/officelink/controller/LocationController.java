@@ -40,6 +40,24 @@ public class LocationController {
     @Autowired
     LocationService service;
 
+    @GetMapping(value = "/getAll")
+    public ResponseEntity<List<LocationDTO>> getAll() {
+        HttpStatus status = null;
+        List<LocationDTO> res = new ArrayList<>();
+        try {
+            List<Location> result = service.getAllLocation();
+            result.forEach(element -> {
+                LocationDTO dto = new LocationDTO();
+                BeanUtils.copyProperties(element, dto);
+                res.add(dto);
+            });
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<List<LocationDTO>>(res, status);
+    }
+    
     @GetMapping(value = "/getId")
     public ResponseEntity<LocationDTO> searchById(@RequestParam("id") int id) {
         HttpStatus status = null;
