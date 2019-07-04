@@ -159,12 +159,12 @@ public class AccountController {
         try {
             String token = null;
             String emailTo = dto.getEmail();
-            String role = dto.getRole();
+            Integer role_id = dto.getRole_id();
 
                 token = jwt.createTokenWithAccount(dto);
                 model.put("link", "http://localhost:4200/confirm/" + token);
 
-                mailService.sendMail(emailTo, role , model);
+                mailService.sendMail(emailTo, role_id , model);
 
             status = HttpStatus.OK;
         }catch (Exception ex){
@@ -206,7 +206,7 @@ public class AccountController {
         HttpStatus status = null;
         try{
                 for(int i = 0 ; i < emailTo.length ; i++){
-                    mailService.sendMail(emailTo[i], "employee", null);
+                    mailService.sendMail(emailTo[i], 2, null);
                 }
 
 

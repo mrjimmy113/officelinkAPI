@@ -25,12 +25,12 @@ public class MailService {
         @Autowired
         private Configuration config;
 
-        public void sendMail(String to, String role , Map<String , Object> model){
+        public void sendMail(String to, Integer role_id , Map<String , Object> model){
 
                 MimeMessage message = sender.createMimeMessage();
                 try{
                         MimeMessageHelper helper = new  MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
-                        if(role == "employee"){
+                        if(role_id == 2){
                                 Template template = config.getTemplate("email-invite-temp.ftl");
                                 String html = FreeMarkerTemplateUtils.processTemplateIntoString(template,null);
                                 helper.setSubject("OfficeLink ");
