@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.Role;
 import com.fpt.officelink.repository.AccountRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean addNewAccount(Account account) {
+    public boolean addNewAccount(Account account , Integer roleId) {
+        
         Optional<Account> optionalAccount = accountRespository.findAccountByEmailAndWorkspacename( account.getEmail(), account.getWorkspacename());
         if(optionalAccount.isPresent()){
             return false;

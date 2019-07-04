@@ -11,7 +11,7 @@ public interface AccountService {
     Page<Account> searchWithPagination(String term, int pageNum);
 
 
-    boolean addNewAccount(Account account);
+    boolean addNewAccount(Account account , Integer roleId);
 
     void modifyAccount(Account account);
 

@@ -19,6 +19,15 @@ public class AccountDTO implements Serializable {
     private Date dateCreated;
     private Date dateModified;
 
+    private RoleDTO roleDTO;
+
+    public RoleDTO getRoleDTO() {
+        return roleDTO;
+    }
+
+    public void setRoleDTO(RoleDTO roleDTO) {
+        this.roleDTO = roleDTO;
+    }
 
     public Date getDateCreated() {
         return dateCreated;

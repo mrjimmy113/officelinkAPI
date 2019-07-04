@@ -3,6 +3,7 @@ package com.fpt.officelink.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Set;
 
 
 @Entity
@@ -17,7 +18,7 @@ public class Role implements Serializable {
     private String role;
 
     @OneToMany(mappedBy = "role")
-    private Collection<Account> accounts;
+    private Set<Account> accounts;
 
 
     public Integer getId() {
@@ -36,11 +37,11 @@ public class Role implements Serializable {
         this.role = role;
     }
 
-    public Collection<Account> getAccounts() {
+    public Set<Account> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(Collection<Account> accounts) {
+    public void setAccounts(Set<Account> accounts) {
         this.accounts = accounts;
     }
 }
