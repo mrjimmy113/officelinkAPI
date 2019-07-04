@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e34e5a57-c70d-4c99-8204-2cb0305cf98a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="60" selection-start-line="2" selection-start-column="50" selection-end-line="2" selection-end-column="60" />
+            <state relative-caret-position="495">
+              <caret line="185" column="79" selection-start-line="185" selection-start-column="79" selection-end-line="185" selection-end-column="79" />
             </state>
           </provider>
         </entry>
@@ -33,14 +32,6 @@
                 <element signature="e#377#378#0" expanded="true" />
                 <element signature="e#447#448#0" expanded="true" />
                 <element signature="e#493#494#0" expanded="true" />
-                <element signature="e#326#327#0" expanded="true" />
-                <element signature="e#351#352#0" expanded="true" />
-                <element signature="e#388#389#0" expanded="true" />
-                <element signature="e#416#417#0" expanded="true" />
-                <element signature="e#447#448#0" expanded="true" />
-                <element signature="e#474#475#0" expanded="true" />
-                <element signature="e#514#515#0" expanded="true" />
-                <element signature="e#546#547#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -49,12 +40,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Account.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
+            <state relative-caret-position="675">
               <caret line="54" column="22" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
-              <folding>
-                <element signature="e#1097#1098#0" expanded="true" />
-                <element signature="e#1131#1132#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -80,22 +67,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Role.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="388">
-              <caret line="35" column="18" lean-forward="true" selection-start-line="35" selection-start-column="18" selection-end-line="35" selection-end-column="18" />
+            <state relative-caret-position="435">
+              <caret line="35" column="18" selection-start-line="35" selection-start-column="18" selection-end-line="35" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#453#454#0" expanded="true" />
-                <element signature="e#478#479#0" expanded="true" />
-                <element signature="e#515#516#0" expanded="true" />
-                <element signature="e#543#544#0" expanded="true" />
-                <element signature="e#574#575#0" expanded="true" />
-                <element signature="e#601#602#0" expanded="true" />
-                <element signature="e#641#642#0" expanded="true" />
-                <element signature="e#673#674#0" expanded="true" />
-                <element signature="e#721#722#0" expanded="true" />
-                <element signature="e#752#753#0" expanded="true" />
-                <element signature="e#813#814#0" expanded="true" />
-                <element signature="e#853#854#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -104,26 +79,18 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/dto/AccountDTO.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-461">
+            <state relative-caret-position="300">
               <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
               <folding>
                 <element signature="e#603#604#0" expanded="true" />
                 <element signature="e#650#651#0" expanded="true" />
                 <element signature="e#688#689#0" expanded="true" />
-                <element signature="e#545#546#0" expanded="true" />
-                <element signature="e#579#580#0" expanded="true" />
-                <element signature="e#631#632#0" expanded="true" />
-                <element signature="e#677#678#0" expanded="true" />
-                <element signature="e#714#715#0" expanded="true" />
-                <element signature="e#749#750#0" expanded="true" />
-                <element signature="e#803#804#0" expanded="true" />
-                <element signature="e#851#852#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="231">
@@ -189,7 +156,6 @@
         <option value="$PROJECT_DIR$/src/main/resources/templates/email-invite-temp.ftl" />
         <option value="$PROJECT_DIR$/src/main/resources/templates/email-temp.ftl" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/mail/service/MailService.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/dto/RoleDTO.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/dto/AccountDTO.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Account.java" />
@@ -197,6 +163,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/repository/RoleRespository.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java" />
       </list>
     </option>
   </component>
@@ -358,8 +325,8 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -369,7 +336,7 @@
     <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1562249033336" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1562252690113" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -419,14 +386,24 @@
       <workItem from="1562039227639" duration="2059000" />
       <workItem from="1562042449664" duration="39810000" />
       <workItem from="1562227224610" duration="3402000" />
+      <workItem from="1562251346966" duration="417000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="57012000" />
+    <option name="totallyTimeSpent" value="57175000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="6" y="23" width="1440" height="829" extended-state="6" />
+    <frame x="0" y="23" width="1440" height="829" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26752505" />
@@ -569,8 +546,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="452">
-          <caret line="208" column="33" selection-start-line="208" selection-start-column="33" selection-end-line="208" selection-end-column="33" />
+        <state relative-caret-position="495">
+          <caret line="185" column="79" selection-start-line="185" selection-start-column="79" selection-end-line="185" selection-end-column="79" />
         </state>
       </provider>
     </entry>
@@ -642,20 +619,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/dto/AccountDTO.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-461">
+        <state relative-caret-position="300">
           <caret line="23" column="33" selection-start-line="23" selection-start-column="33" selection-end-line="23" selection-end-column="33" />
           <folding>
             <element signature="e#603#604#0" expanded="true" />
             <element signature="e#650#651#0" expanded="true" />
             <element signature="e#688#689#0" expanded="true" />
-            <element signature="e#545#546#0" expanded="true" />
-            <element signature="e#579#580#0" expanded="true" />
-            <element signature="e#631#632#0" expanded="true" />
-            <element signature="e#677#678#0" expanded="true" />
-            <element signature="e#714#715#0" expanded="true" />
-            <element signature="e#749#750#0" expanded="true" />
-            <element signature="e#803#804#0" expanded="true" />
-            <element signature="e#851#852#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -669,14 +638,6 @@
             <element signature="e#377#378#0" expanded="true" />
             <element signature="e#447#448#0" expanded="true" />
             <element signature="e#493#494#0" expanded="true" />
-            <element signature="e#326#327#0" expanded="true" />
-            <element signature="e#351#352#0" expanded="true" />
-            <element signature="e#388#389#0" expanded="true" />
-            <element signature="e#416#417#0" expanded="true" />
-            <element signature="e#447#448#0" expanded="true" />
-            <element signature="e#474#475#0" expanded="true" />
-            <element signature="e#514#515#0" expanded="true" />
-            <element signature="e#546#547#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -700,33 +661,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Account.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
+        <state relative-caret-position="675">
           <caret line="54" column="22" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
-          <folding>
-            <element signature="e#1097#1098#0" expanded="true" />
-            <element signature="e#1131#1132#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Role.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="35" column="18" lean-forward="true" selection-start-line="35" selection-start-column="18" selection-end-line="35" selection-end-column="18" />
+        <state relative-caret-position="435">
+          <caret line="35" column="18" selection-start-line="35" selection-start-column="18" selection-end-line="35" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#453#454#0" expanded="true" />
-            <element signature="e#478#479#0" expanded="true" />
-            <element signature="e#515#516#0" expanded="true" />
-            <element signature="e#543#544#0" expanded="true" />
-            <element signature="e#574#575#0" expanded="true" />
-            <element signature="e#601#602#0" expanded="true" />
-            <element signature="e#641#642#0" expanded="true" />
-            <element signature="e#673#674#0" expanded="true" />
-            <element signature="e#721#722#0" expanded="true" />
-            <element signature="e#752#753#0" expanded="true" />
-            <element signature="e#813#814#0" expanded="true" />
-            <element signature="e#853#854#0" expanded="true" />
           </folding>
         </state>
       </provider>
