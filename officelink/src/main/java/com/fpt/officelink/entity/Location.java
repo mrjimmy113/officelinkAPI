@@ -26,31 +26,29 @@ public class Location implements Serializable {
     private Integer id;
 
     @Column
-    private String county;
+    private String name;
 
-    @Column 
+    @Column
     private String address;
     
     @Column
-    private String city;
+    private Double latitude;
     
+    @Column
+    private Double longitude;
+
     @Column
     private Date dateCreated;
-    
-    @Column 
+
+    @Column
     private Date dateModified;
-    
+
     @Column
     private boolean isDeleted;
-    
-//    @ManyToMany(mappedBy = "locations")
-//    @JsonIgnore
-//    private List<Department> departments;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "workplace_id")
-//    private int workplace;
-    
+
+    @Column
+    private Date dateDeleted;
+
     //Getter and Setter
     public Integer getId() {
         return id;
@@ -59,14 +57,6 @@ public class Location implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
-
-    public String getCounty() {
-        return county;
-    }
-
-    public void setCounty(String county) {
-        this.county = county;
-    } 
 
     public boolean isIsDeleted() {
         return isDeleted;
@@ -84,14 +74,6 @@ public class Location implements Serializable {
         this.address = address;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -107,21 +89,47 @@ public class Location implements Serializable {
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
     }
-    
-    public boolean isDeleted() {
-		return isDeleted;
-	}
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getDateDeleted() {
+        return dateDeleted;
+    }
+
+    public void setDateDeleted(Date dateDeleted) {
+        this.dateDeleted = dateDeleted;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
     
-//    public List<Department> getDepartments() {
-//		return departments;
-//	}
-//
-//	public void setDepartments(List<Department> departments) {
-//		this.departments = departments;
-//	}
     
 }

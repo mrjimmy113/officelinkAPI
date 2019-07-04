@@ -12,37 +12,32 @@ import java.util.Date;
  * @author Thai Phu Cuong
  */
 public class LocationDTO {
-    
+
     private int id;
 
-    private String county;
+    private String name;
 
     private String address;
     
-    private String city;
+    private Double latitude;
     
+    private Double longitude;
+
     private Date dateCreated;
-    
+
     private Date dateModified;
-    
+
     private boolean isDeleted;
-    
+
+    private Date dateDeleted;
+
     //Getter and Setter
-    
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getCounty() {
-        return county;
-    }
-
-    public void setCounty(String county) {
-        this.county = county;
     }
 
     public boolean isIsDeleted() {
@@ -61,14 +56,6 @@ public class LocationDTO {
         this.address = address;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -85,6 +72,36 @@ public class LocationDTO {
         this.dateModified = dateModified;
     }
 
-    
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getDateDeleted() {
+        return dateDeleted;
+    }
+
+    public void setDateDeleted(Date dateDeleted) {
+        this.dateDeleted = dateDeleted;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+    
 }
