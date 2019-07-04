@@ -14,7 +14,7 @@ public interface AccountService {
 
     boolean addNewAccount(Account account , Integer roleId);
 
-    void modifyAccount(Account account);
+    void modifyAccount(Account account, Integer roleId);
 
     void removeAccount(int id);
 

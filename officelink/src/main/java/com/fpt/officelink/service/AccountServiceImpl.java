@@ -3,6 +3,7 @@ package com.fpt.officelink.service;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Role;
 import com.fpt.officelink.repository.AccountRespository;
+import com.fpt.officelink.repository.RoleRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     JwtService jwtSer;
 
+    @Autowired
+    RoleRespository roleRespository;
+
     @Override
     public Page<Account> searchWithPagination(String term, int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
@@ -37,7 +41,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean addNewAccount(Account account , Integer roleId) {
-        
+        Optional<Role> optionalRole = roleRespository.findById(roleId);
         Optional<Account> optionalAccount = accountRespository.findAccountByEmailAndWorkspacename( account.getEmail(), account.getWorkspacename());
         if(optionalAccount.isPresent()){
             return false;
@@ -49,7 +53,8 @@ public class AccountServiceImpl implements AccountService {
         	workplaceService.addNewWorkplace(workplace);
         	
         	// create account with the new workplace
-        	account.setWorkplace(workplace);
+            account.setWorkplace(workplace);
+            account.setRole(optionalRole.get());
             accountRespository.save(account);
             return true;
         }
@@ -58,8 +63,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void modifyAccount(Account account) {
-        accountRespository.save(account);
+    public void modifyAccount(Account account, Integer roleId) {
+        Optional<Role> optionalRole = roleRespository.findById(roleId);
+        if(optionalRole.isPresent()){
+            account.setRole(optionalRole.get());
+            accountRespository.save(account);
+        }
+
     }
 
     @Override
