@@ -10,6 +10,7 @@ import com.fpt.officelink.dto.NewsDTO;
 import com.fpt.officelink.entity.News;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface NewsService {
     
-    Page<News> searchWithPagination(String term, int pageNum);
+    Optional<News> searchById(int id);
+    
+    Page<News> searchByTitleWithPagination(String term, int pageNum);
     
     boolean addNews(News news);
     
@@ -30,5 +33,9 @@ public interface NewsService {
     NewsDTO saveImageAndConvertStringToJson(String path, MultipartFile file, String string);
     
     List<ImageNewsDTO> getListNews(Page<News> news, String path);
+    
+    ImageNewsDTO getNews(Optional<News> news, String path);
+    
+    List<ImageNewsDTO> findNewsByDate(String startDate, String endDate, String path);
     
 }

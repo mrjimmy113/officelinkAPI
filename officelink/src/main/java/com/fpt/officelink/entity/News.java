@@ -18,36 +18,38 @@ import javax.persistence.Id;
  */
 @Entity
 public class News {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
     private String title;
-    
-    @Column
+
+    @Column(length = 500)
     private String shortDescription;
-    
+
     @Column
     private String image;
-    
-    @Column
+
+    @Column(length = 13000)
     private String content;
-    
+
     @Column
     private Date dateCreated;
-    
+
     @Column
     private Date dateModified;
-    
+
     @Column
     private boolean isDeleted;
 
+    @Column
+    private Date dateDeleted;
     //Getter and Setter
-    
+
     public Integer getId() {
         return id;
     }
@@ -111,6 +113,13 @@ public class News {
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    
-    
+
+    public Date getDateDeleted() {
+        return dateDeleted;
+    }
+
+    public void setDateDeleted(Date dateDeleted) {
+        this.dateDeleted = dateDeleted;
+    }
+
 }

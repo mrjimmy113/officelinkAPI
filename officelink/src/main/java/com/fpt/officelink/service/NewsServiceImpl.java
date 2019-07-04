@@ -16,7 +16,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -45,21 +50,23 @@ public class NewsServiceImpl implements NewsService {
     NewsRepository newsRep;
 
     @Override
-    public Page<News> searchWithPagination(String term, int pageNum) {
+    public Optional<News> searchById(int id) {
+        return newsRep.findById(id);
+    }
+
+    @Override
+    public Page<News> searchByTitleWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
         return newsRep.findAllByTitleContainingAndIsDeleted(term, false, pageRequest);
     }
 
     @Override
     public boolean addNews(News news) {
-        Optional<News> title = newsRep.findByTitleAndIsDeleted(news.getTitle(), Boolean.FALSE);
-        Optional<News> content = newsRep.findByContentAndIsDeleted(news.getContent(), Boolean.FALSE);
-        Optional<News> shortDescription = newsRep.findByShortDescriptionAndIsDeleted(news.getShortDescription(), Boolean.FALSE);
-        if (title.isPresent() || content.isPresent() || shortDescription.isPresent()) {
-            return false;
-        } else {
+        try {
             newsRep.save(news);
             return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -79,6 +86,7 @@ public class NewsServiceImpl implements NewsService {
         if (news != null) {
             try {
                 news.setIsDeleted(true);
+                news.setDateDeleted(Date.from(Instant.now()));
                 newsRep.save(news);
                 return true;
             } catch (Exception e) {
@@ -93,7 +101,6 @@ public class NewsServiceImpl implements NewsService {
         Gson g = new Gson();
         NewsDTO newsDTO = g.fromJson(string, NewsDTO.class);
         String imageName = String.valueOf(file.hashCode());
-        String imageContentType = FilenameUtils.getExtension(file.getOriginalFilename());
         String imageFolder = path + IMAGE_FOLDER;
         String imagePath = path + IMAGE_FOLDER + "/" + imageName + "." + "jpg";
         try {
@@ -117,6 +124,51 @@ public class NewsServiceImpl implements NewsService {
     public List<ImageNewsDTO> getListNews(Page<News> news, String path) {
         List<ImageNewsDTO> listNews = new ArrayList<>();
         news.getContent().forEach(element -> {
+            try {
+                ImageNewsDTO dto = new ImageNewsDTO();
+                BeanUtils.copyProperties(element, dto);
+                String tmp = path + "image\\" + dto.getImage();
+                Path byteImage = Paths.get(tmp);
+                byte[] data = Files.readAllBytes(byteImage);
+                dto.setByte_image(data);
+                listNews.add(dto);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return listNews;
+    }
+
+    @Override
+    public ImageNewsDTO getNews(Optional<News> opt, String path) {
+        ImageNewsDTO dto = new ImageNewsDTO();
+        News news = opt.get();
+        BeanUtils.copyProperties(news, dto);
+        try {
+            String tmp = path + "image\\" + dto.getImage();
+            Path byteImage = Paths.get(tmp);
+            byte[] data = Files.readAllBytes(byteImage);
+            dto.setByte_image(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dto;
+    }
+
+    @Override
+    public List<ImageNewsDTO> findNewsByDate(String startDate, String endDate, String path) {
+        List<ImageNewsDTO> listNews = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        List<News> news = newsRep.findByIsDeleted(false);
+        try {
+            c.setTime(sdf.parse(endDate));
+            c.add(Calendar.DATE, 1);
+            news = newsRep.findNewstByDateCreated(sdf.parse(startDate), c.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        news.forEach(element -> {
             try {
                 ImageNewsDTO dto = new ImageNewsDTO();
                 BeanUtils.copyProperties(element, dto);
