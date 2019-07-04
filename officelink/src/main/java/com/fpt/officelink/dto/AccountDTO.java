@@ -2,6 +2,7 @@ package com.fpt.officelink.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AccountDTO implements Serializable {
@@ -12,10 +13,28 @@ public class AccountDTO implements Serializable {
     private String lastname;
     private String address;
     private boolean isDeleted ;
-    private String role;
+    private Integer role_id;
     private String workspacename;
 
+    private Date dateCreated;
+    private Date dateModified;
 
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 
     public String getWorkspacename() {
         return workspacename;
@@ -25,15 +44,13 @@ public class AccountDTO implements Serializable {
         this.workspacename = workspacename;
     }
 
-    public String getRole() {
-        return role;
+    public Integer getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
     }
-
-
 
     public AccountDTO() {
     }
@@ -54,7 +71,7 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public AccountDTO(Integer id, String password, String email, String firstname, boolean isDeleted, String lastname, String address, String role, String workspacename) {
+    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDeleted, Integer role_id, String workspacename, Date dateCreated, Date dateModified) {
         this.id = id;
         this.password = password;
         this.email = email;
@@ -62,8 +79,10 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
         this.address = address;
         this.isDeleted = isDeleted;
-        this.role = role;
+        this.role_id = role_id;
         this.workspacename = workspacename;
+        this.dateCreated = dateCreated;
+        this.dateModified = dateModified;
     }
 
     public boolean isIsDeleted() {
