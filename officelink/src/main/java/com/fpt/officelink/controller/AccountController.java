@@ -132,8 +132,8 @@ public class AccountController {
         try {
             Account entity = new Account();
 
-            BeanUtils.copyProperties(dto, entity);
-            boolean res = service.addNewAccount(entity);
+            BeanUtils.copyProperties(dto, entity, "roleId");
+            boolean res = service.addNewAccount(entity, dto.getRole_id());
             if(res){
 
                 status = HttpStatus.OK;
@@ -182,8 +182,8 @@ public class AccountController {
             AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
 
             Account entity = new Account();
-            BeanUtils.copyProperties(accountDTO,entity);
-            boolean res = service.addNewAccount(entity);
+            BeanUtils.copyProperties(accountDTO,entity , "roleId");
+            boolean res = service.addNewAccount(entity, accountDTO.getRole_id());
             if(res){
 
                 status = HttpStatus.OK;
@@ -252,8 +252,8 @@ public class AccountController {
         HttpStatus status = null;
         try {
             Account entity = new Account();
-            BeanUtils.copyProperties(dto, entity);
-            service.modifyAccount(entity);
+            BeanUtils.copyProperties(dto, entity, "roleId");
+            service.modifyAccount(entity, dto.getRole_id());
             status = HttpStatus.CREATED;
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
