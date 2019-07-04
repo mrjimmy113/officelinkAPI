@@ -11,11 +11,12 @@
     <!-- use the font -->
 
 </head>
-<body style="margin: 0; padding: 0; background-color: #7efff5">
+<body style="text-align: center; background-color: #dfe4ea; border-radius: 15px ">
 
-<h2 style="align-content: center; color: darkturquoise">OFFICE LINK</h2><br/>
-<img src="officelink.png" alt=""/>
+<h2 style="align-content: center; color: #5352ed">OFFICE LINK</h2><br/>
 
+<img src="https://www.metricstream.com/cdn/farfuture/WgqOE65etJBYR5WBeDZd6uPK4TkYcnTygpB4949_57s/mtime:1486551461/sites/default/files/M7-App-Banner-7-Survey.jpg" alt=""/>
+<br/>
 <span>Hello!</span><br/>
 <span>You just received an invitation to create an account at OFFICE LINK, please click the button below:</span><br/>
 <a  rel="link" style="display: inline-block;
