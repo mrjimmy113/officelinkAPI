@@ -2,6 +2,8 @@ package com.fpt.officelink.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Account implements Serializable {
@@ -32,16 +34,39 @@ public class Account implements Serializable {
     private String lastname;
 
     @Column
-    private String role;
+    private Date dateCreated;
+
+    @Column
+    private Date dateModified;
 
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
-    public String getRole() {
+
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
     }
 
     public boolean isIsDeleted() {
