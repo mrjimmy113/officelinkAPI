@@ -1,23 +1,25 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.fpt.officelink.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  *
  * @author Thai Phu Cuong
  */
 @Entity
-public class Location implements Serializable {
+public class News {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,16 +28,16 @@ public class Location implements Serializable {
     private Integer id;
 
     @Column
-    private String name;
+    private String title;
+
+    @Column(length = 500)
+    private String shortDescription;
 
     @Column
-    private String address;
-    
-    @Column
-    private Double latitude;
-    
-    @Column
-    private Double longitude;
+    private String image;
+
+    @Column(length = 13000)
+    private String content;
 
     @Column
     private Date dateCreated;
@@ -48,8 +50,13 @@ public class Location implements Serializable {
 
     @Column
     private Date dateDeleted;
-
+    
+    @ManyToOne
+    @JoinColumn(name = "workplaceId")
+    private Workplace workplace;
+    
     //Getter and Setter
+
     public Integer getId() {
         return id;
     }
@@ -58,20 +65,36 @@ public class Location implements Serializable {
         this.id = id;
     }
 
-    public boolean isIsDeleted() {
-        return isDeleted;
+    public String getTitle() {
+        return title;
     }
 
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getAddress() {
-        return address;
+    public String getShortDescription() {
+        return shortDescription;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getDateCreated() {
@@ -90,20 +113,12 @@ public class Location implements Serializable {
         this.dateModified = dateModified;
     }
 
-    public boolean isDeleted() {
+    public boolean isIsDeleted() {
         return isDeleted;
     }
 
-    public void setDeleted(boolean isDeleted) {
+    public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Date getDateDeleted() {
@@ -114,22 +129,4 @@ public class Location implements Serializable {
         this.dateDeleted = dateDeleted;
     }
 
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    
-    
 }
