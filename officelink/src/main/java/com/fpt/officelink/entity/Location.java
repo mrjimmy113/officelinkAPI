@@ -10,7 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -48,6 +50,10 @@ public class Location implements Serializable {
 
     @Column
     private Date dateDeleted;
+    
+    @ManyToOne
+    @JoinColumn(name = "workplaceId")
+    private Workplace workplaces;
 
     //Getter and Setter
     public Integer getId() {
@@ -128,6 +134,14 @@ public class Location implements Serializable {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public Workplace getWorkplaces() {
+        return workplaces;
+    }
+
+    public void setWorkplaces(Workplace workplaces) {
+        this.workplaces = workplaces;
     }
 
     

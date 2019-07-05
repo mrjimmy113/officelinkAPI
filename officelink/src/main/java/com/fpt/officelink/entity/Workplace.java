@@ -41,6 +41,10 @@ public class Workplace implements Serializable {
     @JsonIgnore
     private List<News> news = new ArrayList<>();
 
+    @OneToMany(mappedBy = "workplaces")
+    @JsonIgnore
+    private List<Location> location = new ArrayList<>();
+    
     //Getter setter
     public int getId() {
         return id;
@@ -82,4 +86,22 @@ public class Workplace implements Serializable {
         this.isDeleted = isDeleted;
     }
 
+    public List<News> getNews() {
+        return news;
+    }
+
+    public void setNews(List<News> news) {
+        this.news = news;
+    }
+
+    public List<Location> getLocation() {
+        return location;
+    }
+
+    public void setLocation(List<Location> location) {
+        this.location = location;
+    }
+
+    
+    
 }
