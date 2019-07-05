@@ -129,4 +129,13 @@ public class News {
         this.dateDeleted = dateDeleted;
     }
 
+    public Workplace getWorkplace() {
+        return workplace;
+    }
+
+    public void setWorkplace(Workplace workplace) {
+        this.workplace = workplace;
+    }
+
+    
 }

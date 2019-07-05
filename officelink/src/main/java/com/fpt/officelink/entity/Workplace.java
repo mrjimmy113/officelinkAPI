@@ -14,110 +14,132 @@ import javax.persistence.OneToMany;
 @Entity
 public class Workplace implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
-	
-	@Column
-	private String name;
-	
-	@Column(updatable = false)
-	private Date dateCreated;
-	
-	@Column
-	private Date dateModified;
-	
-	@Column
-	private boolean isDeleted;
-	
-	@OneToMany(mappedBy = "workplace")
-	private Set<Configuration> configurations;
-	
-	@OneToMany(mappedBy = "workplace")
-	private Set<Account> accounts;
-	
-	@OneToMany(mappedBy = "workplace")
-	private Set<Department> departments;
-	
-	@OneToMany(mappedBy = "workplace")
-	private Set<Survey> surveys;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	//Getter setter
-	public int getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    @Column
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    @Column(updatable = false)
+    private Date dateCreated;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Column
+    private Date dateModified;
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
+    @Column
+    private boolean isDeleted;
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<Configuration> configurations;
 
-	public Date getDateModified() {
-		return dateModified;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<Account> accounts;
 
-	public void setDateModified(Date dateModified) {
-		this.dateModified = dateModified;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<Department> departments;
 
-	public boolean isDeleted() {
-		return isDeleted;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<Survey> surveys;
 
-	public void setDeleted(boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
-	
-	public Set<Configuration> getConfigurations() {
-		return configurations;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<Location> location;
 
-	public void setConfigurations(Set<Configuration> configurations) {
-		this.configurations = configurations;
-	}
+    @OneToMany(mappedBy = "workplace")
+    private Set<News> news;
 
-	public Set<Account> getAccounts() {
-		return accounts;
-	}
+    //Getter setter
+    public int getId() {
+        return id;
+    }
 
-	public void setAccounts(Set<Account> accounts) {
-		this.accounts = accounts;
-	}
-	
-	public Set<Department> getDepartments() {
-		return departments;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setDepartments(Set<Department> departments) {
-		this.departments = departments;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Set<Survey> getSurveys() {
-		return surveys;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setSurveys(Set<Survey> surveys) {
-		this.surveys = surveys;
-	}
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Set<Configuration> getConfigurations() {
+        return configurations;
+    }
+
+    public void setConfigurations(Set<Configuration> configurations) {
+        this.configurations = configurations;
+    }
+
+    public Set<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(Set<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    public Set<Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(Set<Department> departments) {
+        this.departments = departments;
+    }
+
+    public Set<Survey> getSurveys() {
+        return surveys;
+    }
+
+    public void setSurveys(Set<Survey> surveys) {
+        this.surveys = surveys;
+    }
+
+    public Set<Location> getLocation() {
+        return location;
+    }
+
+    public void setLocation(Set<Location> location) {
+        this.location = location;
+    }
+
+    public Set<News> getNews() {
+        return news;
+    }
+
+    public void setNews(Set<News> news) {
+        this.news = news;
+    }
 
 }

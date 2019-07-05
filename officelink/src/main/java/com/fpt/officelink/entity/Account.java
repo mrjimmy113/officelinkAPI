@@ -15,12 +15,16 @@ public class Account implements Serializable {
     private boolean isDelete;
 
     @ManyToOne
-	@JoinColumn(name = "workplace_id", nullable = false)
+    @JoinColumn(name = "workplace_id", nullable = false)
     private Workplace workplace;
+
+    @ManyToOne
+    @JoinColumn(name = "locationId", nullable = false)
+    private Location location;
 
     @Column
     private String password;
-	@Column
+    @Column
     private String email;
     @Column
     private String firstname;
@@ -42,8 +46,7 @@ public class Account implements Serializable {
         return isDelete;
     }
 
-    public void setDelete(boolean isDelete)
-    {
+    public void setDelete(boolean isDelete) {
         this.isDelete = isDelete;
     }
 
@@ -54,7 +57,6 @@ public class Account implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public String getPassword() {
         return password;
@@ -96,16 +98,24 @@ public class Account implements Serializable {
         this.address = address;
     }
 
-
-
     @Column
     private String address;
 
     public Workplace getWorkplace() {
-		return workplace;
-	}
+        return workplace;
+    }
 
-	public void setWorkplace(Workplace workplace) {
-		this.workplace = workplace;
-	}
+    public void setWorkplace(Workplace workplace) {
+        this.workplace = workplace;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+    
+    
 }
