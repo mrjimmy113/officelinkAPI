@@ -43,37 +43,6 @@ public class TeamController {
 	TeamService teamService;
 
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<TeamDTO>> search(@RequestParam("term") String term) {
-		this.user = getUserContext();
-		HttpStatus status = null;
-		PageSearchDTO<TeamDTO> res = new PageSearchDTO<TeamDTO>();
-
-		try {
-			//
-			Page<Team> result = teamService.searchWithPagination(term, user.getWorkplaceId(), 0);
-			//
-			List<TeamDTO> resultList = new ArrayList<TeamDTO>();
-			result.getContent().forEach(element -> {
-				DepartmentDTO depDTO = new DepartmentDTO();
-				TeamDTO teamDTO = new TeamDTO();
-				BeanUtils.copyProperties(element.getDepartment(), depDTO);
-				BeanUtils.copyProperties(element, teamDTO);
-				teamDTO.setDepartment(depDTO);
-				resultList.add(teamDTO);
-			});
-
-			res.setMaxPage(result.getTotalPages());
-			res.setObjList(resultList);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
-	}
-
-	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
 		this.user = getUserContext();

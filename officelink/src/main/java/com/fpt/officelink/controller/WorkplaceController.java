@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.WorkplaceDTO;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.WorkplaceService;
 
@@ -28,61 +30,37 @@ import com.fpt.officelink.service.WorkplaceService;
 @RequestMapping("/workplace")
 public class WorkplaceController {
 	
+	private CustomUser user;
+
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
+
 	@Autowired
 	WorkplaceService workpService;
 
-	@GetMapping(value = "/getAll")
-	public ResponseEntity<List<WorkplaceDTO>> getAll(){
+	@GetMapping(value = "/getUserWorkplace")
+	public ResponseEntity<WorkplaceDTO> getUserWorkplace(){
+		user = this.getUserContext();
 		HttpStatus status = null;
-		List<WorkplaceDTO> res = new ArrayList<WorkplaceDTO>();
+		WorkplaceDTO res = new WorkplaceDTO();
 		
 		try {
 			//
-			List<Workplace> result = workpService.getAll();
+			Workplace result = workpService.getWorkplace(user.getWorkplaceId());
 			//
-			List<WorkplaceDTO> resultList = new ArrayList<WorkplaceDTO>();
-			result.forEach(element -> {
-				WorkplaceDTO dto = new WorkplaceDTO();
-				BeanUtils.copyProperties(element, dto);
-				resultList.add(dto);
-			});
+			BeanUtils.copyProperties(result, res);
 			//
-			res.addAll(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
-		return new ResponseEntity<List<WorkplaceDTO>>(res, status);
+		return new ResponseEntity<WorkplaceDTO>(res, status);
 	}
+	
 	
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<WorkplaceDTO>> search(@RequestParam("term") String term){
-		HttpStatus status = null;
-		PageSearchDTO<WorkplaceDTO> res = new PageSearchDTO<WorkplaceDTO>();
-		
-		try {
-			//
-			Page<Workplace> result = workpService.searchWithPagination(term, 0);
-			//
-			List<WorkplaceDTO> resultList = new ArrayList<WorkplaceDTO>();
-			result.getContent().forEach(element -> {
-				WorkplaceDTO dto = new WorkplaceDTO();
-				BeanUtils.copyProperties(element, dto);
-				resultList.add(dto);
-			});
-			//
-			res.setMaxPage(result.getTotalPages());
-			res.setObjList(resultList);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<PageSearchDTO<WorkplaceDTO>>(res, status);
-	}
-	
-	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<WorkplaceDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<WorkplaceDTO> res = new PageSearchDTO<WorkplaceDTO>();
