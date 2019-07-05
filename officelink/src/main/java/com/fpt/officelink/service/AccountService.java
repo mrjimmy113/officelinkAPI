@@ -17,6 +17,10 @@ public interface AccountService {
 
     void removeAccount(int id);
 
+    boolean checkAccountExisted(String email);
+
+
+
 
 
 
