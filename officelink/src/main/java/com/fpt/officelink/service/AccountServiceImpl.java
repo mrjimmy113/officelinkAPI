@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,17 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     AccountRespository accountRespository;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
+    @Autowired
+    public AccountServiceImpl(AccountRespository accountRespository,
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.accountRespository = accountRespository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Autowired
     RoleRespository roleRespository;
@@ -40,6 +52,7 @@ public class AccountServiceImpl implements AccountService {
                 return false;
             }else{
                 account.setRole(optionalRole.get());
+                account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
                 accountRespository.save(account);
                 return true;
             }

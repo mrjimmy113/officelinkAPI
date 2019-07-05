@@ -182,8 +182,10 @@ public class AccountController {
             AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
 
             Account entity = new Account();
-            BeanUtils.copyProperties(accountDTO,entity , "roleId");
+            BeanUtils.copyProperties(accountDTO,entity ,"roleId");
             boolean res = service.addNewAccount(entity, accountDTO.getRole_id());
+
+
             if(res){
 
                 status = HttpStatus.OK;

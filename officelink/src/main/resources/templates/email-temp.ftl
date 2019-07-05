@@ -11,11 +11,11 @@
     <!-- use the font -->
 
 </head>
-<body style="style="text-align: center; background-color: #dfe4ea; border-radius: 15px">
+<body style="text-align: center; background-color: #dfe4ea; border-radius: 15px ">
 
 <h2 style="align-content: center; color:#5352ed">OFFICE LINK</h2><br/>
 
-<img src="https://www.metricstream.com/cdn/farfuture/WgqOE65etJBYR5WBeDZd6uPK4TkYcnTygpB4949_57s/mtime:1486551461/sites/default/files/M7-App-Banner-7-Survey.jpg" alt=""/>
+<img src="http://webshop.officelink.no/htdocs/images/logo.png" alt=""/>
 <br/>
 
 <span>Hello!</span><br/>
