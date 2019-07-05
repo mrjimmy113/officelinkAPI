@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -43,6 +45,13 @@ public class Survey implements Serializable {
 	
 	@Column
 	private boolean isDeleted;
+	
+	@OneToMany(mappedBy = "survey")
+	private Set<Configuration> configurations;
+	
+	@ManyToOne
+	@JoinColumn(name = "workplace_id")
+	private Workplace workplace;
 
 	public Integer getId() {
 		return id;
@@ -108,4 +117,20 @@ public class Survey implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 	
+	public Set<Configuration> getConfigurations() {
+		return configurations;
+	}
+
+	public void setConfigurations(Set<Configuration> configurations) {
+		this.configurations = configurations;
+	}
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
+
 }

@@ -2,69 +2,69 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 @Entity
-public class Department implements Serializable{
-
+public class Configuration implements Serializable{
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	
-	@Column
-	private String name;
-	
+    private int  id;
+
+	// cron expression
+    @NotNull
+    @Column
+    private String scheduleTime;
+    
 	@Column(updatable = false)
 	private Date dateCreated;
 	
 	@Column
 	private Date dateModified;
-	
-	@Column
+    
+    @Column
 	private boolean isDeleted;
-	
-	@OneToMany(mappedBy = "department")
-	private Set<Team> teams;
-	
-	@ManyToOne
-	@JoinColumn(name = "workplace_id", nullable = false)
-	private Workplace workplace;
-	
-//	@ManyToMany
-//	@JoinTable(name = "department_in_location",
-//	joinColumns = {@JoinColumn(name = "departmentId")},
-//	inverseJoinColumns = {@JoinColumn(name = "locationId")})
-//	private List<Location> locations;
+    
+    @Column
+	private boolean isActive;
 
-	// Getter Setter
-	public Integer getId() {
+	@ManyToOne
+    @JoinColumn(name = "workplace_id", nullable = false)
+    private Workplace workplace;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "survey_id")
+    private Survey survey;
+
+	//Getter setter
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getScheduleTime() {
+		return scheduleTime;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setScheduleTime(String scheduleTime) {
+		this.scheduleTime = scheduleTime;
 	}
 	
 	public Date getDateCreated() {
@@ -86,17 +86,17 @@ public class Department implements Serializable{
 	public boolean isDeleted() {
 		return isDeleted;
 	}
+	
+    public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
 
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
-	}
-	
-	public Set<Team> getTeams() {
-		return teams;
-	}
-
-	public void setTeams(Set<Team> teams) {
-		this.teams = teams;
 	}
 
 	public Workplace getWorkplace() {
@@ -107,4 +107,11 @@ public class Department implements Serializable{
 		this.workplace = workplace;
 	}
 	
+    public Survey getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(Survey survey) {
+		this.survey = survey;
+	}
 }

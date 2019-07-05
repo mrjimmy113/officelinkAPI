@@ -26,7 +26,7 @@ public class Team implements Serializable{
 	@Column
 	private String name;
 	
-	@Column
+	@Column(updatable = false)
 	private Date dateCreated;
 	
 	@Column

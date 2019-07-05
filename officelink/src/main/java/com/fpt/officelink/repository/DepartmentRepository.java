@@ -14,12 +14,12 @@ import com.fpt.officelink.entity.Department;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Integer> {
-	Page<Department> findAllByNameContainingAndIsDeleted(String name, Boolean isDeleted, Pageable page);
+	Page<Department> findAllByNameContainingAndIsDeletedAndWorkplaceId(String name, Boolean isDeleted, int workplaceId, Pageable page);
 
 	// for create new
-	Optional<Department> findByNameAndIsDeleted(String name, Boolean isDeleted);
+	Optional<Department> findByNameAndIsDeletedAndWorkplaceId(String name, Boolean isDeleted, int workplaceId);
 	//
-	List<Department> findAllByIsDeleted(Boolean isDeleted); 
+	List<Department> findAllByWorkplaceIdAndIsDeleted(int workplaceId, Boolean isDeleted); 
 	//
 	@Query(value = "SELECT d FROM Department d left join fetch d.teams t WHERE d.id = :depId AND t.isDeleted= false")
 	Department getDepartmentWithTeam(@Param("depId") int depId);

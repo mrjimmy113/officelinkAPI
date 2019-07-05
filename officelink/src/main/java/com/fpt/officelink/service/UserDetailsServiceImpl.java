@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.repository.AccountRespository;
 
 @Service("authService")
@@ -27,8 +28,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private UserDetails userWithRoles(Account acc, List<GrantedAuthority> roles) {
-        return new org.springframework.security.core.userdetails.User(
-               acc.getEmail(), acc.getPassword(), true, true, true, true, roles);
+        return new CustomUser(
+               acc.getEmail(), acc.getPassword(), true, true, true, true, roles, acc.getWorkplace().getId());
     }
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -15,7 +15,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
     Page<Account> findAllByFirstnameContainingAndIsDelete(String firstname , Boolean isDelete , Pageable pageable);
     Optional<Account> findAccountByEmail( String email);
 
-    Optional<Account> findAccountByEmailAndWorkspacename(String email, String worksapcename);
+//    Optional<Account> findAccountByEmailAndWorkspacename(String email, String worksapcename);
 
     Optional<Account> findByEmail(String email);
     

@@ -26,7 +26,9 @@ public interface SurveyService {
 
 	SurveyDTO getTakeSurvey(String token) throws ParseException;
 
-	void sendOutSurvey(Integer surveyId) throws JOSEException;
+	boolean sendOutSurvey(Integer surveyId) throws JOSEException;
 
 	void saveAnswer(List<AnswerDTO> answers);
+	
+	List<Survey> getWorkplaceSurvey(int workplaceId);
 }

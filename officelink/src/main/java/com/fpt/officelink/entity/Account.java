@@ -2,7 +2,6 @@ package com.fpt.officelink.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 public class Account implements Serializable {
@@ -15,20 +14,13 @@ public class Account implements Serializable {
     @Column
     private boolean isDelete;
 
-    @Column
-    private String workspacename;
-
-    public String getWorkspacename() {
-        return workspacename;
-    }
-
-    public void setWorkspacename(String workspacename) {
-        this.workspacename = workspacename;
-    }
+    @ManyToOne
+	@JoinColumn(name = "workplace_id", nullable = false)
+    private Workplace workplace;
 
     @Column
     private String password;
-    @Column
+	@Column
     private String email;
     @Column
     private String firstname;
@@ -109,4 +101,11 @@ public class Account implements Serializable {
     @Column
     private String address;
 
+    public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
 }

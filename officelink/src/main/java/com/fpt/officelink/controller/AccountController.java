@@ -132,7 +132,7 @@ public class AccountController {
             Account entity = new Account();
 
             BeanUtils.copyProperties(dto, entity);
-            boolean res = service.addNewAccount(entity);
+            boolean res = service.addNewAccount(entity, dto.getWorkspacename());
             if(res){
 
                 status = HttpStatus.OK;

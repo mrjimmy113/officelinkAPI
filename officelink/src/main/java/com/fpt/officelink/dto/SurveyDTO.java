@@ -3,9 +3,12 @@ package com.fpt.officelink.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Positive;
+
 import com.fpt.officelink.entity.Question;
 
 public class SurveyDTO {
+	@Positive
 	private Integer id;
 	
 	private String name;

@@ -10,9 +10,9 @@ public interface DepartmentService {
 	
 	Department getDepartment(int depId);
 	
-	List<Department> getAll();
+	List<Department> getAll(int workplaceId);
 	
-	Page<Department> searchWithPagination(String term, int pageNum);
+	Page<Department> searchWithPagination(String term, int workplaceId, int pageNum);
 	
 	boolean addNewDepartment(Department dep);
 	

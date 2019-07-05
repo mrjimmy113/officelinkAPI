@@ -29,6 +29,7 @@ import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.TypeQuestion;
@@ -42,6 +43,33 @@ public class SurveyController {
 	SurveyService ser;
 
 	Logger log = Logger.getLogger(SurveyController.class.getName());
+	
+	private CustomUser user;
+
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
+	
+	@GetMapping("/getWorkplaceSurveys")
+	public ResponseEntity<List<SurveyDTO>> getWorkplaceSurveys() {
+		this.user = getUserContext();
+		HttpStatus status = null;
+		List<SurveyDTO> res = new ArrayList<SurveyDTO>();
+		try {
+			List<Survey> result = ser.getWorkplaceSurvey(user.getWorkplaceId());
+			
+			result.forEach(s -> {
+				SurveyDTO dto = new SurveyDTO();
+				BeanUtils.copyProperties(s, dto);
+				res.add(dto);
+			});
+			
+			status =HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<SurveyDTO>>(res,status);
+	}
 
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> search(@RequestParam("term") String term,@RequestParam("page") int page) {

@@ -11,11 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.TeamRepository;
+import com.fpt.officelink.utils.Constants;
 
 @Service
 public class TeamServiceImpl implements TeamService {
-
-	private static final int PAGEMAXSIZE = 9;
 
 	@Autowired
 	TeamRepository teamRep;
@@ -26,17 +25,18 @@ public class TeamServiceImpl implements TeamService {
 	}
 	
 	@Override
-	public Page<Team> searchWithPagination(String term, int pageNum) {
+	public Page<Team> searchWithPagination(String term, int workplaceId, int pageNum) {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
-		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return teamRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		PageRequest pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+
+		return teamRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
 	}
 
 	@Override
 	public boolean addNewTeam(Team team) {
-		Optional<Team> opTeam = teamRep.findByNameAndIsDeleted(team.getName(), false);
+		Optional<Team> opTeam = teamRep.findByNameAndIsDeleted(team.getName(), team.getDepartment().getWorkplace().getId() , false);
 		if (opTeam.isPresent()) {
 			return false;
 		} else {
@@ -59,8 +59,25 @@ public class TeamServiceImpl implements TeamService {
 		if (team != null) {
 			team.setDeleted(true);
 		}
+		
+		team.setDateModified(new Date());
 		teamRep.save(team);
 		return true;
 	}
 
+	@Override
+	public List<Team> getTeams() {
+		return teamRep.findAllByIsDeleted(false);
+	}
+
+	@Override
+	public Team getTeam(int id) {
+		Team team = null;
+		Optional<Team> opTeams = teamRep.findById(id);
+		
+		if(opTeams.isPresent()) {
+			team = opTeams.get();
+		}
+		return team;
+	}
 }
