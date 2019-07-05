@@ -2,7 +2,9 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Answer implements Serializable {
@@ -32,6 +35,9 @@ public class Answer implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "question_identity")
 	private SurveyQuestion surveyQuestion;
+	
+	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST)
+	private Set<WordCloud> wordClouds;
 
 	public Integer getId() {
 		return id;
@@ -65,6 +71,15 @@ public class Answer implements Serializable {
 		this.surveyQuestion = surveyQuestion;
 	}
 
+	public Set<WordCloud> getWordClouds() {
+		return wordClouds;
+	}
+
+	public void setWordClouds(Set<WordCloud> wordClouds) {
+		this.wordClouds = wordClouds;
+	}
+
+	
 	
 
 }

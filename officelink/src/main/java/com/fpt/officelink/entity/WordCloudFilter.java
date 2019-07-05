@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class WordCloudFilter implements Serializable {
@@ -45,6 +46,10 @@ public class WordCloudFilter implements Serializable {
 	
 	@Column(name = "date_modified")
 	private Date dateModified;
+	
+	@ManyToOne
+	@JoinColumn(name = "workplace_id")
+	private Workplace workplace;
 
 	public Integer getId() {
 		return id;
@@ -101,8 +106,13 @@ public class WordCloudFilter implements Serializable {
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
 	}
-	
-	
-	
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
 	
 }

@@ -15,6 +15,8 @@ public class QuestionDTO {
 	private boolean isDeleted;
 	
 	private Integer questionIdentity;
+	
+	private Integer questionIndex;
 
 	public Integer getId() {
 		return id;
@@ -63,7 +65,13 @@ public class QuestionDTO {
 	public void setQuestionIdentity(Integer questionIdentity) {
 		this.questionIdentity = questionIdentity;
 	}
-	
-	
 
+	public Integer getQuestionIndex() {
+		return questionIndex;
+	}
+
+	public void setQuestionIndex(Integer questionIndex) {
+		this.questionIndex = questionIndex;
+	}
+	
 }
