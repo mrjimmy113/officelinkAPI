@@ -105,26 +105,27 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>nimbus-jose-jwt</artifactId>
-            <version>4.20</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <scope>compile</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>4.20</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<scope>compile</scope>
+		</dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
         </dependency>
         <dependency>
-            <groupId>net.minidev</groupId>
-            <artifactId>asm</artifactId>
-            <version>1.0.2</version>
-            <scope>test</scope>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>5.1.5.RELEASE</version>
         </dependency>
+    </dependencies>
 
         <dependency>
             <groupId>net.minidev</groupId>

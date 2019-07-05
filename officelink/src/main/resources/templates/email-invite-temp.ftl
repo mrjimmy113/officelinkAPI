@@ -15,7 +15,7 @@
 
 <h2 style="align-content: center; color: #5352ed">OFFICE LINK</h2><br/>
 
-<img src="https://www.metricstream.com/cdn/farfuture/WgqOE65etJBYR5WBeDZd6uPK4TkYcnTygpB4949_57s/mtime:1486551461/sites/default/files/M7-App-Banner-7-Survey.jpg" alt=""/>
+<img src="http://www.kenwitsconsultancy.co.uk/wp-content/uploads/2016/03/Survey.jpg" alt=""/>
 <br/>
 <span>Hello!</span><br/>
 <span>You just received an invitation to create an account at OFFICE LINK, please click the button below:</span><br/>

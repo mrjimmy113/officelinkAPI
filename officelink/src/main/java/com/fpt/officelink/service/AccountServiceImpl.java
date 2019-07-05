@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AuthDTO;
@@ -29,6 +30,17 @@ public class AccountServiceImpl implements AccountService {
     
     @Autowired
     JwtService jwtSer;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
+    @Autowired
+    public AccountServiceImpl(AccountRespository accountRespository,
+                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.accountRespository = accountRespository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Autowired
     RoleRespository roleRespository;
@@ -55,6 +67,7 @@ public class AccountServiceImpl implements AccountService {
         	// create account with the new workplace
             account.setWorkplace(workplace);
             account.setRole(optionalRole.get());
+            account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
             accountRespository.save(account);
             return true;
         }
