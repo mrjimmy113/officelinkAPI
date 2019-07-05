@@ -10,7 +10,9 @@ import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.service.LocationService;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.BeanUtils;
@@ -38,57 +40,37 @@ public class LocationController {
     @Autowired
     LocationService service;
 
-    @GetMapping(value = "/listAll")
-    public ResponseEntity<List<LocationDTO>> getAllLocation() {
+    @GetMapping(value = "/getAll")
+    public ResponseEntity<List<LocationDTO>> getAll() {
         HttpStatus status = null;
-        List<LocationDTO> res = new ArrayList<LocationDTO>();
-
+        List<LocationDTO> res = new ArrayList<>();
         try {
-            //
             List<Location> result = service.getAllLocation();
-            //
-            List<LocationDTO> resultList = new ArrayList<LocationDTO>();
             result.forEach(element -> {
                 LocationDTO dto = new LocationDTO();
                 BeanUtils.copyProperties(element, dto);
-                resultList.add(dto);
+                res.add(dto);
             });
-            //
-            res.addAll(resultList);
             status = HttpStatus.OK;
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
         }
-
         return new ResponseEntity<List<LocationDTO>>(res, status);
     }
-
-//    @GetMapping(value = "/list")
-//    public ResponseEntity<List<LocationDTO>> getLocationByDepartmentId(@RequestParam("depId") Integer depId) {
-//        HttpStatus status = null;
-//        List<LocationDTO> res = new ArrayList<LocationDTO>();
-//
-//        try {
-//            //
-//            Department dep = service.getDepartmentById(depId);
-//            List<Location> loc = new ArrayList<>();
-//            //		
-//            BeanUtils.copyProperties(loc, res);
-//            dep.getLocations().forEach(l -> {
-//                LocationDTO locationDTO = new LocationDTO();
-//                BeanUtils.copyProperties(l, locationDTO);
-//                if (locationDTO.isIsDeleted() == false) {
-//                    res.add(locationDTO);
-//                }
-//            });
-//            BeanUtils.copyProperties(loc, res);
-//            status = HttpStatus.OK;
-//        } catch (Exception e) {
-//            status = HttpStatus.BAD_REQUEST;
-//        }
-//
-//        return new ResponseEntity<List<LocationDTO>>(res, status);
-//    }
+    
+    @GetMapping(value = "/getId")
+    public ResponseEntity<LocationDTO> searchById(@RequestParam("id") int id) {
+        HttpStatus status = null;
+        LocationDTO res = new LocationDTO();
+        try {
+            Optional<Location> result = service.searchById(id);
+            BeanUtils.copyProperties(result.get(), res);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<LocationDTO>(res, status);
+    }
 
     @GetMapping
     public ResponseEntity<PageSearchDTO<LocationDTO>> search(@RequestParam("term") String term) {
@@ -144,6 +126,7 @@ public class LocationController {
         HttpStatus status = null;
         try {
             Location location = new Location();
+            dto.setDateCreated(Date.from(Instant.now()));
             BeanUtils.copyProperties(dto, location);
             if (service.addLocation(location)) {
                 status = HttpStatus.CREATED;
@@ -163,6 +146,7 @@ public class LocationController {
         HttpStatus status = null;
         try {
             Location location = new Location();
+            dto.setDateModified(Date.from(Instant.now()));
             BeanUtils.copyProperties(dto, location);
             if (service.editLocation(location)) {
                 status = HttpStatus.OK;

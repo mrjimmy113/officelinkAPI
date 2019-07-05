@@ -11,27 +11,28 @@ import java.util.Date;
  *
  * @author Thai Phu Cuong
  */
-public class LocationDTO {
-
+public class NewsDTO {
+    
     private int id;
 
-    private String name;
+    private String title;
 
-    private String address;
+    private String shortDescription;
     
-    private Double latitude;
+    private String image;
     
-    private Double longitude;
-
+    private String content;
+    
     private Date dateCreated;
-
+    
     private Date dateModified;
-
+    
     private boolean isDeleted;
-
+    
     private Date dateDeleted;
 
     //Getter and Setter
+    
     public int getId() {
         return id;
     }
@@ -40,20 +41,36 @@ public class LocationDTO {
         this.id = id;
     }
 
-    public boolean isIsDeleted() {
-        return isDeleted;
+    public String getTitle() {
+        return title;
     }
 
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getAddress() {
-        return address;
+    public String getShortDescription() {
+        return shortDescription;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getDateCreated() {
@@ -72,12 +89,12 @@ public class LocationDTO {
         this.dateModified = dateModified;
     }
 
-    public String getName() {
-        return name;
+    public boolean isIsDeleted() {
+        return isDeleted;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
     public Date getDateDeleted() {
@@ -87,21 +104,6 @@ public class LocationDTO {
     public void setDateDeleted(Date dateDeleted) {
         this.dateDeleted = dateDeleted;
     }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
+    
     
 }

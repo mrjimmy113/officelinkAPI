@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
  */
 public interface LocationService {
 
+    Optional<Location> searchById(int id);
+    
     Page<Location> searchWithPagination(String term, int pageNum);
 
     boolean addLocation(Location location);
@@ -24,8 +26,6 @@ public interface LocationService {
     boolean editLocation(Location location);
 
     boolean removeLocation(int id);
-    
-    Department getDepartmentById(int depId);
     
     List<Location> getAllLocation();
 
