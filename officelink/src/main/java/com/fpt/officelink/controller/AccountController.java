@@ -157,16 +157,23 @@ public class AccountController {
 
 
         try {
-            String token = null;
-            String emailTo = dto.getEmail();
-            Integer role_id = dto.getRole_id();
+
+            boolean res = service.checkAccountExisted(dto.getEmail());
+            if(res) {
+
+                String token = null;
+                String emailTo = dto.getEmail();
+                Integer role_id = dto.getRole_id();
 
                 token = jwt.createTokenWithAccount(dto);
                 model.put("link", "http://localhost:4200/confirm/" + token);
 
-                mailService.sendMail(emailTo, role_id , model);
+                mailService.sendMail(emailTo, role_id, model);
 
-            status = HttpStatus.OK;
+                status = HttpStatus.OK;
+            } else{
+                status = HttpStatus.CONFLICT;
+            }
         }catch (Exception ex){
             status = HttpStatus.BAD_REQUEST;
         }

@@ -5,10 +5,12 @@ import com.fpt.officelink.entity.Role;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.RoleRespository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AuthDTO;
@@ -31,16 +33,12 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     JwtService jwtSer;
 
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-
-
-    @Autowired
-    public AccountServiceImpl(AccountRespository accountRespository,
-                           BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.accountRespository = accountRespository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
+
+
 
     @Autowired
     RoleRespository roleRespository;
@@ -75,6 +73,8 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+
+
     @Override
     public void modifyAccount(Account account, Integer roleId) {
         Optional<Role> optionalRole = roleRespository.findById(roleId);
@@ -83,6 +83,15 @@ public class AccountServiceImpl implements AccountService {
             accountRespository.save(account);
         }
 
+    }
+
+    @Override
+    public boolean checkAccountExisted(String email) {
+        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( email);
+        if(optionalAccount.isPresent()){
+            return false;
+        }
+        return true;
     }
 
     @Override
