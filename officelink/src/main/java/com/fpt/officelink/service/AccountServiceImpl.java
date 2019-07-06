@@ -18,6 +18,9 @@ import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.AccountRespository;
 
+import java.util.Date;
+import java.util.Optional;
+
 @Service
 public class AccountServiceImpl implements AccountService {
 
@@ -49,23 +52,45 @@ public class AccountServiceImpl implements AccountService {
         return accountRespository.findAllByFirstnameContainingAndIsDeleted(term, false,  pageable);
     }
 
+
+    @Override
+    public boolean addNewAccount(Account account, String workplaceName) {
+        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( account.getEmail());
+        if(optionalAccount.isPresent()){
+            return false;
+        }else{
+            // create workplace
+            Workplace workplace = new Workplace();
+            workplace.setName(workplaceName);
+            workplace.setDateCreated(new Date());
+            workplaceService.addNewWorkplace(workplace);
+
+            // create account with the new workplace
+            account.setWorkplace(workplace);
+            accountRespository.save(account);
+            return true;
+        }
+
+
+    }
+
     @Override
     public boolean addNewAccount(Account account , Integer roleId) {
         Optional<Role> optionalRole = roleRespository.findById(roleId);
-        Optional<Account> optionalAccount = accountRespository.findAccountByEmailAndWorkspacename( account.getEmail(), account.getWorkspacename());
+        Optional<Account> optionalAccount = accountRespository.findAccountByEmail(account.getEmail());
         if(optionalAccount.isPresent()){
             return false;
         }else{
         	// create workplace
         	Workplace workplace = new Workplace();
-        	workplace.setName(workplaceName);
+        	workplace.setName();
         	workplace.setDateCreated(new Date());
         	workplaceService.addNewWorkplace(workplace);
         	
         	// create account with the new workplace
             account.setWorkplace(workplace);
             account.setRole(optionalRole.get());
-            account.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
+            account.setPassword(passwordEncoder().encode(account.getPassword()));
             accountRespository.save(account);
             return true;
         }
