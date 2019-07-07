@@ -2,6 +2,7 @@ package com.fpt.officelink.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AccountDTO implements Serializable {
@@ -11,11 +12,38 @@ public class AccountDTO implements Serializable {
     private String firstname;
     private String lastname;
     private String address;
-    private boolean isDelete ;
-    private String role;
+    private boolean isDeleted ;
+    private Integer role_id;
     private String workspacename;
 
+    private Date dateCreated;
+    private Date dateModified;
 
+    private RoleDTO roleDTO;
+
+    public RoleDTO getRoleDTO() {
+        return roleDTO;
+    }
+
+    public void setRoleDTO(RoleDTO roleDTO) {
+        this.roleDTO = roleDTO;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 
     public String getWorkspacename() {
         return workspacename;
@@ -25,15 +53,13 @@ public class AccountDTO implements Serializable {
         this.workspacename = workspacename;
     }
 
-    public String getRole() {
-        return role;
+    public Integer getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
     }
-
-
 
     public AccountDTO() {
     }
@@ -54,26 +80,27 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDelete, String role, String workspacename) {
+    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDeleted, Integer role_id, String workspacename, Date dateCreated, Date dateModified) {
         this.id = id;
         this.password = password;
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
-        this.isDelete = isDelete;
-        this.role = role;
+        this.isDeleted = isDeleted;
+        this.role_id = role_id;
         this.workspacename = workspacename;
+        this.dateCreated = dateCreated;
+        this.dateModified = dateModified;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public boolean isIsDeleted() {
+        return isDeleted;
     }
 
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
-
 
     public Integer getId() {
         return id;

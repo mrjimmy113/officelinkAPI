@@ -11,11 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.repository.DepartmentRepository;
-import com.fpt.officelink.utils.Constants;;
+import com.fpt.officelink.repository.DepartmentRepository;;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService{
+
+	private static final int MAXPAGESIZE = 9;
 	
 	@Autowired
 	DepartmentRepository depRep;
@@ -32,24 +33,24 @@ public class DepartmentServiceImpl implements DepartmentService{
 		return result; 
 	}
 	
-	public List<Department> getAll(int workplaceId) {
-		List<Department> result = depRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false);
+	public List<Department> getAll() {
+		List<Department> result = depRep.findAllByIsDeleted(false);
 		return result;
 	}
 	
 	@Override
-	public Page<Department> searchWithPagination(String term, int workplaceId, int pageNum) {
+	public Page<Department> searchWithPagination(String term, int pageNum) {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
-		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
 		
-		return depRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
+		return depRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
 
 	@Override
 	public boolean addNewDepartment(Department dep) {
-		Optional<Department> opDep = depRep.findByNameAndIsDeletedAndWorkplaceId(dep.getName(), false, dep.getWorkplace().getId());
+		Optional<Department> opDep = depRep.findByNameAndIsDeleted(dep.getName(), false);
 		if (opDep.isPresent()) {
 			return false;
 		} else {
@@ -62,21 +63,16 @@ public class DepartmentServiceImpl implements DepartmentService{
 	@Override
 	public boolean modifyDepartment(Department dep) {
 		depRep.save(dep);
-		
 		return true;
 	}
 
 	@Override
 	public boolean removeDepartment(int id) {
 		Department dep = depRep.findById(id).get();
-		if (dep == null) {
-			return false;
+		if (dep != null) {
+			dep.setDeleted(true);
+			depRep.save(dep);
 		}
-		
-		dep.setDateModified(new Date());
-		dep.setDeleted(true);
-		depRep.save(dep);
-		
 		return true;
 	}
 

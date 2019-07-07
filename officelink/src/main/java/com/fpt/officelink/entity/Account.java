@@ -2,6 +2,8 @@ package com.fpt.officelink.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 public class Account implements Serializable {
@@ -12,15 +14,18 @@ public class Account implements Serializable {
     private Integer id;
 
     @Column
-    private boolean isDelete;
+    private boolean isDeleted;
 
-    @ManyToOne
-    @JoinColumn(name = "workplace_id", nullable = false)
-    private Workplace workplace;
+    @Column
+    private String workspacename;
 
-    @ManyToOne
-    @JoinColumn(name = "locationId", nullable = false)
-    private Location location;
+    public String getWorkspacename() {
+        return workspacename;
+    }
+
+    public void setWorkspacename(String workspacename) {
+        this.workspacename = workspacename;
+    }
 
     @Column
     private String password;
@@ -32,22 +37,47 @@ public class Account implements Serializable {
     private String lastname;
 
     @Column
-    private String role;
+    private Date dateCreated;
 
-    public String getRole() {
+    @Column
+    private Date dateModified;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setDelete(boolean isDelete) {
-        this.isDelete = isDelete;
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+    public boolean isIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public Integer getId() {
@@ -57,6 +87,7 @@ public class Account implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
+
 
     public String getPassword() {
         return password;
@@ -98,24 +129,9 @@ public class Account implements Serializable {
         this.address = address;
     }
 
+
+
     @Column
     private String address;
 
-    public Workplace getWorkplace() {
-        return workplace;
-    }
-
-    public void setWorkplace(Workplace workplace) {
-        this.workplace = workplace;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-    
-    
 }

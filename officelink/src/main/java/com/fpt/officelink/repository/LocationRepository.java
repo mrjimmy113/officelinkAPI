@@ -23,16 +23,12 @@ import org.springframework.stereotype.Repository;
 public interface LocationRepository extends JpaRepository<Location, Integer> {
 
     //get list location
-    Page<Location> findAllByNameContainingAndIsDeleted(String name, Boolean isDeleted, Pageable page);
+    Page<Location> findAllByAddressContainingAndIsDeleted(String address, Boolean isDeleted, Pageable page);
 
-    //check address has existed and be deleted
-    List<Location> findByAddressAndIsDeleted(String address, Boolean isDeleted);
-    
-    Optional<Location> findByNameContainingAndIsDeleted(String name, boolean isDeleted);
-    
-    Optional<Location> findByAddressContainingAndIsDeleted(String address, boolean isDeleted);
-    
-    
+    //check city has existed and be deleted
+    Optional<Location> findByAddressAndCountyAndCityAndIsDeleted(String address, String county, String city, Boolean isDeleted);
    
+    //find all location which not be deleted
+    List<Location> findAllByIsDeleted(Boolean isDeleted); 
     
 }

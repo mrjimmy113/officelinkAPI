@@ -1,17 +1,11 @@
 package com.fpt.officelink.dto;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 public class TeamDTO {
 	
-	@NotNull
 	private int id;
 	
-	@NotEmpty
 	private String name;
 	
-	@NotNull
 	private DepartmentDTO department; 
 
 	public int getId() {
