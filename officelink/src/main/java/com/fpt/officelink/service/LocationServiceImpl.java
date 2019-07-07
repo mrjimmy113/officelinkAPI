@@ -9,8 +9,6 @@ import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,28 +32,28 @@ public class LocationServiceImpl implements LocationService {
     @Autowired
     DepartmentRepository departmentRep;
 
+    
     @Override
-    public Optional<Location> searchById(int id) {
-        return locationRep.findById(id);
+    public List<Location> getAllLocation() {
+        List<Location> result = locationRep.findAllByIsDeleted(false);
+        return result;
     }
 
     @Override
-    public List<Location> getAllLocation() {
-        List<Location> result = locationRep.findByAddressAndIsDeleted("", false);
-        return result;
+    public Department getDepartmentById(int depId) {
+        return departmentRep.findDepartmentById(depId);
     }
 
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return locationRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+        return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
     @Override
     public boolean addLocation(Location location) {
-        Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-        Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-        if (loc1.isPresent() || loc2.isPresent()) {
+        Optional<Location> loc = locationRep.findByAddressAndCountyAndCityAndIsDeleted(location.getAddress(), location.getCounty(), location.getCity(), Boolean.FALSE);
+        if (loc.isPresent()) {
             return false;
         } else {
             locationRep.save(location);
@@ -65,13 +63,11 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public boolean editLocation(Location location) {
-        Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-        Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-        if (loc1.isPresent() || loc2.isPresent()) {
-            return false;
-        } else {
+        try {
             locationRep.save(location);
             return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -81,7 +77,6 @@ public class LocationServiceImpl implements LocationService {
         if (loc != null) {
             try {
                 loc.setIsDeleted(true);
-                loc.setDateDeleted(Date.from(Instant.now()));
                 locationRep.save(loc);
                 return true;
             } catch (Exception e) {

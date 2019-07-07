@@ -11,12 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Workplace;
-import com.fpt.officelink.repository.WorkplaceRepository;
-import com.fpt.officelink.utils.Constants;;
+import com.fpt.officelink.repository.WorkplaceRepository;;
 
 @Service
 public class WorkplaceServiceImpl implements WorkplaceService{
 
+	private static final int MAXPAGESIZE = 9;
+	
 	@Autowired
 	WorkplaceRepository workpRep;
 	
@@ -31,7 +32,7 @@ public class WorkplaceServiceImpl implements WorkplaceService{
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
-		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+		Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
 		
 		return workpRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
@@ -58,13 +59,10 @@ public class WorkplaceServiceImpl implements WorkplaceService{
 	@Override
 	public boolean removeWorkplace(int id) {
 		Workplace workp = workpRep.findById(id).get();
-		if (workp == null) {
-			return false;
+		if (workp != null) {
+			workp.setDeleted(true);
+			workpRep.save(workp);
 		}
-		
-		workp.setDateModified(new Date());
-		workp.setDeleted(true);
-		workpRep.save(workp);
 		return true;
 	}
 
