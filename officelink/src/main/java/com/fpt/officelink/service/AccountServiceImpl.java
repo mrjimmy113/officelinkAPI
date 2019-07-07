@@ -53,29 +53,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    @Override
-    public boolean addNewAccount(Account account, String workplaceName) {
-        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( account.getEmail());
-        if(optionalAccount.isPresent()){
-            return false;
-        }else{
-            // create workplace
-            Workplace workplace = new Workplace();
-            workplace.setName(workplaceName);
-            workplace.setDateCreated(new Date());
-            workplaceService.addNewWorkplace(workplace);
-
-            // create account with the new workplace
-            account.setWorkplace(workplace);
-            accountRespository.save(account);
-            return true;
-        }
-
-
-    }
 
     @Override
-    public boolean addNewAccount(Account account , Integer roleId) {
+    public boolean addNewAccount(Account account , Integer roleId, String workplaceName) {
         Optional<Role> optionalRole = roleRespository.findById(roleId);
         Optional<Account> optionalAccount = accountRespository.findAccountByEmail(account.getEmail());
         if(optionalAccount.isPresent()){
@@ -83,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
         }else{
         	// create workplace
         	Workplace workplace = new Workplace();
-        	workplace.setName();
+        	workplace.setName(workplaceName);
         	workplace.setDateCreated(new Date());
         	workplaceService.addNewWorkplace(workplace);
         	
@@ -142,7 +122,7 @@ public class AccountServiceImpl implements AccountService {
     	Optional<Account> acc = accountRespository.findByEmailAndPassword(email, password);
     	if(acc.isPresent()) {
     		result = new AuthDTO();
-    		result.setRole(acc.get().getRole());
+    		result.setRole(acc.get().getRole().getRole());
     		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());
     		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
     	}

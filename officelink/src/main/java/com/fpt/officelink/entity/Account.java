@@ -24,6 +24,11 @@ public class Account implements Serializable {
     @JoinColumn(name = "locationId", nullable = false)
     private Location location;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+
     @Column
     private String password;
     @Column
@@ -40,9 +45,6 @@ public class Account implements Serializable {
     private Date dateModified;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
 
 
     public Role getRole() {

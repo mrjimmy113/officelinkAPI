@@ -44,24 +44,24 @@ public class JwtService {
     return token;
   }
 
-//  public String createTokenWithEmail(String email) {
-//    String token = null;
-//    try {
-//      // Create HMAC signer
-//      JWSSigner signer = new MACSigner(generateShareSecret());
-//      JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
-//      builder.claim(EMAIL, email);
-//
-//      builder.expirationTime(generateExpirationDate());
-//      JWTClaimsSet claimsSet = builder.build();
-//      SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
-//      signedJWT.sign(signer);
-//      token = signedJWT.serialize();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//    return token;
-//  }
+  public String createTokenWithEmail(String email) {
+    String token = null;
+    try {
+      // Create HMAC signer
+      JWSSigner signer = new MACSigner(generateShareSecret());
+      JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+      builder.claim(EMAIL, email);
+
+      builder.expirationTime(generateExpirationDate());
+      JWTClaimsSet claimsSet = builder.build();
+      SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+      signedJWT.sign(signer);
+      token = signedJWT.serialize();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return token;
+  }
 
   public String createTokenWithAccount (AccountDTO dto){
     String token = null;
@@ -188,4 +188,7 @@ public class JwtService {
     }
     return true;
   }
+
+
+
 }
