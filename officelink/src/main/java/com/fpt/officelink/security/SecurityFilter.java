@@ -1,6 +1,7 @@
 package com.fpt.officelink.security;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -9,6 +10,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,9 +30,11 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
 	@Autowired
 	private JwtService jwt;
 
+
+	@Qualifier("authService")
 	@Autowired
 	private UserDetailsService ser;
-	
+
 	@Autowired
 	@Override
 	public void setAuthenticationManager(AuthenticationManager authenticationManager) {
@@ -59,11 +63,12 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
 			} catch (UsernameNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//			} catch (ParseException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			}
+			chain.doFilter(req, res);
 		}
-		chain.doFilter(req, res);
 	}
 }
