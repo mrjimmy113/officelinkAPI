@@ -9,7 +9,6 @@ import com.fpt.officelink.dto.ImageNewsDTO;
 import com.fpt.officelink.dto.NewsDTO;
 import com.fpt.officelink.entity.News;
 import com.fpt.officelink.repository.NewsRepository;
-import com.google.gson.Gson;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +26,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+
+import com.google.gson.Gson;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
