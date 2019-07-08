@@ -20,18 +20,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.SurveyDTO;
+import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.TypeQuestion;
 import com.fpt.officelink.service.SurveyService;
 
@@ -99,9 +100,11 @@ public class SurveyController {
 		try {
 			Survey survey = new Survey();
 			BeanUtils.copyProperties(dto, survey);
-			List<Question> questions = new ArrayList<Question>();
+			List<SurveyQuestion> sqList = new ArrayList<SurveyQuestion>();
 			dto.getQuestions().forEach(q -> {
 				Question tmpQ = new Question();
+				SurveyQuestion tmpSQ = new SurveyQuestion();
+				tmpSQ.setQuestionIndex(q.getQuestionIndex());
 				Set<AnswerOption> options = new HashSet<AnswerOption>();
 				if (q.getOptions() != null) {
 					q.getOptions().forEach(o -> {
@@ -115,9 +118,10 @@ public class SurveyController {
 				TypeQuestion tmpType = new TypeQuestion();
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
-				questions.add(tmpQ);
+				tmpSQ.setQuestion(tmpQ);
+				sqList.add(tmpSQ);
 			});
-			ser.newSurvey(survey, questions);
+			ser.newSurvey(survey, sqList);
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -134,9 +138,11 @@ public class SurveyController {
 		try {
 			Survey survey = new Survey();
 			BeanUtils.copyProperties(dto, survey);
-			List<Question> questions = new ArrayList<Question>();
+			List<SurveyQuestion> sqList = new ArrayList<SurveyQuestion>();
 			dto.getQuestions().forEach(q -> {
 				Question tmpQ = new Question();
+				SurveyQuestion tmpSQ = new SurveyQuestion();
+				tmpSQ.setQuestionIndex(q.getQuestionIndex());
 				Set<AnswerOption> options = new HashSet<AnswerOption>();
 				if (q.getOptions() != null) {
 					q.getOptions().forEach(o -> {
@@ -150,10 +156,11 @@ public class SurveyController {
 				TypeQuestion tmpType = new TypeQuestion();
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
-				questions.add(tmpQ);
+				tmpSQ.setQuestion(tmpQ);
+				sqList.add(tmpSQ);
 			});
-			ser.updateSurvey(survey, questions);
-			status = HttpStatus.CREATED;
+			ser.updateSurvey(survey, sqList);
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
@@ -181,9 +188,11 @@ public class SurveyController {
 		HttpStatus status = null;
 		List<QuestionDTO> res = new ArrayList<QuestionDTO>();
 		try {
-			List<Question> result = ser.getDetail(id);
-			result.forEach(e ->  {
+			List<SurveyQuestion> result = ser.getDetail(id);
+			result.forEach(r ->  {
+				Question e = r.getQuestion();
 				QuestionDTO dto = new QuestionDTO();
+				dto.setQuestionIdentity(r.getQuestionIndex());
 				BeanUtils.copyProperties(e, dto,"type","options");
 				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
 				e.getOptions().forEach(op -> {
@@ -242,5 +251,19 @@ public class SurveyController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Number>(status.value(),status);
+	}
+	
+	@GetMapping("/report")
+	public ResponseEntity<SurveyReportDTO> report(@RequestParam("id") Integer id) {
+		HttpStatus status = null;
+		SurveyReportDTO res = null;
+		try {
+			res = ser.getReport(id);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<SurveyReportDTO>(res,status);
 	}
 }
