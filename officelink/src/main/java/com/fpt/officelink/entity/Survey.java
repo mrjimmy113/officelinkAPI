@@ -133,12 +133,5 @@ public class Survey implements Serializable {
 		this.configurations = configurations;
 	}
 
-	public Workplace getWorkplace() {
-		return workplace;
-	}
-
-	public void setWorkplace(Workplace workplace) {
-		this.workplace = workplace;
-	}
 
 }
