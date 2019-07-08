@@ -50,6 +50,9 @@ public class Location implements Serializable {
 
     @Column
     private Date dateDeleted;
+
+    @Column
+    private String county;
     
     @ManyToOne
     @JoinColumn(name = "workplaceId")

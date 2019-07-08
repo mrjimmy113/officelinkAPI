@@ -133,7 +133,7 @@ public class AccountController {
             Account entity = new Account();
 
             BeanUtils.copyProperties(dto, entity, "roleId");
-            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkspacename());
+            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkspacename() , dto.getAddress());
             if(res){
 
                 status = HttpStatus.OK;
@@ -190,7 +190,7 @@ public class AccountController {
 
             Account entity = new Account();
             BeanUtils.copyProperties(accountDTO,entity ,"roleId");
-            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkspacename());
+            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkspacename() , accountDTO.getAddress());
 
 
             if(res){

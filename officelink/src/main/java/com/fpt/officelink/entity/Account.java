@@ -21,7 +21,7 @@ public class Account implements Serializable {
     private Workplace workplace;
 
     @ManyToOne
-    @JoinColumn(name = "locationId", nullable = false)
+    @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
     @ManyToOne(fetch = FetchType.EAGER)

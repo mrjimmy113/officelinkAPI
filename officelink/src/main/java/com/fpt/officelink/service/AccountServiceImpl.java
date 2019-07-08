@@ -1,7 +1,6 @@
 package com.fpt.officelink.service;
 
-import com.fpt.officelink.entity.Account;
-import com.fpt.officelink.entity.Role;
+import com.fpt.officelink.entity.*;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.RoleRespository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AuthDTO;
 import com.fpt.officelink.entity.Account;
-import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.AccountRespository;
 
 import java.util.Date;
@@ -31,7 +29,10 @@ public class AccountServiceImpl implements AccountService {
     AccountRespository accountRespository;
     
     @Autowired
-    WorkplaceService workplaceService; 
+    WorkplaceService workplaceService;
+
+    @Autowired
+    LocationService locationService;
     
     @Autowired
     JwtService jwtSer;
@@ -55,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public boolean addNewAccount(Account account , Integer roleId, String workplaceName) {
+    public boolean addNewAccount(Account account , Integer roleId, String workplaceName, String address) {
         Optional<Role> optionalRole = roleRespository.findById(roleId);
         Optional<Account> optionalAccount = accountRespository.findAccountByEmail(account.getEmail());
         if(optionalAccount.isPresent()){
@@ -63,12 +64,21 @@ public class AccountServiceImpl implements AccountService {
         }else{
         	// create workplace
         	Workplace workplace = new Workplace();
+
         	workplace.setName(workplaceName);
         	workplace.setDateCreated(new Date());
         	workplaceService.addNewWorkplace(workplace);
-        	
+
+            Location location = new Location();
+            location.setAddress(address);
+        	location.setDateCreated(new Date());
+        	locationService.addLocation(location);
+
+
         	// create account with the new workplace
             account.setWorkplace(workplace);
+
+            account.setLocation(location);
             account.setRole(optionalRole.get());
             account.setPassword(passwordEncoder().encode(account.getPassword()));
             accountRespository.save(account);
