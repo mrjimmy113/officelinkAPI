@@ -2,6 +2,7 @@ package com.fpt.officelink.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AccountDTO implements Serializable {
@@ -11,11 +12,32 @@ public class AccountDTO implements Serializable {
     private String firstname;
     private String lastname;
     private String address;
-    private boolean isDelete ;
-    private String role;
+    private boolean isDeleted ;
+    private Integer role_id;
     private String workspacename;
+    private Date dateCreated;
+    private Date dateModified;
+    private Integer roleId;
 
 
+
+
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 
     public String getWorkspacename() {
         return workspacename;
@@ -25,15 +47,13 @@ public class AccountDTO implements Serializable {
         this.workspacename = workspacename;
     }
 
-    public String getRole() {
-        return role;
+    public Integer getRole_id() {
+        return role_id;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
     }
-
-
 
     public AccountDTO() {
     }
@@ -54,26 +74,25 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDelete, String role, String workspacename) {
-        this.id = id;
-        this.password = password;
-        this.email = email;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.address = address;
-        this.isDelete = isDelete;
-        this.role = role;
-        this.workspacename = workspacename;
+    public Integer getRoleId() {
+        return roleId;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+//    public boolean isIsDeleted() {
+//        return isDeleted;
+//    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
 
     public Integer getId() {
         return id;
@@ -107,6 +126,7 @@ public class AccountDTO implements Serializable {
     public void setAddress(String address) {
         this.address = address;
     }
+
 
 
 }

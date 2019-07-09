@@ -66,6 +66,27 @@ public class AccountController {
         return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
     }
 
+    @GetMapping(value = "/confirm")
+    public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken){
+
+        HttpStatus status = null;
+        AccountDTO accountDTO = new AccountDTO();
+        try{
+            accountDTO = jwt.getAccountByToken(accountToken);
+            status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<AccountDTO>(accountDTO, status);
+
+    }
+
+
+
     @GetMapping(value = "/getAccountByEmail")
     public ResponseEntity<Optional<Account>> getAccountByEmail(@RequestParam("emailToken") String emailToken){
         HttpStatus status = null;
@@ -132,7 +153,7 @@ public class AccountController {
             Account entity = new Account();
 
             BeanUtils.copyProperties(dto, entity);
-            boolean res = service.addNewAccount(entity, dto.getWorkspacename());
+            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkspacename() , dto.getAddress());
             if(res){
 
                 status = HttpStatus.OK;
@@ -148,39 +169,73 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
-    @GetMapping(value = "/sendMail")
-    public ResponseEntity<Integer> sendMail(@RequestParam("emailTo") String[] emailTo, @RequestParam("role") String role){
+
+
+
+    @PostMapping(value = "/sendMail")
+    public ResponseEntity<Number> sendMail(@RequestBody AccountDTO dto){
         HttpStatus status = null;
         Map<String, Object> model = new HashMap<>();
 
 
 
         try {
-            String token = null;
-            for (int i = 0 ; i < emailTo.length; i++){
-                token = jwt.createTokenWithEmail(emailTo[i]);
+
+            boolean res = service.checkAccountExisted(dto.getEmail());
+            if(res) {
+
+                String token = null;
+                List<String> listEmail = new ArrayList<>();
+
+                String emailTo = dto.getEmail();
+
+                listEmail.add(emailTo);
+                Integer role_id = dto.getRole_id();
+
+                token = jwt.createTokenWithAccount(dto);
+                model.put("link", "http://localhost:4200/confirm/" + token);
+
+                mailService.sendMail(listEmail.toArray(new String[listEmail.size()]),"email-temp.ftl", model);
+
+                status = HttpStatus.OK;
+            } else{
+                status = HttpStatus.CONFLICT;
             }
-
-
-            model.put("link", "http://localhost:4200/login-form/" + token);
-            if(role.contentEquals("employee")){
-
-                mailService.sendMail(emailTo,"email-invite-temp.ftl",null);
-            }
-            else{
-
-                mailService.sendMail(emailTo,"email-temp.ftl",model);
-
-            }
-
-
-            status = HttpStatus.OK;
         }catch (Exception ex){
             status = HttpStatus.BAD_REQUEST;
         }
 
 
-        return new ResponseEntity<Integer>(status.value(), status);
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+
+    @PostMapping(value = "/confirm")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken ){
+        HttpStatus status = null;
+        try{
+            AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
+
+            Account entity = new Account();
+            BeanUtils.copyProperties(accountDTO,entity);
+            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkspacename() , accountDTO.getAddress());
+
+
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
     }
 
 
@@ -190,7 +245,7 @@ public class AccountController {
         try {
             Account entity = new Account();
             BeanUtils.copyProperties(dto, entity);
-            service.modifyAccount(entity);
+            service.modifyAccount(entity, dto.getRole_id(), dto.getAddress());
             status = HttpStatus.CREATED;
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
@@ -202,6 +257,23 @@ public class AccountController {
 
 
 
+    @PostMapping(value = "/sendInvite")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo ){
+        HttpStatus status = null;
+            try{
+
+                mailService.sendMail(emailTo, "email-invite-temp.ftl", null);
+                status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
 
     @DeleteMapping
     public ResponseEntity<Integer> delete(@RequestParam("id") int id){

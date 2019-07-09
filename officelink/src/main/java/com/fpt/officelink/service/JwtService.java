@@ -3,6 +3,8 @@ package com.fpt.officelink.service;
 import java.text.ParseException;
 import java.util.Date;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpt.officelink.dto.AccountDTO;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
@@ -19,6 +21,7 @@ import com.nimbusds.jwt.SignedJWT;
 public class JwtService {
 	public static final String USERNAME = "username";
 	public static final String EMAIL = "email";
+	public static final String DTO = "dto";
 	public static final String SURVEY_ID = "surveyId";
 	public static final String ROLE = "role";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
@@ -71,6 +74,45 @@ public class JwtService {
 		return token;
 	}
 
+	public String createTokenWithAccount (AccountDTO dto){
+		String token = null;
+		try{
+			JWSSigner signer = new MACSigner(generateShareSecret());
+			JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+			builder.claim(DTO, dto);
+
+			builder.expirationTime(generateExpirationDate());
+			JWTClaimsSet claimsSet = builder.build();
+			SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+			signedJWT.sign(signer);
+			token = signedJWT.serialize();
+
+		}catch (Exception ex){
+			ex.printStackTrace();
+		}
+
+
+		return token;
+	}
+
+	public AccountDTO getAccountByToken(String token) {
+		Object account = null;
+		AccountDTO newAccount = new AccountDTO();
+		try {
+			JWTClaimsSet claims = getClaimsFromToken(token);
+			account = claims.getClaim(DTO);
+			ObjectMapper mapper = new ObjectMapper();
+
+			newAccount = mapper.readValue(account.toString(), AccountDTO.class);
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return newAccount;
+	}
+
+
 	private JWTClaimsSet getClaimsFromToken(String token) {
 		JWTClaimsSet claims = null;
 		try {
@@ -84,6 +126,8 @@ public class JwtService {
 		}
 		return claims;
 	}
+
+
 
 	private Date generateExpirationDate() {
 		return new Date(System.currentTimeMillis() + EXPIRE_TIME);
