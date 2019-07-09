@@ -11,10 +11,12 @@ public class AccountDTO implements Serializable {
     private String email;
     private String firstname;
     private String lastname;
-    private String address;
+    //private String address;
     private boolean isDeleted ;
     private Integer role_id;
-    private String workspacename;
+//    private String workspacename;
+    private LocationDTO location;
+    private WorkplaceDTO workplace;
     private Date dateCreated;
     private Date dateModified;
     private Integer roleId;
@@ -39,13 +41,32 @@ public class AccountDTO implements Serializable {
         this.dateModified = dateModified;
     }
 
-    public String getWorkspacename() {
-        return workspacename;
+//    public String getWorkspacename() {
+//        return workspacename;
+//    }
+//
+//    public void setWorkspacename(String workspacename) {
+//        this.workspacename = workspacename;
+//    }
+
+
+    public LocationDTO getLocation() {
+        return location;
     }
 
-    public void setWorkspacename(String workspacename) {
-        this.workspacename = workspacename;
+    public void setLocation(LocationDTO location) {
+        this.location = location;
     }
+
+    public WorkplaceDTO getWorkplace() {
+        return workplace;
+    }
+
+    public void setWorkplace(WorkplaceDTO workplace) {
+        this.workplace = workplace;
+    }
+
+
 
     public Integer getRole_id() {
         return role_id;
@@ -119,13 +140,13 @@ public class AccountDTO implements Serializable {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
 
 
 

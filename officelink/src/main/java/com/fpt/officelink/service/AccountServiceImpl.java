@@ -100,17 +100,28 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public void modifyAccount(Account account, Integer roleId , String addressName) {
+    public boolean modifyAccount(Account account, Integer roleId , Location location , Workplace workplace) {
+        Optional<Account> optionalAccount = accountRespository.findById(account.getId());
         Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if(optionalRole.isPresent()){
-            Location location = new Location();
-            location.setAddress(addressName);
+
+        if(optionalAccount.isPresent()){
+
+            location.setAddress(location.getAddress());
+            location.setDateModified(new Date());
             locationRepository.save(location);
+
+            workplace.setName("mickey");
+            workplaceRepository.save(workplace);
 
             account.setRole(optionalRole.get());
             account.setDateModified(new Date());
+            account.setWorkplace(workplace);
+            account.setLocation(location);
             accountRespository.save(account);
+            return true;
         }
+
+        return false;
 
     }
 

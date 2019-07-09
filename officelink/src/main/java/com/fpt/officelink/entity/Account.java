@@ -105,16 +105,6 @@ public class Account implements Serializable {
         this.lastname = lastname;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    @Column
-    private String address;
 
     public Workplace getWorkplace() {
         return workplace;

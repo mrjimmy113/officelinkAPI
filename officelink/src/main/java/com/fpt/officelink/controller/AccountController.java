@@ -2,13 +2,18 @@ package com.fpt.officelink.controller;
 
 
 import com.fpt.officelink.dto.AccountDTO;
+import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.service.AccountService;
 import com.fpt.officelink.service.JwtService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +52,15 @@ public class AccountController {
 
             pageAccount.getContent().forEach(element -> {
                 AccountDTO accountDTO = new AccountDTO();
+                WorkplaceDTO workplaceDTO = new WorkplaceDTO();
+                LocationDTO locationDTO = new LocationDTO();
 
+                BeanUtils.copyProperties(element.getLocation(), locationDTO);
+                BeanUtils.copyProperties(element.getWorkplace(), workplaceDTO);
                 BeanUtils.copyProperties(element,accountDTO);
+
+                accountDTO.setLocation(locationDTO);
+                accountDTO.setWorkplace(workplaceDTO);
 
                 listAccount.add(accountDTO);
 
@@ -152,8 +164,9 @@ public class AccountController {
         try {
             Account entity = new Account();
 
+
             BeanUtils.copyProperties(dto, entity);
-            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkspacename() , dto.getAddress());
+            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName() , dto.getLocation().getAddress());
             if(res){
 
                 status = HttpStatus.OK;
@@ -218,7 +231,7 @@ public class AccountController {
 
             Account entity = new Account();
             BeanUtils.copyProperties(accountDTO,entity);
-            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkspacename() , accountDTO.getAddress());
+            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkplace().getName() , accountDTO.getLocation().getAddress());
 
 
             if(res){
@@ -244,9 +257,20 @@ public class AccountController {
         HttpStatus status = null;
         try {
             Account entity = new Account();
-            BeanUtils.copyProperties(dto, entity);
-            service.modifyAccount(entity, dto.getRole_id(), dto.getAddress());
-            status = HttpStatus.CREATED;
+            Location location = new Location();
+            Workplace workplace = new Workplace();
+            BeanUtils.copyProperties(dto.getWorkplace(), workplace);
+            BeanUtils.copyProperties(dto.getLocation(), location);
+            BeanUtils.copyProperties(dto,entity);
+
+
+            boolean res = service.modifyAccount(entity, dto.getRole_id(), location , workplace );
+
+
+            if(res){
+                status = HttpStatus.CREATED;
+            }
+
         } catch (Exception e) {
             status = HttpStatus.BAD_REQUEST;
             e.printStackTrace();
