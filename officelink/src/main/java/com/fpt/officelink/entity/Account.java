@@ -2,6 +2,8 @@ package com.fpt.officelink.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Account implements Serializable {
@@ -19,7 +21,7 @@ public class Account implements Serializable {
     private Workplace workplace;
 
     @ManyToOne
-    @JoinColumn(name = "locationId", nullable = false)
+    @JoinColumn(name = "locationId")
     private Location location;
 
     @Column
@@ -33,6 +35,11 @@ public class Account implements Serializable {
 
     @Column
     private String role;
+    
+    @ManyToMany
+	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "team_id") })
+	private Set<Team> teams = new HashSet<Team>();
 
     public String getRole() {
         return role;
@@ -116,6 +123,16 @@ public class Account implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+	public Set<Team> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams;
+	}
+    
+    
     
     
 }

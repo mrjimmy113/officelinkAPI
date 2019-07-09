@@ -188,9 +188,9 @@ public class SurveyServiceImpl implements SurveyService {
 		Survey survey = opSurvey.get();
 		survey.setActive(true);
 		surveyRep.save(survey);
-		String token = jwtSer.createSurveyToken("duongphse62746@fpt.edu.vn", surveyId);
+		String token = jwtSer.createSurveyToken("quangnguyenvietminh@gmail.com", surveyId);
 		List<String> emailList = new ArrayList<String>();
-		emailList.add("duongphse62746@fpt.edu.vn");
+		emailList.add("quangnguyenvietminh@gmail.com");
 		Map<String, Object> model = new HashMap<>();
 		model.put("link", "http://localhost:4200/take/" + token);
 		mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
