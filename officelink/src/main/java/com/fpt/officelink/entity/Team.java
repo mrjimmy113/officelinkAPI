@@ -2,6 +2,8 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -38,6 +41,9 @@ public class Team implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "department_id", nullable = false)
 	private Department department;
+	
+	@ManyToMany(mappedBy = "teams")
+	private Set<Account> accounts = new HashSet<Account>();
 
 	// Getter Setter
 	public Integer getId() {

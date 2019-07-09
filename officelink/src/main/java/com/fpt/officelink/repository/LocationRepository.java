@@ -32,7 +32,4 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     
     Optional<Location> findByAddressContainingAndIsDeleted(String address, boolean isDeleted);
     
-    
-   
-    
 }
