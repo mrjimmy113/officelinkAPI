@@ -82,5 +82,10 @@ public class DepartmentServiceImpl implements DepartmentService{
 		
 		return true;
 	}
+	
+	@Override
+	public List<Department> getByLocationId(int id) {
+		return depRep.findAllByLocationId(id);
+	}
 
 }

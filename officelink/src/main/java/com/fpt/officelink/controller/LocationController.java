@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fpt.officelink.dto.LocationDTO;
+import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.service.LocationService;
 
 /**
  *
@@ -204,6 +211,25 @@ public class LocationController {
         }
 
         return new ResponseEntity<Integer>(status.value(), status);
+    }
+    
+    @GetMapping("/byDepartment")
+    public ResponseEntity<List<LocationDTO>> getByDepId(@Param("id") int id) {
+    	HttpStatus status = null;
+    	List<LocationDTO> res = new ArrayList<LocationDTO>();
+    	try {
+    		List<Location> result = service.getByDepartmentId(id);
+            result.forEach(element -> {
+                LocationDTO dto = new LocationDTO();
+                BeanUtils.copyProperties(element, dto);
+                res.add(dto);
+            });
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+    	
+    	return new ResponseEntity<List<LocationDTO>>(res,status);
     }
 
 }

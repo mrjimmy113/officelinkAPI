@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.fpt.officelink.dto.AnswerDTO;
+import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.entity.Survey;
@@ -22,17 +23,19 @@ public interface SurveyService {
 
 	List<SurveyQuestion> getDetail(Integer id);
 
-	String getSurveyToken(String email, Integer surveyId) throws JOSEException;
-
 	SurveyDTO getTakeSurvey(String token) throws ParseException;
 
-	boolean sendOutSurvey(Integer surveyId) throws JOSEException;
-
 	void saveAnswer(List<AnswerDTO> answers);
-	
+
 	List<Survey> getWorkplaceSurvey(int workplaceId);
 
 	void newSurvey(Survey survey, List<SurveyQuestion> sqList);
 
 	SurveyReportDTO getReport(Integer id);
+
+	void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException;
+
+	String getSurveyToken(Integer surveyId) throws JOSEException;
+
+	boolean checkIfUserTakeSurvey();
 }

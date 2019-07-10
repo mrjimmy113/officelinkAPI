@@ -66,6 +66,9 @@ public class Account implements Serializable {
 	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "team_id") })
 	private Set<Team> teams = new HashSet<Team>();
+    
+    @OneToMany(mappedBy = "account")
+    private Set<Answer> answers = new HashSet<Answer>();
 
 
     public boolean isDeleted() {
@@ -158,4 +161,12 @@ public class Account implements Serializable {
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
     }
+
+	public Set<Answer> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(Set<Answer> answers) {
+		this.answers = answers;
+	}
 }

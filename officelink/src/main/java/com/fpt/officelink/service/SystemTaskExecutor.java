@@ -21,27 +21,32 @@ public class SystemTaskExecutor {
 	
 	@Async
 	public void sentRoutineSurvey(Configuration config) {
-		try {
-			boolean success = surveyService.sendOutSurvey(config.getSurvey().getId());
-			
-			if (success) {
-				String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
-						config.getWorkplace().getName(),
-						config.getSurvey().getName(),
-						new Date().toString());
-
-				log.log(Level.INFO, msg);
-			} else {
-				String msg = String.format("Fail to sent scheduled survey for %s, survey name: %s, scheduled time: %s",
-						config.getWorkplace().getName(),
-						config.getSurvey().getName(),
-						config.getScheduleTime());
-
-				log.log(Level.INFO, msg);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.log(Level.FINEST, e.toString());
-		}
+//		try {
+//			boolean success = surveyService.sendOutSurvey(config.getSurvey().getId());
+//			
+//			if (success) {
+//				String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
+//						config.getWorkplace().getName(),
+//						config.getSurvey().getName(),
+//						new Date().toString());
+//
+//				log.log(Level.INFO, msg);
+//			} else {
+//				String msg = String.format("Fail to sent scheduled survey for %s, survey name: %s, scheduled time: %s",
+//						config.getWorkplace().getName(),
+//						config.getSurvey().getName(),
+//						config.getScheduleTime());
+//
+//				log.log(Level.INFO, msg);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			log.log(Level.FINEST, e.toString());
+//		}
+	}
+	
+	@Async
+	public void sendSurvey() {
+		
 	}
 }

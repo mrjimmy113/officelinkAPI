@@ -38,6 +38,10 @@ public class Answer implements Serializable {
 	
 	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST)
 	private Set<WordCloud> wordClouds;
+	
+	@ManyToOne
+	@JoinColumn(name = "account_id")
+	private Account account;
 
 	public Integer getId() {
 		return id;

@@ -1,6 +1,6 @@
 package com.fpt.officelink.dto;
 
-public class SendSurveyTargetInforDTO {
+public class SendTargetDTO {
 	private Integer locationId;
 	private Integer departmentId;
 	private Integer teamId;

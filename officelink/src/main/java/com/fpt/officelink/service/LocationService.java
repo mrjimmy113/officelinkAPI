@@ -5,13 +5,14 @@
  */
 package com.fpt.officelink.service;
 
-import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Location;
 import java.util.List;
 import java.util.Optional;
 
 import com.fpt.officelink.entity.Team;
+
 import org.springframework.data.domain.Page;
+
+import com.fpt.officelink.entity.Location;
 
 /**
  *
@@ -32,6 +33,8 @@ public interface LocationService {
     
     List<Location> getAllLocation();
 
+	List<Location> getWorkplaceLocation();
 
+	List<Location> getByDepartmentId(int id);
 
 }

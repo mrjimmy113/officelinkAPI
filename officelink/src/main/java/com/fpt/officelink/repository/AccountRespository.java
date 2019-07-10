@@ -28,10 +28,27 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
             @Param("isDeleted") Boolean isDeleted,
     Pageable pageable);
 
-    Optional<Account> findAccountByEmail( String email);
-    Optional<Account> findByEmail(String email);
-    Optional<Account> findByEmailAndPassword(String email, String password);
+	Optional<Account> findAccountByEmail(String email);
 
+//    Optional<Account> findAccountByEmailAndWorkspacename(String email, String worksapcename);
+
+	Optional<Account> findByEmail(String email);
+
+	Optional<Account> findByEmailAndPassword(String email, String password);
+	
+	List<Account> findAllByWorkplaceIdAndIsDelete(Integer workplaceId, boolean isDelete); 
+
+	@Query("SELECT a.id, a.email FROM Account a WHERE a.location.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
+	List<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+
+	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
+	List<Account> findAllEmailByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+	
+	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
+	List<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+	
+	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :depId AND a.location.id = :loId AND a.workplace.id = :workId AND a.isDelete = :isDelete")
+	List<Account> findAllEmailByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
     @Query("SELECT t FROM Account t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
     List<Account> findAllByWorkplaceId(
             @Param("workplaceId") Integer workplaceId,

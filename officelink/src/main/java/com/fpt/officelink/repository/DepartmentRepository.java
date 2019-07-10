@@ -29,8 +29,8 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	
 	@Query("SELECT d FROM Department d "
 			+ "JOIN Team t ON d.id = t.department.id "
-			+ "JOIN Account a "
-			+ "JOIN Location l ON a.location.id = l.id "
-			+ "WHERE l.id = :id")
-	List<Department> findAllDepartmentByLocationId(@Param("id") Integer id);
+			+ "JOIN t.accounts a "
+			+ "WHERE a.location.id = :id"
+			)
+	List<Department> findAllByLocationId(@Param("id") Integer id);
 }

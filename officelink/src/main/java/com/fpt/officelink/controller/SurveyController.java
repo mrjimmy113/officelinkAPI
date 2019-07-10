@@ -25,6 +25,7 @@ import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
+import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
@@ -89,6 +90,7 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status =HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res,status);
@@ -218,19 +220,23 @@ public class SurveyController {
 		HttpStatus status = null;
 		SurveyDTO res = null;
 		try {
-			res = ser.getTakeSurvey(token);
-			status = HttpStatus.OK;
+			if(!ser.checkIfUserTakeSurvey()) {
+				res = ser.getTakeSurvey(token);
+				status = HttpStatus.OK;
+			}else {
+				status = HttpStatus.ACCEPTED;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyDTO>(res,status);
 	}
 	
-	@GetMapping("/sendOut")
-	public ResponseEntity<Number> sendOutSurvey(@RequestParam("id") Integer surveyId) {
+	@PostMapping("/sendOut")
+	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			ser.sendOutSurvey(surveyId);
+			
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();

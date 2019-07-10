@@ -5,9 +5,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerDTO;
@@ -23,16 +26,20 @@ import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
+import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
+import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.mail.service.MailService;
+import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
 import com.fpt.officelink.repository.AnswerRepository;
 import com.fpt.officelink.repository.QuestionRepository;
@@ -44,6 +51,8 @@ import com.nimbusds.jose.JOSEException;
 public class SurveyServiceImpl implements SurveyService {
 
 	private static final int PAGEMAXSIZE = 9;
+	
+	int workplaceId = ((CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId();
 
 	@Autowired
 	SurveyRepository surveyRep;
@@ -68,6 +77,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	WordCloudFilterService filterSer;
+	
+	@Autowired
+	AccountRespository accRep;
 
 	@Transactional(rollbackOn = Exception.class)
 	@Override
@@ -178,23 +190,56 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	public String getSurveyToken(String email, Integer surveyId) throws JOSEException {
-		return jwtSer.createSurveyToken(email, surveyId);
+	public String getSurveyToken(Integer surveyId) throws JOSEException {
+		return jwtSer.createSurveyToken(surveyId);
 	}
 
 	@Override
-	public boolean sendOutSurvey(Integer surveyId) throws JOSEException {
-		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
-		Survey survey = opSurvey.get();
-		survey.setActive(true);
-		surveyRep.save(survey);
-		String token = jwtSer.createSurveyToken("quangnguyenvietminh@gmail.com", surveyId);
-		List<String> emailList = new ArrayList<String>();
-		emailList.add("quangnguyenvietminh@gmail.com");
-		Map<String, Object> model = new HashMap<>();
-		model.put("link", "http://localhost:4200/take/" + token);
-		mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
-		return true;
+	@Transactional
+	@Async
+	public void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException {
+		Optional<Survey> opSurvey = surveyRep.findById(sendInfor.getSurveyId());
+		int workplaceId = ((CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId();
+		if(opSurvey.isPresent()) {
+			Survey survey = opSurvey.get();
+			survey.setActive(true);
+			survey.setDateSendOut(new Date(Calendar.getInstance().getTimeInMillis()));
+			survey.setDateStop(sendInfor.getDateStop());
+			Set<Account> sendList = new HashSet<Account>();
+			sendInfor.getTargetList().forEach(e -> {
+				if(e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
+					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDelete(workplaceId, false));
+				}else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
+					sendList.addAll(accRep.findAllEmailByDepartmentId(e.getDepartmentId(), workplaceId, false));
+				}else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
+					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
+				}else if (!e.getTeamId().equals(0)) {
+					sendList.addAll(accRep.findAllEmailByTeamId(e.getTeamId(), workplaceId, false));
+				}
+			});
+			
+			String token = jwtSer.createSurveyToken(sendInfor.getSurveyId());
+			List<String> emailList = new ArrayList<String>();
+			sendList.forEach(e -> {
+				emailList.add(e.getEmail());
+			});
+			survey.setSentOut(emailList.size());
+			Map<String, Object> model = new HashMap<String,Object>();
+			model.put("link", "http://localhost:4200/take/" + token);
+			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
+			surveyRep.save(survey);
+		}
+		
+		
+	}
+	
+	@Override
+	public boolean checkIfUserTakeSurvey() {
+		boolean isTake = false;
+		if(answerRep.countAnswerByAccountId() > 0) {
+			isTake = true;
+		}
+		return isTake;
 	}
 
 	@Transactional
