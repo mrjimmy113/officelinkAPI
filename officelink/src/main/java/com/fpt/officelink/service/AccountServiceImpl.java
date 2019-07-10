@@ -63,9 +63,9 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public boolean addNewAccount(Account account, Integer roleId , String workplaceName  , String addressName) {
-        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( account.getEmail());
+        Optional<Account> acc = accountRespository.findAccountByEmail( account.getEmail());
         Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if(optionalAccount.isPresent()){
+        if(acc.isPresent()){
             return false;
         }else{
         	// create workplace
@@ -110,7 +110,7 @@ public class AccountServiceImpl implements AccountService {
             location.setDateModified(new Date());
             locationRepository.save(location);
 
-            workplace.setName("mickey");
+            workplace.setName(workplace.getName());
             workplaceRepository.save(workplace);
 
             account.setRole(optionalRole.get());
@@ -136,7 +136,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Optional<Account> getAccountByEmail(String email) {
-        Optional<Account> account = accountRespository.findAccountByEmail(email);
+        Optional<Account> account = accountRespository.findByEmail(email);
         return account;
     }
     
@@ -155,8 +155,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean checkAccountExisted(String email) {
-        Optional<Account> optionalAccount = accountRespository.findAccountByEmail( email);
-        if(optionalAccount.isPresent()){
+        Optional<Account> acc = accountRespository.findAccountByEmail( email);
+        if(acc.isPresent()){
             return false;
         }
         return true;
