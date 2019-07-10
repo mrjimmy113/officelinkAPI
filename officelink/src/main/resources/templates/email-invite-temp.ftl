@@ -11,22 +11,26 @@
     <!-- use the font -->
 
 </head>
-<body style="margin: 0; padding: 0;">
+<body style="text-align: center; background-color: #dfe4ea; border-radius: 15px ">
 
-<h2 style="align-content: center; color: darkturquoise">OFFICE LINK</h2><br/>
+<h2 style="align-content: center; color: #5352ed">OFFICE LINK</h2><br/>
 
+<img src="http://www.kenwitsconsultancy.co.uk/wp-content/uploads/2016/03/Survey.jpg" width="120px" height="30" alt=""/>
+<br/>
 <span>Hello!</span><br/>
-<span>You just received an invitation to create an account at OFFICE LINK, please select the button below:</span><br/>
-<a  rel="link" style="background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
+<span>You just received an invitation to create an account at OFFICE LINK, please click the button below:</span><br/>
+<a  rel="link" style="display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;"  href="http://localhost:4200/join">Go OFFICE LINK</a> <br/>
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;"  href="http://localhost:4200/join">JOIN NOW</a> <br/>
 
 <span>or Go to http://localhost:4200/join</span>
 
