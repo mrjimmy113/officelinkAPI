@@ -35,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<Account> acc = rep.findByEmail(username);
 		if(acc.isPresent()) {
-			List<GrantedAuthority> roles = buildRoles(acc.get().getRole());
+			List<GrantedAuthority> roles = buildRoles(acc.get().getRole().getRole());
 	        return userWithRoles(acc.get(), roles);
 		}
 		return null;
