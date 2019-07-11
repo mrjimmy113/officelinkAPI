@@ -15,24 +15,34 @@ import com.fpt.officelink.repository.WorkplaceRepository;
 import com.fpt.officelink.utils.Constants;;
 
 @Service
-public class WorkplaceServiceImpl implements WorkplaceService{
+public class WorkplaceServiceImpl implements WorkplaceService {
 
 	@Autowired
 	WorkplaceRepository workpRep;
-	
-	
+
 	public List<Workplace> getAll() {
 		List<Workplace> result = workpRep.findAllByIsDeleted(false);
 		return result;
 	}
-	
+
+	@Override
+	public Workplace getWorkplace(int workplaceId) {
+		Optional<Workplace> opWorkplace = workpRep.findById(workplaceId);
+		
+		if (opWorkplace.isPresent()) {
+			return opWorkplace.get();
+		}
+		
+		return null;
+	}
+
 	@Override
 	public Page<Workplace> searchWithPagination(String term, int pageNum) {
 		if (pageNum > 0) {
 			pageNum = pageNum - 1;
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
-		
+
 		return workpRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
 	}
 
@@ -61,7 +71,7 @@ public class WorkplaceServiceImpl implements WorkplaceService{
 		if (workp == null) {
 			return false;
 		}
-		
+
 		workp.setDateModified(new Date());
 		workp.setDeleted(true);
 		workpRep.save(workp);

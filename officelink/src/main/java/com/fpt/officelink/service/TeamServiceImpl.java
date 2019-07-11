@@ -66,8 +66,8 @@ public class TeamServiceImpl implements TeamService {
 	}
 
 	@Override
-	public List<Team> getTeams() {
-		return teamRep.findAllByIsDeleted(false);
+	public List<Team> getTeamsByWorkplace(int workplaceId) {
+		return teamRep.findAllByWorkplaceId(workplaceId, false);
 	}
 
 	@Override

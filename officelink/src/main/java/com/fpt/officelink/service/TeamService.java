@@ -10,7 +10,7 @@ public interface TeamService {
 	
 	Team getTeam(int id);
 	
-	List<Team> getTeams();
+	List<Team> getTeamsByWorkplace(int workplaceId);
 	
 	Page<Team> searchWithPagination(String term, int workplaceId, int pageNum);
 	

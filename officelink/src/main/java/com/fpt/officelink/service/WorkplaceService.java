@@ -10,6 +10,8 @@ public interface WorkplaceService {
 	
 	List<Workplace> getAll();
 	
+	Workplace getWorkplace(int workplaceId);
+	
 	Page<Workplace> searchWithPagination(String term, int pageNum);
 	
 	boolean addNewWorkplace(Workplace workp);

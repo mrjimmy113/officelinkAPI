@@ -32,6 +32,11 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 	
 	@Query("SELECT t FROM Team t WHERE t.department.id = :id")
 	List<Team> findAllByDepartmentId(@Param("id") Integer id);
+	
+	@Query("SELECT t FROM Team t WHERE t.isDeleted = :isDeleted AND t.department.workplace.id = :workplaceId")
+	List<Team> findAllByWorkplaceId(
+			@Param("workplaceId") Integer workplaceId, 
+			@Param("isDeleted") Boolean isDeleted);
 	//
 	List<Team> findAllByIsDeleted(Boolean isDeleted);
 }

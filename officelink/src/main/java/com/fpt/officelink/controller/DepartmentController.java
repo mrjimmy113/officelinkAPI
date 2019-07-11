@@ -41,14 +41,14 @@ public class DepartmentController {
 	DepartmentService depService;
 
 	@GetMapping(value = "/getAll")
-	public ResponseEntity<List<DepartmentDTO>> getAll() {
+	public ResponseEntity<List<DepartmentDTO>> getAllByWorkplace() {
 		this.user = getUserContext();
 		HttpStatus status = null;
 		List<DepartmentDTO> res = new ArrayList<DepartmentDTO>();
 
 		try {
 			//
-			List<Department> result = depService.getAll(user.getWorkplaceId());
+			List<Department> result = depService.getAllByWorkplace(user.getWorkplaceId());
 			//
 			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
 			result.forEach(element -> {
@@ -66,34 +66,8 @@ public class DepartmentController {
 		return new ResponseEntity<List<DepartmentDTO>>(res, status);
 	}
 
+
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<DepartmentDTO>> search(@RequestParam("term") String term) {
-		this.user = getUserContext();
-		HttpStatus status = null;
-		PageSearchDTO<DepartmentDTO> res = new PageSearchDTO<DepartmentDTO>();
-
-		try {
-			//
-			Page<Department> result = depService.searchWithPagination(term, user.getWorkplaceId(), 0);
-			//
-			List<DepartmentDTO> resultList = new ArrayList<DepartmentDTO>();
-			result.getContent().forEach(element -> {
-				DepartmentDTO dto = new DepartmentDTO();
-				BeanUtils.copyProperties(element, dto);
-				resultList.add(dto);
-			});
-			//
-			res.setMaxPage(result.getTotalPages());
-			res.setObjList(resultList);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
-	}
-
-	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
 		this.user = getUserContext();

@@ -32,7 +32,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 		return result; 
 	}
 	
-	public List<Department> getAll(int workplaceId) {
+	public List<Department> getAllByWorkplace(int workplaceId) {
 		List<Department> result = depRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false);
 		return result;
 	}
