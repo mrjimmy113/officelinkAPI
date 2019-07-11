@@ -8,6 +8,7 @@ package com.fpt.officelink.service;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Team;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import java.time.Instant;
@@ -41,6 +42,11 @@ public class LocationServiceImpl implements LocationService {
 
 	@Autowired
 	DepartmentRepository departmentRep;
+	
+	private CustomUser getUserContext() {
+    	return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
 
     @Override
     public List<Location> getLocationsByWorkplace(int workplaceId) {
@@ -74,6 +80,9 @@ public class LocationServiceImpl implements LocationService {
 		if (loc1.isPresent() || loc2.isPresent()) {
 			return false;
 		} else {
+			Workplace workplace = new Workplace();
+			workplace.setId(getUserContext().getWorkplaceId());
+			location.setWorkplace(workplace);
 			locationRep.save(location);
 			return true;
 		}

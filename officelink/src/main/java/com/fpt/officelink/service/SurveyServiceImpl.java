@@ -78,7 +78,7 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	AccountRespository accRep;
-	
+
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
@@ -145,8 +145,7 @@ public class SurveyServiceImpl implements SurveyService {
 	public Page<Survey> searchReportWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
 		return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(term,
-				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
-				false, true, pageRequest);
+				getUserContext().getWorkplaceId(), false, true, pageRequest);
 	}
 
 	@Override
@@ -244,9 +243,13 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public boolean checkIfUserTakeSurvey() {
 		boolean isTake = false;
-		if (answerRep.countAnswerByAccountId() > 0) {
+		Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
+		int result = answerRep.countAnswerByAccountId(acc.getId());
+
+		if (result > 0) {
 			isTake = true;
 		}
+		System.out.println(isTake);
 		return isTake;
 	}
 
@@ -256,6 +259,8 @@ public class SurveyServiceImpl implements SurveyService {
 		List<Answer> savedAnswer = new ArrayList<Answer>();
 		answers.forEach(a -> {
 			Answer entity = new Answer();
+			Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
+			entity.setAccount(acc);
 			entity.setContent(a.getContent());
 			entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
 			entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
@@ -334,45 +339,49 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public SurveyReportDTO getReport(Integer id) {
 		SurveyReportDTO result = new SurveyReportDTO();
-		result.setName("TEST");
-		List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
-		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
-		sqList.forEach(sq -> {
-			QuestionReportDTO qr = new QuestionReportDTO();
-			Question e = sq.getQuestion();
-			// Change Question to Question DTO
-			QuestionDTO dto = new QuestionDTO();
-			BeanUtils.copyProperties(e, dto, "type", "options");
-			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-			e.getOptions().forEach(op -> {
-				AnswerOptionDTO opDto = new AnswerOptionDTO();
-				BeanUtils.copyProperties(op, opDto);
-				opList.add(opDto);
-			});
-			dto.setOptions(opList);
-			TypeQuestionDTO typeDto = new TypeQuestionDTO();
-			BeanUtils.copyProperties(e.getType(), typeDto);
-			dto.setType(typeDto);
-			// Set Question
-			qr.setQuestion(dto);
-			// Get each question report
-			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
-			switch (sq.getQuestion().getType().getType()) {
-			case MULTIPLE:
-				arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
-				break;
-			case SINGLE:
-				arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
-				break;
-			case TEXT:
-				arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
-				break;
+		Optional<Survey> survey =surveyRep.findById(id);
+		if(survey.isPresent()) {
+			BeanUtils.copyProperties(survey.get(), result);
+			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
+			List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
+			sqList.forEach(sq -> {
+				QuestionReportDTO qr = new QuestionReportDTO();
+				Question e = sq.getQuestion();
+				// Change Question to Question DTO
+				QuestionDTO dto = new QuestionDTO();
+				BeanUtils.copyProperties(e, dto, "type", "options");
+				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
+				e.getOptions().forEach(op -> {
+					AnswerOptionDTO opDto = new AnswerOptionDTO();
+					BeanUtils.copyProperties(op, opDto);
+					opList.add(opDto);
+				});
+				dto.setOptions(opList);
+				TypeQuestionDTO typeDto = new TypeQuestionDTO();
+				BeanUtils.copyProperties(e.getType(), typeDto);
+				dto.setType(typeDto);
+				// Set Question
+				qr.setQuestion(dto);
+				// Get each question report
+				List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
+				switch (sq.getQuestion().getType().getType()) {
+				case MULTIPLE:
+					arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+					break;
+				case SINGLE:
+					arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+					break;
+				case TEXT:
+					arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
+					break;
 
-			}
-			qr.setAnswers(arList);
-			qrList.add(qr);
-		});
-		result.setQuestions(qrList);
+				}
+				qr.setAnswers(arList);
+				qrList.add(qr);
+			});
+			result.setQuestions(qrList);
+		}
+		
 		return result;
 	}
 

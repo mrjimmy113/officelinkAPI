@@ -240,10 +240,8 @@ public class SurveyController {
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
 		SurveyDTO res = null;
-		System.out.println("Hello");
 		try {
 			if(!ser.checkIfUserTakeSurvey()) {
-				System.out.println("Hello");
 				res = ser.getTakeSurvey(token);
 				status = HttpStatus.OK;
 			}else {
@@ -283,8 +281,8 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(),status);
 	}
 	
-	@GetMapping("/report")
-	public ResponseEntity<SurveyReportDTO> report(@RequestParam("id") Integer id) {
+	@GetMapping("/report/detail")
+	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
 		SurveyReportDTO res = null;
 		try {
@@ -295,5 +293,27 @@ public class SurveyController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyReportDTO>(res,status);
+	}
+	
+	@GetMapping("/report")
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
+		try {
+			Page<Survey> result = ser.searchReportWithPagination(term, page);
+			List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
+			result.getContent().forEach(s -> {
+				SurveyReportDTO dto = new SurveyReportDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status =HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
 	}
 }

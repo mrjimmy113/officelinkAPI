@@ -4,11 +4,12 @@ import java.sql.Date;
 import java.util.List;
 
 public class SurveyReportDTO {
+	private Integer id;
 	private String name;
-	private Date startDate;
-	private Date endDate;
-	private int received;
-	private int sendOut;
+	private Date dateSendOut;
+	private Date dateStop;
+	private int receivedAnswer;
+	private int sentOut;
 	private List<QuestionReportDTO> questions;
 
 	public String getName() {
@@ -27,37 +28,50 @@ public class SurveyReportDTO {
 		this.questions = questions;
 	}
 
-	public Date getStartDate() {
-		return startDate;
+
+
+	public Date getDateSendOut() {
+		return dateSendOut;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setDateSendOut(Date dateSendOut) {
+		this.dateSendOut = dateSendOut;
 	}
 
-	public Date getEndDate() {
-		return endDate;
+
+
+	public Date getDateStop() {
+		return dateStop;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setDateStop(Date dateStop) {
+		this.dateStop = dateStop;
 	}
 
-	public int getReceived() {
-		return received;
+	public int getReceivedAnswer() {
+		return receivedAnswer;
 	}
 
-	public void setReceived(int received) {
-		this.received = received;
+	public void setReceivedAnswer(int receivedAnswer) {
+		this.receivedAnswer = receivedAnswer;
 	}
 
-	public int getSendOut() {
-		return sendOut;
+	public int getSentOut() {
+		return sentOut;
 	}
 
-	public void setSendOut(int sendOut) {
-		this.sendOut = sendOut;
+	public void setSentOut(int sentOut) {
+		this.sentOut = sentOut;
 	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
 	
 	
 }
