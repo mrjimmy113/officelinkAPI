@@ -50,6 +50,14 @@ public class Team implements Serializable{
 		return id;
 	}
 
+	public Set<Account> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(Set<Account> accounts) {
+		this.accounts = accounts;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}

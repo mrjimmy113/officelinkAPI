@@ -36,6 +36,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 		List<Department> result = depRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false);
 		return result;
 	}
+
+
+
 	
 	@Override
 	public Page<Department> searchWithPagination(String term, int workplaceId, int pageNum) {

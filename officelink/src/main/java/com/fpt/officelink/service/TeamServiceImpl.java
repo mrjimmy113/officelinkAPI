@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,9 @@ public class TeamServiceImpl implements TeamService {
 	public List<Team> getTeamByDepartmentId(Integer id) {
 		return teamRep.findAllByDepartmentId(id);
 	}
-	
+
+
+
 	@Override
 	public Page<Team> searchWithPagination(String term, int workplaceId, int pageNum) {
 		if (pageNum > 0) {

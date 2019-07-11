@@ -61,6 +61,8 @@ public class Account implements Serializable {
         return isDeleted;
     }
 
+
+
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
     }
