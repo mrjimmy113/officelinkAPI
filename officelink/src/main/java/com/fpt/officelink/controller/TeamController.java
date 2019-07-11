@@ -73,6 +73,26 @@ public class TeamController {
 
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
+	
+	@GetMapping("getByWorkplace")
+	public ResponseEntity<List<TeamDTO>> findByWorkplace() {
+		this.user = getUserContext();
+		HttpStatus status = null;
+		List<TeamDTO> res = new ArrayList<TeamDTO>();
+		try {
+			List<Team> result = teamService.getTeamsByWorkplace(user.getWorkplaceId());
+			result.forEach(element -> {
+				TeamDTO teamDTO = new TeamDTO();
+				BeanUtils.copyProperties(element, teamDTO);
+				res.add(teamDTO);
+			});
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return new ResponseEntity<List<TeamDTO>>(res, status);
+	}
 
 	@GetMapping("dep")
 	public ResponseEntity<List<TeamDTO>> findByDepId(@RequestParam("id") Integer id) {

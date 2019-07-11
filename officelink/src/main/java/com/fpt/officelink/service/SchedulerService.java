@@ -22,14 +22,16 @@ import com.fpt.officelink.entity.Configuration;
 
 @Service
 public class SchedulerService implements SchedulingConfigurer {
+	
+	private ThreadPoolTaskScheduler dailyScheduler;
 
 	private List<Configuration> configList; // list of configurations
 
-	ThreadPoolTaskScheduler scheduler; // scheduler properties
+	private ThreadPoolTaskScheduler configScheduler; // scheduler properties
 
 	private List<ScheduledFuture<?>> scheduleList; // store scheduled schedule
 	
-	private static final Logger log = Logger.getLogger(SurveyController.class.getName());
+	private static final Logger log = Logger.getLogger(SchedulerService.class.getName());
 
 	@Autowired
 	ConfigurationService configurationService;
@@ -39,10 +41,8 @@ public class SchedulerService implements SchedulingConfigurer {
 	
 	// constructor
 	private SchedulerService() {
-		scheduler = new ThreadPoolTaskScheduler();
-		scheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
-		scheduler.setPoolSize(5);
-		scheduler.initialize();
+		dailyScheduler = dailyPoolScheduler();
+		configScheduler = configurationPoolScheduler();
 		scheduleList = new ArrayList<ScheduledFuture<?>>();
 	}
 
@@ -57,16 +57,21 @@ public class SchedulerService implements SchedulingConfigurer {
 		return instance;
 	}
 
-	@Bean
-	public TaskScheduler poolScheduler() {
+	private ThreadPoolTaskScheduler configurationPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-		scheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
+		scheduler.setThreadNamePrefix("ConfigurationThreadPool");
 		scheduler.setPoolSize(5);
 		scheduler.initialize();
 		return scheduler;
 	}
 	
-
+	private ThreadPoolTaskScheduler dailyPoolScheduler() {
+		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+		scheduler.setThreadNamePrefix("DailyThreadPool");
+		scheduler.setPoolSize(5);
+		scheduler.initialize();
+		return scheduler;
+	}
 
 	// task registration
 	@Override
@@ -84,7 +89,7 @@ public class SchedulerService implements SchedulingConfigurer {
 		// set schedules
 		for (Configuration config : configList) {
 			if (config.getSurvey() != null && !config.getScheduleTime().isEmpty()) {
-				ScheduledFuture<?> newSchedule = scheduler.schedule(new Runnable() {
+				ScheduledFuture<?> newSchedule = configScheduler.schedule(new Runnable() {
 					@Override
 					public void run() {
 						// Put task here
@@ -110,7 +115,7 @@ public class SchedulerService implements SchedulingConfigurer {
 				}
 				i++;
 			}
-			taskRegistrar.setScheduler(scheduler);
+			taskRegistrar.setScheduler(configScheduler);
 		}
 	}
 }
