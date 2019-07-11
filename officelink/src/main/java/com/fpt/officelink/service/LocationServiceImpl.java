@@ -7,6 +7,7 @@ package com.fpt.officelink.service;
 
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import java.time.Instant;
@@ -35,6 +36,11 @@ public class LocationServiceImpl implements LocationService {
     DepartmentRepository departmentRep;
 
     @Override
+    public List<Location> getLocationsByWorkplace(int workplaceId) {
+        return locationRep.findAllByWorkplaceId(workplaceId, false);
+    }
+
+    @Override
     public Optional<Location> searchById(int id) {
         return locationRep.findById(id);
     }
@@ -48,7 +54,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return locationRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+        return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
     @Override
@@ -62,6 +68,8 @@ public class LocationServiceImpl implements LocationService {
             return true;
         }
     }
+
+
 
     @Override
     public boolean editLocation(Location location) {

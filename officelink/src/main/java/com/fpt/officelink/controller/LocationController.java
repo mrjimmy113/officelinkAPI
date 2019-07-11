@@ -7,8 +7,11 @@ package com.fpt.officelink.controller;
 
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.TeamDTO;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.service.LocationService;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +40,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/location")
 public class LocationController {
+    private CustomUser user;
+
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     @Autowired
     LocationService service;
@@ -70,6 +79,26 @@ public class LocationController {
             status = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<LocationDTO>(res, status);
+    }
+
+    @GetMapping("getByWorkplace")
+    public ResponseEntity<List<LocationDTO>> findByWorkplace() {
+        this.user = getUserContext();
+        HttpStatus status = null;
+        List<LocationDTO> res = new ArrayList<LocationDTO>();
+        try {
+            List<Location> result = service.getLocationsByWorkplace(user.getWorkplaceId());
+            result.forEach(element -> {
+                LocationDTO locationDTO = new LocationDTO();
+                BeanUtils.copyProperties(element, locationDTO);
+                res.add(locationDTO);
+            });
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<List<LocationDTO>>(res, status);
     }
 
     @GetMapping

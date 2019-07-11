@@ -7,13 +7,13 @@ import javax.validation.constraints.NotNull;
 
 public class DepartmentDTO {
 	
-	@NotNull
+
 	private Integer id;
 	
-	@NotEmpty
+
 	private String name;
 	
-	@NotNull
+
 	private List<TeamDTO> teams;
 	
 //	private List<LocationDTO> locations;
