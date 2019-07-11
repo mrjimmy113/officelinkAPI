@@ -83,7 +83,12 @@ public class Answer implements Serializable {
 		this.wordClouds = wordClouds;
 	}
 
-	
-	
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
 
 }

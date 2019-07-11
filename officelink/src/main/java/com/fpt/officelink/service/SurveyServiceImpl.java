@@ -78,6 +78,10 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	AccountRespository accRep;
+	
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
 
 	@Transactional(rollbackOn = Exception.class)
 	@Override
@@ -201,12 +205,10 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	@Transactional
-	@Async
+	@Transactional(rollbackOn = Exception.class)
 	public void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException {
 		Optional<Survey> opSurvey = surveyRep.findById(sendInfor.getSurveyId());
-		int workplaceId = ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-				.getWorkplaceId();
+		Integer workplaceId = getUserContext().getWorkplaceId();
 		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			survey.setActive(true);

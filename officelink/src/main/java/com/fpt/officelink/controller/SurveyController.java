@@ -240,14 +240,17 @@ public class SurveyController {
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
 		SurveyDTO res = null;
+		System.out.println("Hello");
 		try {
 			if(!ser.checkIfUserTakeSurvey()) {
+				System.out.println("Hello");
 				res = ser.getTakeSurvey(token);
 				status = HttpStatus.OK;
 			}else {
 				status = HttpStatus.ACCEPTED;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyDTO>(res,status);
@@ -257,7 +260,7 @@ public class SurveyController {
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			
+			ser.sendOutSurvey(target);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
