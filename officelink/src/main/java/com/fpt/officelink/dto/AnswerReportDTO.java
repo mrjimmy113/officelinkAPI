@@ -5,9 +5,6 @@ public class AnswerReportDTO {
 	
 	private Integer weight;
 
-	
-	
-	
 	public AnswerReportDTO() {
 		super();
 	}

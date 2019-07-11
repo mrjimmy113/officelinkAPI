@@ -1,8 +1,6 @@
 package com.fpt.officelink.service;
 
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -12,17 +10,15 @@ import java.util.Set;
 
 import javax.transaction.Transactional;
 
-import org.aspectj.weaver.patterns.IfPointcut.IfFalsePointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.fpt.officelink.entity.Word;
 import com.fpt.officelink.entity.Answer;
-import com.fpt.officelink.entity.AnswerReport;
-import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.Word;
+import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.entity.WordCloudFilter;
 import com.fpt.officelink.repository.WordCloudFilterRepository;
 import com.fpt.officelink.repository.WordListRepository;
@@ -107,6 +103,50 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		if (opWCF.isPresent())
 			return true;
 		return false;
+	}
+	
+	@Override
+	public Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity) {
+		Set<WordCloud> details = new HashSet<WordCloud>();
+		Optional<WordCloudFilter> opFilter = filterRep.findById(id);
+		rawText = rawText.toLowerCase();
+		String[] words = rawText.trim().split(" ");
+		if(opFilter.isPresent()) {
+			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());
+			boolean isFound;
+			for(int i = 0; i< words.length; i++) {
+				if(words[i].trim() == "") {
+					continue;
+				}
+				isFound = false;
+				for (WordCloud d : details) {
+					if(d.getWord().equalsIgnoreCase(words[i])) {
+						d.setTimes(d.getTimes() + 1);
+						isFound = true;
+						break;
+					}
+				}
+				if(!isFound) {
+					boolean isIncludeInFilter = false;
+					for (Word word : filterWordList) {
+						if(word.getName().equalsIgnoreCase(words[i])) {
+							isIncludeInFilter = true;
+							break;
+						}
+					}
+					if(!isIncludeInFilter) {
+						WordCloud tmp = new WordCloud();
+						tmp.setWord(words[i].toLowerCase());
+						tmp.setTimes(1);
+						tmp.setAnswer(entity);
+						details.add(tmp);
+					}
+				}
+			}
+		}
+		
+		return details;
+		
 	}
 	
 	

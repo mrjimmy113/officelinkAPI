@@ -2,6 +2,7 @@ package com.fpt.officelink.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AccountDTO implements Serializable {
@@ -10,30 +11,70 @@ public class AccountDTO implements Serializable {
     private String email;
     private String firstname;
     private String lastname;
-    private String address;
-    private boolean isDelete ;
-    private String role;
-    private String workspacename;
+    //private String address;
+    private boolean isDeleted ;
+    private Integer role_id;
+//    private String workspacename;
+    private LocationDTO location;
+    private WorkplaceDTO workplace;
+    private Date dateCreated;
+    private Date dateModified;
+    private Integer roleId;
 
 
 
-    public String getWorkspacename() {
-        return workspacename;
+
+
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setWorkspacename(String workspacename) {
-        this.workspacename = workspacename;
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
-    public String getRole() {
-        return role;
+    public Date getDateModified() {
+        return dateModified;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
+
+//    public String getWorkspacename() {
+//        return workspacename;
+//    }
+//
+//    public void setWorkspacename(String workspacename) {
+//        this.workspacename = workspacename;
+//    }
+
+
+    public LocationDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationDTO location) {
+        this.location = location;
+    }
+
+    public WorkplaceDTO getWorkplace() {
+        return workplace;
+    }
+
+    public void setWorkplace(WorkplaceDTO workplace) {
+        this.workplace = workplace;
     }
 
 
+
+    public Integer getRole_id() {
+        return role_id;
+    }
+
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
+    }
 
     public AccountDTO() {
     }
@@ -54,26 +95,25 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public AccountDTO(Integer id, String password, String email, String firstname, String lastname, String address, boolean isDelete, String role, String workspacename) {
-        this.id = id;
-        this.password = password;
-        this.email = email;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.address = address;
-        this.isDelete = isDelete;
-        this.role = role;
-        this.workspacename = workspacename;
+    public Integer getRoleId() {
+        return roleId;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
-    public void setDelete(boolean delete) {
-        isDelete = delete;
+//    public boolean isIsDeleted() {
+//        return isDeleted;
+//    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
 
     public Integer getId() {
         return id;
@@ -100,13 +140,14 @@ public class AccountDTO implements Serializable {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
-    }
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
 
 }

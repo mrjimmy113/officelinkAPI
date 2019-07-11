@@ -2,6 +2,9 @@ package com.fpt.officelink.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Account implements Serializable {
@@ -12,7 +15,7 @@ public class Account implements Serializable {
     private Integer id;
 
     @Column
-    private boolean isDelete;
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
@@ -21,6 +24,15 @@ public class Account implements Serializable {
     @ManyToOne
     @JoinColumn(name = "locationId", nullable = false)
     private Location location;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    @Column
+    private Date dateCreated;
+
+    @Column Date dateModified;
 
     @Column
     private String password;
@@ -31,23 +43,26 @@ public class Account implements Serializable {
     @Column
     private String lastname;
 
-    @Column
-    private String role;
-
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
-    public boolean isDelete() {
-        return isDelete;
+    @ManyToMany
+	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "team_id") })
+	private Set<Team> teams = new HashSet<Team>();
+
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
-    public void setDelete(boolean isDelete) {
-        this.isDelete = isDelete;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     public Integer getId() {
@@ -90,16 +105,6 @@ public class Account implements Serializable {
         this.lastname = lastname;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    @Column
-    private String address;
 
     public Workplace getWorkplace() {
         return workplace;
@@ -116,6 +121,28 @@ public class Account implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
-    
-    
+
+	public Set<Team> getTeams() {
+		return teams;
+	}
+
+	public void setTeams(Set<Team> teams) {
+		this.teams = teams;
+	}
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public Date getDateModified() {
+        return dateModified;
+    }
+
+    public void setDateModified(Date dateModified) {
+        this.dateModified = dateModified;
+    }
 }

@@ -24,12 +24,14 @@ import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
+import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AnswerOptionRepository;
 import com.fpt.officelink.repository.AnswerRepository;
@@ -64,13 +66,16 @@ public class SurveyServiceImpl implements SurveyService {
 	@Autowired
 	AnswerRepository answerRep;
 
+	@Autowired
+	WordCloudFilterService filterSer;
+
 	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public void newSurvey(Survey survey, List<Question> questions) {
+	public void newSurvey(Survey survey, List<SurveyQuestion> sqList) {
 		survey.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 		surveyRep.save(survey);
-		questions.forEach(q -> {
-
+		sqList.forEach(sq -> {
+			Question q = sq.getQuestion();
 			if (q.getId() == null) {
 				for (AnswerOption op : q.getOptions()) {
 					op.setQuestion(q);
@@ -82,38 +87,36 @@ public class SurveyServiceImpl implements SurveyService {
 					q = tmp.get();
 				}
 			}
-			SurveyQuestion tmp = new SurveyQuestion();
-			tmp.setQuestion(q);
-			tmp.setSurvey(survey);
-			surQuestRep.save(tmp);
-
+			sq.setQuestion(q);
+			sq.setSurvey(survey);
+			surQuestRep.save(sq);
 		});
 
 	}
 
 	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public void updateSurvey(Survey survey, List<Question> questions) {
+	public void updateSurvey(Survey survey, List<SurveyQuestion> sqList) {
 		survey.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		surveyRep.save(survey);
 		System.out.println("delete");
 		surQuestRep.deleteBySurveyId(survey.getId());
-		questions.forEach(q -> {
-
+		sqList.forEach(sq -> {
+			Question q = sq.getQuestion();
 			if (q.getId() == null) {
-				questionRep.saveAndFlush(q);
+				for (AnswerOption op : q.getOptions()) {
+					op.setQuestion(q);
+				}
+				questionRep.save(q);
 			} else {
 				Optional<Question> tmp = questionRep.findById(q.getId());
 				if (tmp.isPresent()) {
 					q = tmp.get();
 				}
 			}
-
-			SurveyQuestion tmp = new SurveyQuestion();
-			tmp.setQuestion(q);
-			tmp.setSurvey(survey);
-			surQuestRep.save(tmp);
-
+			sq.setQuestion(q);
+			sq.setSurvey(survey);
+			surQuestRep.save(sq);
 		});
 
 	}
@@ -135,16 +138,14 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	public List<Question> getDetail(Integer id) {
-		return questionRep.findAllBySurveyId(id);
+	public List<SurveyQuestion> getDetail(Integer id) {
+		return surQuestRep.findAllBySurveyId(id);
 	}
 
 	@Override
 	public SurveyDTO getTakeSurvey(String token) throws ParseException {
 		SurveyDTO result = null;
-
 		if (jwtSer.validateTakeSurveyToken(token)) {
-			String email = jwtSer.getEmailFromToken(token);
 			Integer id = jwtSer.getSurveyId(token);
 			Optional<Survey> survey = surveyRep.findById(id);
 			if (survey.isPresent()) {
@@ -187,9 +188,9 @@ public class SurveyServiceImpl implements SurveyService {
 		Survey survey = opSurvey.get();
 		survey.setActive(true);
 		surveyRep.save(survey);
-		String token = jwtSer.createSurveyToken("duongphse62746@fpt.edu.vn", surveyId);
+		String token = jwtSer.createSurveyToken("quangnguyenvietminh@gmail.com", surveyId);
 		List<String> emailList = new ArrayList<String>();
-		emailList.add("duongphse62746@fpt.edu.vn");
+		emailList.add("quangnguyenvietminh@gmail.com");
 		Map<String, Object> model = new HashMap<>();
 		model.put("link", "http://localhost:4200/take/" + token);
 		mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
@@ -199,92 +200,109 @@ public class SurveyServiceImpl implements SurveyService {
 	@Transactional
 	@Override
 	public void saveAnswer(List<AnswerDTO> answers) {
+		List<Answer> savedAnswer = new ArrayList<Answer>();
 		answers.forEach(a -> {
 			Answer entity = new Answer();
 			entity.setContent(a.getContent());
 			entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
 			entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
-			answerRep.save(entity);
-		});
-	}
-	
-	private List<AnswerReportDTO> getWordCloudDetail(String text, Integer filterId) {
-		List<AnswerReportDTO> details = new ArrayList<AnswerReportDTO>();
-		String[] words = text.split(" ");
-		boolean isFound;
-		for(int i = 0; i< words.length; i++) {
-			isFound = false;
-			for (AnswerReportDTO d : details) {
-				if(d.getTerm().equalsIgnoreCase(words[i])) {
-					d.setWeight(d.getWeight() + 1);
-					isFound = true;
-					break;
-				}
+			if (a.getContent().matches(".*[a-zA-Z]+.*")) {
+				entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), 1, entity));
 			}
-			if(!isFound) details.add(new AnswerReportDTO(words[i],1));
-		}
-		return details;
+			savedAnswer.add(entity);
+		});
+		answerRep.saveAll(savedAnswer);
 	}
-	
-	private List<AnswerReportDTO> combineWordCloudDetail(List<AnswerReportDTO> details) {
+
+	private List<AnswerReportDTO> getFreeTextReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
-		for (AnswerReportDTO d : details) {
-			isFound = false;
-			for (AnswerReportDTO r : result) {
-				if(d.getTerm().equalsIgnoreCase(r.getTerm())) {
-					r.setWeight(r.getWeight() + d.getWeight());
-					isFound = true;
-					break;
+		for (Answer a : answers) {
+			for (WordCloud w : a.getWordClouds()) {
+				isFound = false;	
+				for (AnswerReportDTO r : result) {
+					if (r.getTerm().equalsIgnoreCase(w.getWord())) {
+						r.setWeight(r.getWeight() + w.getTimes());
+						isFound = true;
+						break;
+					}
 				}
+				if (!isFound) {
+					System.out.println(w.getWord());
+					result.add(new AnswerReportDTO(w.getWord(), w.getTimes()));
+				}
+
 			}
-			if(!isFound) result.add(d);
+
 		}
+		System.out.println(result.size());
 		return result;
 	}
-	
+
 	private List<AnswerReportDTO> getSingleChoiceReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
 		for (Answer answer : answers) {
 			isFound = false;
 			for (AnswerReportDTO AnswerReportDTO : result) {
-				if(answer.getContent().equalsIgnoreCase(AnswerReportDTO.getTerm())) {
+				if (answer.getContent().equalsIgnoreCase(AnswerReportDTO.getTerm())) {
 					AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
 					isFound = true;
+					break;
 				}
 			}
-			if(!isFound) result.add(new AnswerReportDTO(answer.getContent(), 1));
+			if (!isFound)
+				result.add(new AnswerReportDTO(answer.getContent(), 1));
 		}
 		return result;
 	}
-	
+
 	private List<AnswerReportDTO> getMutipleChoiceReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
 		for (Answer answer : answers) {
-			String[] options = answer.getContent().split(" ");
-			for(int i =0 ; i < options.length;i++) {
+			String[] options = answer.getContent().split(",");
+			for (int i = 0; i < options.length; i++) {
 				isFound = false;
 				for (AnswerReportDTO AnswerReportDTO : result) {
-					if(options[i].equalsIgnoreCase(AnswerReportDTO.getTerm())) {
+					if (options[i].equalsIgnoreCase(AnswerReportDTO.getTerm())) {
 						AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
 						isFound = true;
+						break;
 					}
 				}
-				if(!isFound) result.add(new AnswerReportDTO(options[i],1));
+				if (!isFound)
+					result.add(new AnswerReportDTO(options[i], 1));
 			}
 		}
 		return result;
 	}
-	
-	public void getReport(Integer id) {
+
+	@Override
+	public SurveyReportDTO getReport(Integer id) {
+		SurveyReportDTO result = new SurveyReportDTO();
+		result.setName("TEST");
 		List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
 		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
 		sqList.forEach(sq -> {
 			QuestionReportDTO qr = new QuestionReportDTO();
-			//Change Question to Question DTO
+			Question e = sq.getQuestion();
+			// Change Question to Question DTO
+			QuestionDTO dto = new QuestionDTO();
+			BeanUtils.copyProperties(e, dto,"type","options");
+			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
+			e.getOptions().forEach(op -> {
+				AnswerOptionDTO opDto = new AnswerOptionDTO();
+				BeanUtils.copyProperties(op, opDto);
+				opList.add(opDto);
+			});
+			dto.setOptions(opList);
+			TypeQuestionDTO typeDto = new TypeQuestionDTO();
+			BeanUtils.copyProperties(e.getType(), typeDto);
+			dto.setType(typeDto);
 			// Set Question
+			qr.setQuestion(dto);
+			//Get each question report
 			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
 			switch (sq.getQuestion().getType().getType()) {
 			case MULTIPLE:
@@ -293,12 +311,16 @@ public class SurveyServiceImpl implements SurveyService {
 			case SINGLE:
 				arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
 				break;
-			case TEXT :
-				//getFreeTextReport
+			case TEXT:
+				arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
 				break;
-				
+
 			}
+			qr.setAnswers(arList);
+			qrList.add(qr);
 		});
+		result.setQuestions(qrList);
+		return result;
 	}
 
 	@Override

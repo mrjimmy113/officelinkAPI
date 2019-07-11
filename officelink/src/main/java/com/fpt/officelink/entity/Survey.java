@@ -116,6 +116,14 @@ public class Survey implements Serializable {
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
 	
 	public Set<Configuration> getConfigurations() {
 		return configurations;
@@ -125,12 +133,5 @@ public class Survey implements Serializable {
 		this.configurations = configurations;
 	}
 
-	public Workplace getWorkplace() {
-		return workplace;
-	}
-
-	public void setWorkplace(Workplace workplace) {
-		this.workplace = workplace;
-	}
 
 }
