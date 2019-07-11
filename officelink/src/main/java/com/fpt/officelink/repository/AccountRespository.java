@@ -1,7 +1,9 @@
 package com.fpt.officelink.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +17,23 @@ import com.fpt.officelink.entity.Account;
 @Repository
 public interface AccountRespository extends CrudRepository<Account, Integer> {
     Page<Account> findAllByFirstname(String firstname, Pageable pageable);
+
+
     Page<Account> findAllByFirstnameContainingAndIsDeleted(String firstname , Boolean isDeleted , Pageable pageable);
 
-
+    @Query("SELECT t FROM Account t WHERE t.firstname LIKE %:firstName% AND t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
+    Page<Account> findAllByFirstnameAndWorkplace(
+            @Param("firstName") String firstName,
+            @Param("workplaceId") Integer workplaceId,
+            @Param("isDeleted") Boolean isDeleted,
+    Pageable pageable);
 
     Optional<Account> findAccountByEmail( String email);
     Optional<Account> findByEmail(String email);
     Optional<Account> findByEmailAndPassword(String email, String password);
+
+    @Query("SELECT t FROM Account t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
+    List<Account> findAllByWorkplaceId(
+            @Param("workplaceId") Integer workplaceId,
+            @Param("isDeleted") Boolean isDeleted);
 }

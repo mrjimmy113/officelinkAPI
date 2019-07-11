@@ -6,6 +6,7 @@ import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,6 +26,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/account")
 public class AccountController {
+
+    private CustomUser user;
+
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     @Autowired
     AccountService service;
@@ -40,12 +48,13 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchWithTerm(@RequestParam("term") String term){
+        this.user = getUserContext();
         HttpStatus status = null;
 
         PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
         try{
-            Page<Account>  pageAccount = service.searchWithPagination(term, 0);
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 0);
 
             List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
 
@@ -121,12 +130,13 @@ public class AccountController {
 
     @GetMapping(value = "/getAccount")
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
+        this.user = getUserContext();
         HttpStatus status = null;
 
         PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
         try{
-            Page<Account>  pageAccount = service.searchWithPagination(term, page);
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), page);
 
             List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
 
@@ -166,7 +176,7 @@ public class AccountController {
 
 
             BeanUtils.copyProperties(dto, entity);
-            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName() , dto.getLocation().getAddress());
+            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
             if(res){
 
                 status = HttpStatus.OK;
@@ -231,7 +241,7 @@ public class AccountController {
 
             Account entity = new Account();
             BeanUtils.copyProperties(accountDTO,entity);
-            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkplace().getName() , accountDTO.getLocation().getAddress());
+            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkplace().getName());
 
 
             if(res){

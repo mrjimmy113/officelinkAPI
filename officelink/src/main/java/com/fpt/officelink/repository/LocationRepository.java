@@ -8,6 +8,8 @@ package com.fpt.officelink.repository;
 import com.fpt.officelink.entity.Location;
 import java.util.List;
 import java.util.Optional;
+
+import com.fpt.officelink.entity.Team;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +38,9 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     
     Optional<Location> findByAddressContainingAndIsDeleted(String address, boolean isDeleted);
 
-
+    @Query("SELECT t FROM Location t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
+    List<Location> findAllByWorkplaceId(
+            @Param("workplaceId") Integer workplaceId,
+            @Param("isDeleted") Boolean isDeleted);
 
 }

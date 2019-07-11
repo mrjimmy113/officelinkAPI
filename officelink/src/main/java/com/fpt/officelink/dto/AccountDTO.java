@@ -11,7 +11,7 @@ public class AccountDTO implements Serializable {
     private String email;
     private String firstname;
     private String lastname;
-    //private String address;
+    private String address;
     private boolean isDeleted ;
     private Integer role_id;
 //    private String workspacename;
@@ -20,6 +20,7 @@ public class AccountDTO implements Serializable {
     private Date dateCreated;
     private Date dateModified;
     private Integer roleId;
+
 
 
 
@@ -140,13 +141,12 @@ public class AccountDTO implements Serializable {
         this.email = email;
     }
 
-//    public String getAddress() {
-//        return address;
-//    }
-//
-//    public void setAddress(String address) {
-//        this.address = address;
-//    }
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
 
 

@@ -9,6 +9,8 @@ import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import java.util.List;
 import java.util.Optional;
+
+import com.fpt.officelink.entity.Team;
 import org.springframework.data.domain.Page;
 
 /**
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page;
  * @author Thai Phu Cuong
  */
 public interface LocationService {
+    List<Location> getLocationsByWorkplace(int workplaceId);
 
     Optional<Location> searchById(int id);
 
@@ -28,5 +31,7 @@ public interface LocationService {
     boolean removeLocation(int id);
     
     List<Location> getAllLocation();
+
+
 
 }

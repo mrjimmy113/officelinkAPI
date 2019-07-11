@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -55,14 +56,14 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public Page<Account> searchWithPagination(String term, int pageNum) {
+    public Page<Account> searchWithPagination(String term, Integer workplaceId, int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
-        return accountRespository.findAllByFirstnameContainingAndIsDeleted(term, false,  pageable);
+        return accountRespository.findAllByFirstnameAndWorkplace(term, workplaceId, false , pageable);
     }
 
     @Transactional
     @Override
-    public boolean addNewAccount(Account account, Integer roleId , String workplaceName  , String addressName) {
+    public boolean addNewAccount(Account account, Integer roleId , String workplaceName) {
         Optional<Account> acc = accountRespository.findAccountByEmail( account.getEmail());
         Optional<Role> optionalRole = roleRepository.findById(roleId);
         if(acc.isPresent()){
@@ -74,18 +75,12 @@ public class AccountServiceImpl implements AccountService {
         	workplace.setDateCreated(new Date());
         	workplaceRepository.save(workplace);
 
-        	//create location
-            Location location = new Location();
-            location.setAddress(addressName);
-            location.setDateCreated(new Date());
-            location.setIsDeleted(false);
-            locationRepository.save(location);
 
 
 
         	// create account with the new workplace
         	account.setWorkplace(workplace);
-        	account.setLocation(location);
+
             account.setRole(optionalRole.get());
             account.setPassword(passwordEncoder().encode(account.getPassword()));
             account.setDateCreated(new Date());
@@ -151,6 +146,11 @@ public class AccountServiceImpl implements AccountService {
     		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
     	}
     	return result;
+    }
+
+    @Override
+    public List<Account> findAccountByWorkplaceId(Integer id) {
+        return accountRespository.findAllByWorkplaceId(id, false);
     }
 
     @Override
