@@ -51,8 +51,6 @@ import com.nimbusds.jose.JOSEException;
 public class SurveyServiceImpl implements SurveyService {
 
 	private static final int PAGEMAXSIZE = 9;
-	
-	int workplaceId = ((CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId();
 
 	@Autowired
 	SurveyRepository surveyRep;
@@ -77,7 +75,7 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	WordCloudFilterService filterSer;
-	
+
 	@Autowired
 	AccountRespository accRep;
 
@@ -140,6 +138,14 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
+	public Page<Survey> searchReportWithPagination(String term, int pageNum) {
+		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+		return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(term,
+				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+				false, true, pageRequest);
+	}
+
+	@Override
 	public void delete(Integer id) {
 		Optional<Survey> opSurvey = surveyRep.findById(id);
 		if (opSurvey.isPresent()) {
@@ -199,44 +205,44 @@ public class SurveyServiceImpl implements SurveyService {
 	@Async
 	public void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException {
 		Optional<Survey> opSurvey = surveyRep.findById(sendInfor.getSurveyId());
-		int workplaceId = ((CustomUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId();
-		if(opSurvey.isPresent()) {
+		int workplaceId = ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+				.getWorkplaceId();
+		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			survey.setActive(true);
 			survey.setDateSendOut(new Date(Calendar.getInstance().getTimeInMillis()));
 			survey.setDateStop(sendInfor.getDateStop());
 			Set<Account> sendList = new HashSet<Account>();
 			sendInfor.getTargetList().forEach(e -> {
-				if(e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
-					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDelete(workplaceId, false));
-				}else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
+				if (e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
+					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
+				} else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByDepartmentId(e.getDepartmentId(), workplaceId, false));
-				}else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
+				} else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
-				}else if (!e.getTeamId().equals(0)) {
+				} else if (!e.getTeamId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByTeamId(e.getTeamId(), workplaceId, false));
 				}
 			});
-			
+
 			String token = jwtSer.createSurveyToken(sendInfor.getSurveyId());
 			List<String> emailList = new ArrayList<String>();
 			sendList.forEach(e -> {
 				emailList.add(e.getEmail());
 			});
 			survey.setSentOut(emailList.size());
-			Map<String, Object> model = new HashMap<String,Object>();
+			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("link", "http://localhost:4200/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 			surveyRep.save(survey);
 		}
-		
-		
+
 	}
-	
+
 	@Override
 	public boolean checkIfUserTakeSurvey() {
 		boolean isTake = false;
-		if(answerRep.countAnswerByAccountId() > 0) {
+		if (answerRep.countAnswerByAccountId() > 0) {
 			isTake = true;
 		}
 		return isTake;
@@ -264,7 +270,7 @@ public class SurveyServiceImpl implements SurveyService {
 		boolean isFound;
 		for (Answer a : answers) {
 			for (WordCloud w : a.getWordClouds()) {
-				isFound = false;	
+				isFound = false;
 				for (AnswerReportDTO r : result) {
 					if (r.getTerm().equalsIgnoreCase(w.getWord())) {
 						r.setWeight(r.getWeight() + w.getTimes());
@@ -334,7 +340,7 @@ public class SurveyServiceImpl implements SurveyService {
 			Question e = sq.getQuestion();
 			// Change Question to Question DTO
 			QuestionDTO dto = new QuestionDTO();
-			BeanUtils.copyProperties(e, dto,"type","options");
+			BeanUtils.copyProperties(e, dto, "type", "options");
 			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
 			e.getOptions().forEach(op -> {
 				AnswerOptionDTO opDto = new AnswerOptionDTO();
@@ -347,7 +353,7 @@ public class SurveyServiceImpl implements SurveyService {
 			dto.setType(typeDto);
 			// Set Question
 			qr.setQuestion(dto);
-			//Get each question report
+			// Get each question report
 			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
 			switch (sq.getQuestion().getType().getType()) {
 			case MULTIPLE:
@@ -370,7 +376,7 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Override
 	public List<Survey> getWorkplaceSurvey(int workplaceId) {
-		
+
 		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
 	}
 

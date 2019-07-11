@@ -38,4 +38,6 @@ public interface SurveyService {
 	String getSurveyToken(Integer surveyId) throws JOSEException;
 
 	boolean checkIfUserTakeSurvey();
+
+	Page<Survey> searchReportWithPagination(String term, int pageNum);
 }

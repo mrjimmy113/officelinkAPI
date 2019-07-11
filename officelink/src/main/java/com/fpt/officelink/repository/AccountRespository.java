@@ -36,16 +36,16 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 
 	Optional<Account> findByEmailAndPassword(String email, String password);
 	
-	List<Account> findAllByWorkplaceIdAndIsDelete(Integer workplaceId, boolean isDelete); 
+	List<Account> findAllByWorkplaceIdAndIsDeleted(Integer workplaceId, boolean isDeleted); 
 
-	@Query("SELECT a.id, a.email FROM Account a WHERE a.location.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
-	List<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+	@Query("SELECT a.id, a.email FROM Account a WHERE a.location.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
+	List<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 
-	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
-	List<Account> findAllEmailByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
+	List<Account> findAllEmailByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 	
-	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :id AND a.workplace.id = :workId AND a.isDelete = :isDelete")
-	List<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);
+	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
+	List<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 	
 	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :depId AND a.location.id = :loId AND a.workplace.id = :workId AND a.isDelete = :isDelete")
 	List<Account> findAllEmailByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("isDelete") boolean isDelete);

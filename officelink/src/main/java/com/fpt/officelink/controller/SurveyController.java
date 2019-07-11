@@ -78,7 +78,6 @@ public class SurveyController {
 		HttpStatus status = null;
 		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
 		try {
-			System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 			Page<Survey> result = ser.searchWithPagination(term, page);
 			List<SurveyDTO> dtoList = new ArrayList<SurveyDTO>();
 			result.getContent().forEach(s -> {
@@ -94,6 +93,28 @@ public class SurveyController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res,status);
+	}
+	
+	@GetMapping("/searchReport")
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> searchReport(@RequestParam("term") String term,@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
+		try {
+			Page<Survey> result = ser.searchWithPagination(term, page);
+			List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
+			result.getContent().forEach(s -> {
+				SurveyReportDTO dto = new SurveyReportDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status =HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
 	}
 	
 	@PostMapping

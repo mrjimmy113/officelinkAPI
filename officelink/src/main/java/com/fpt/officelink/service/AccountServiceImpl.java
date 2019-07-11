@@ -52,6 +52,8 @@ public class AccountServiceImpl implements AccountService {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+    
+   
 
 
 
@@ -138,12 +140,15 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AuthDTO getAuthenticationInfor(String email, String password) {
     	AuthDTO result = null;
-    	Optional<Account> acc = accountRespository.findByEmailAndPassword(email, password);
+    	Optional<Account> acc = accountRespository.findByEmail(email);
     	if(acc.isPresent()) {
-    		result = new AuthDTO();
-    		result.setRole(acc.get().getRole().getRole());
-    		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());
-    		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
+    		if(passwordEncoder().matches(password, acc.get().getPassword())) {
+    			result = new AuthDTO();
+        		result.setRole(acc.get().getRole().getRole());
+        		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());
+        		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
+    		}
+    		
     	}
     	return result;
     }
