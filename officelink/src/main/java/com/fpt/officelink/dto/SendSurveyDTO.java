@@ -1,12 +1,11 @@
 package com.fpt.officelink.dto;
 
-import java.sql.Date;
 import java.util.List;
 
 public class SendSurveyDTO {
 	private Integer surveyId;
 	private List<SendTargetDTO> targetList;
-	private Date dateStop;
+	private long expireDate	;
 	
 	public Integer getSurveyId() {
 		return surveyId;
@@ -20,10 +19,11 @@ public class SendSurveyDTO {
 	public void setTargetList(List<SendTargetDTO> targetList) {
 		this.targetList = targetList;
 	}
-	public Date getDateStop() {
-		return dateStop;
+	public long getExpireDate() {
+		return expireDate;
 	}
-	public void setDateStop(Date dateStop) {
-		this.dateStop = dateStop;
+	public void setExpireDate(long expireDate) {
+		this.expireDate = expireDate;
 	}
+	
 }

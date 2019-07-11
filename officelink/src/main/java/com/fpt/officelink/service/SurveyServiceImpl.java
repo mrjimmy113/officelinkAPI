@@ -17,16 +17,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
+import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
@@ -38,6 +37,7 @@ import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.WordCloud;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
@@ -87,6 +87,9 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public void newSurvey(Survey survey, List<SurveyQuestion> sqList) {
 		survey.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+		Workplace workplace = new Workplace();
+		workplace.setId(getUserContext().getWorkplaceId());
+		survey.setWorkplace(workplace);
 		surveyRep.save(survey);
 		sqList.forEach(sq -> {
 			Question q = sq.getQuestion();
@@ -212,7 +215,7 @@ public class SurveyServiceImpl implements SurveyService {
 			Survey survey = opSurvey.get();
 			survey.setActive(true);
 			survey.setDateSendOut(new Date(Calendar.getInstance().getTimeInMillis()));
-			survey.setDateStop(sendInfor.getDateStop());
+			survey.setDateStop(new Date(sendInfor.getExpireDate()));
 			Set<Account> sendList = new HashSet<Account>();
 			sendInfor.getTargetList().forEach(e -> {
 				if (e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
@@ -255,21 +258,27 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Transactional
 	@Override
-	public void saveAnswer(List<AnswerDTO> answers) {
+	public void saveAnswer(SurveyAnswerInforDTO dto) {
 		List<Answer> savedAnswer = new ArrayList<Answer>();
-		answers.forEach(a -> {
-			Answer entity = new Answer();
-			Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
-			entity.setAccount(acc);
-			entity.setContent(a.getContent());
-			entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
-			entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
-			if (a.getContent().matches(".*[a-zA-Z]+.*")) {
-				entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), 1, entity));
-			}
-			savedAnswer.add(entity);
-		});
-		answerRep.saveAll(savedAnswer);
+		Optional<Survey> opSurvey = surveyRep.findById(dto.getSurveyId());
+		if (opSurvey.isPresent()) {
+			Survey sur = opSurvey.get();
+			sur.setReceivedAnswer(sur.getReceivedAnswer() + 1);
+			surveyRep.save(sur);
+			dto.getAnswers().forEach(a -> {
+				Answer entity = new Answer();
+				Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
+				entity.setAccount(acc);
+				entity.setContent(a.getContent());
+				entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
+				entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+				if (a.getContent().matches(".*[a-zA-Z]+.*")) {
+					entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), 1, entity));
+				}
+				savedAnswer.add(entity);
+			});
+			answerRep.saveAll(savedAnswer);
+		}
 	}
 
 	private List<AnswerReportDTO> getFreeTextReport(List<Answer> answers) {
@@ -339,8 +348,8 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public SurveyReportDTO getReport(Integer id) {
 		SurveyReportDTO result = new SurveyReportDTO();
-		Optional<Survey> survey =surveyRep.findById(id);
-		if(survey.isPresent()) {
+		Optional<Survey> survey = surveyRep.findById(id);
+		if (survey.isPresent()) {
 			BeanUtils.copyProperties(survey.get(), result);
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
 			List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
@@ -381,7 +390,7 @@ public class SurveyServiceImpl implements SurveyService {
 			});
 			result.setQuestions(qrList);
 		}
-		
+
 		return result;
 	}
 

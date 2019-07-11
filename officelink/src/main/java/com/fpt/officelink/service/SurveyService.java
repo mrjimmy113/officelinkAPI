@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
+import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.entity.Survey;
@@ -25,8 +25,6 @@ public interface SurveyService {
 
 	SurveyDTO getTakeSurvey(String token) throws ParseException;
 
-	void saveAnswer(List<AnswerDTO> answers);
-
 	List<Survey> getWorkplaceSurvey(int workplaceId);
 
 	void newSurvey(Survey survey, List<SurveyQuestion> sqList);
@@ -40,4 +38,6 @@ public interface SurveyService {
 	boolean checkIfUserTakeSurvey();
 
 	Page<Survey> searchReportWithPagination(String term, int pageNum);
+
+	void saveAnswer(SurveyAnswerInforDTO dto);
 }

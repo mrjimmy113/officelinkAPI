@@ -177,4 +177,6 @@ public class Survey implements Serializable {
 		this.sentOut = sentOut;
 	}
 	
+	
+	
 }

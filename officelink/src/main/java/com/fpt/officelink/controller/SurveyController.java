@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
+import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
@@ -269,10 +269,11 @@ public class SurveyController {
 	}
 	
 	@PostMapping("/answer")
-	public ResponseEntity<Number> answer(@RequestBody List<AnswerDTO> answers) {
+	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
+		System.out.println("answer");
 		try {
-			ser.saveAnswer(answers);
+			ser.saveAnswer(dto);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
