@@ -5,7 +5,6 @@
  */
 package com.fpt.officelink.repository;
 
-import com.fpt.officelink.entity.Location;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +15,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.fpt.officelink.entity.Location;
 
 /**
  *
@@ -43,4 +44,13 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
             @Param("workplaceId") Integer workplaceId,
             @Param("isDeleted") Boolean isDeleted);
 
+    
+    @Query("SELECT l FROM Location l "
+    		+ "JOIN Account a ON l.id = a.location.id "
+    		+ "JOIN a.teams t "
+    		+ "WHERE t.department.id = :id")
+	List<Location> findAllByDepartmentId(@Param("id") Integer id);
+    
+    List<Location> findAllByWorkplaceIdAndIsDeleted(int workplaceId, boolean isDeleted); 
+    
 }

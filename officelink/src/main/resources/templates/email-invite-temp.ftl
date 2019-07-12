@@ -30,9 +30,9 @@
   background-color: #4CAF50;
   border: none;
   border-radius: 15px;
-  box-shadow: 0 9px #999;"  href="http://localhost:4200/join">JOIN NOW</a> <br/>
+  box-shadow: 0 9px #999;"  href="${link}">JOIN NOW</a> <br/>
 
-<span>or Go to http://localhost:4200/join</span>
+<span>or Go to ${link}</span>
 
 
 

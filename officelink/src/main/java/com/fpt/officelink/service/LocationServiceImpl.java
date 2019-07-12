@@ -8,17 +8,25 @@ package com.fpt.officelink.service;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Team;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.repository.DepartmentRepository;
+import com.fpt.officelink.repository.LocationRepository;
 
 /**
  *
@@ -27,13 +35,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-    private static final int MAXPAGESIZE = 9;
+	private static final int MAXPAGESIZE = 9;
 
-    @Autowired
-    LocationRepository locationRep;
+	@Autowired
+	LocationRepository locationRep;
 
-    @Autowired
-    DepartmentRepository departmentRep;
+	@Autowired
+	DepartmentRepository departmentRep;
+	
+	private CustomUser getUserContext() {
+    	return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
 
     @Override
     public List<Location> getLocationsByWorkplace(int workplaceId) {
@@ -45,11 +58,14 @@ public class LocationServiceImpl implements LocationService {
         return locationRep.findById(id);
     }
 
-    @Override
-    public List<Location> getAllLocation() {
-        List<Location> result = locationRep.findByAddressAndIsDeleted("", false);
-        return result;
-    }
+	@Override
+	public List<Location> getAllLocation() {
+		List<Location> result = locationRep.findAllByWorkplaceIdAndIsDeleted(
+				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+				false);
+		System.out.print(result.size());
+		return result;
+	}
 
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
@@ -57,17 +73,20 @@ public class LocationServiceImpl implements LocationService {
         return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
-    @Override
-    public boolean addLocation(Location location) {
-        Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-        Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-        if (loc1.isPresent() || loc2.isPresent()) {
-            return false;
-        } else {
-            locationRep.save(location);
-            return true;
-        }
-    }
+	@Override
+	public boolean addLocation(Location location) {
+		Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
+		Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
+		if (loc1.isPresent() || loc2.isPresent()) {
+			return false;
+		} else {
+			Workplace workplace = new Workplace();
+			workplace.setId(getUserContext().getWorkplaceId());
+			location.setWorkplace(workplace);
+			locationRep.save(location);
+			return true;
+		}
+	}
 
 
 
@@ -83,20 +102,32 @@ public class LocationServiceImpl implements LocationService {
         }
     }
 
-    @Override
-    public boolean removeLocation(int id) {
-        Location loc = locationRep.findById(id).get();
-        if (loc != null) {
-            try {
-                loc.setIsDeleted(true);
-                loc.setDateDeleted(Date.from(Instant.now()));
-                locationRep.save(loc);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        }
-        return true;
-    }
+	@Override
+	public boolean removeLocation(int id) {
+		Location loc = locationRep.findById(id).get();
+		if (loc != null) {
+			try {
+				loc.setIsDeleted(true);
+				loc.setDateDeleted(Date.from(Instant.now()));
+				locationRep.save(loc);
+				return true;
+			} catch (Exception e) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public List<Location> getWorkplaceLocation() {
+		return locationRep.findAllByWorkplaceIdAndIsDeleted(
+				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+				false);
+	}
+
+	@Override
+	public List<Location> getByDepartmentId(int id) {
+		return locationRep.findAllByDepartmentId(id);
+	}
 
 }

@@ -3,8 +3,6 @@ package com.fpt.officelink.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -96,7 +94,7 @@ public class DepartmentController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Integer> create(@Valid @RequestBody DepartmentDTO dto) {
+	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto) {
 		user = getUserContext();
 		HttpStatus status = null;
 		try {
@@ -114,6 +112,7 @@ public class DepartmentController {
 				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -121,7 +120,7 @@ public class DepartmentController {
 	}
 
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody DepartmentDTO dto) {
+	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
@@ -152,5 +151,25 @@ public class DepartmentController {
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
+	}
+	
+	@GetMapping("/byLocation")
+	public ResponseEntity<List<DepartmentDTO>> findByLocationId(@RequestParam("id") int id) {
+		HttpStatus status = null;
+		List<DepartmentDTO> res = new ArrayList<DepartmentDTO>();
+		try {
+			List<Department> result = depService.getByLocationId(id);
+			result.forEach(element -> {
+				DepartmentDTO dto = new DepartmentDTO();
+				BeanUtils.copyProperties(element, dto);
+				res.add(dto);
+			});
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<List<DepartmentDTO>>(res,status);
 	}
 }

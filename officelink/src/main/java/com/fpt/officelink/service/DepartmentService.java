@@ -19,4 +19,6 @@ public interface DepartmentService {
 	boolean modifyDepartment(Department dep);
 	
 	boolean removeDepartment(int id);
+
+	List<Department> getByLocationId(int id);
 }

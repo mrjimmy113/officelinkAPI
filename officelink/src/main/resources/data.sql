@@ -8,4 +8,4 @@ INSERT INTO `filter_word` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8)
 
 INSERT INTO `word_cloud_filter` VALUES (1,NULL,NULL,_binary '\0','ENG','DEFAULT',NULL);
 
-INSERT INTO `role` VALUES (1,"employer"), (2,"employee");
+INSERT INTO role VALUES (1, "employer"), (2, "employee") , (3, "manager");

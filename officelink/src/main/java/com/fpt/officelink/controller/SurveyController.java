@@ -21,10 +21,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
+import com.fpt.officelink.dto.SendSurveyDTO;
+import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
@@ -77,7 +78,6 @@ public class SurveyController {
 		HttpStatus status = null;
 		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
 		try {
-			System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 			Page<Survey> result = ser.searchWithPagination(term, page);
 			List<SurveyDTO> dtoList = new ArrayList<SurveyDTO>();
 			result.getContent().forEach(s -> {
@@ -89,9 +89,32 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status =HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res,status);
+	}
+	
+	@GetMapping("/searchReport")
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> searchReport(@RequestParam("term") String term,@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
+		try {
+			Page<Survey> result = ser.searchWithPagination(term, page);
+			List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
+			result.getContent().forEach(s -> {
+				SurveyReportDTO dto = new SurveyReportDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status =HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
 	}
 	
 	@PostMapping
@@ -218,19 +241,24 @@ public class SurveyController {
 		HttpStatus status = null;
 		SurveyDTO res = null;
 		try {
-			res = ser.getTakeSurvey(token);
-			status = HttpStatus.OK;
+			if(!ser.checkIfUserTakeSurvey()) {
+				res = ser.getTakeSurvey(token);
+				status = HttpStatus.OK;
+			}else {
+				status = HttpStatus.ACCEPTED;
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyDTO>(res,status);
 	}
 	
-	@GetMapping("/sendOut")
-	public ResponseEntity<Number> sendOutSurvey(@RequestParam("id") Integer surveyId) {
+	@PostMapping("/sendOut")
+	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			ser.sendOutSurvey(surveyId);
+			ser.sendOutSurvey(target);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -241,10 +269,11 @@ public class SurveyController {
 	}
 	
 	@PostMapping("/answer")
-	public ResponseEntity<Number> answer(@RequestBody List<AnswerDTO> answers) {
+	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
+		System.out.println("answer");
 		try {
-			ser.saveAnswer(answers);
+			ser.saveAnswer(dto);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -253,8 +282,8 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(),status);
 	}
 	
-	@GetMapping("/report")
-	public ResponseEntity<SurveyReportDTO> report(@RequestParam("id") Integer id) {
+	@GetMapping("/report/detail")
+	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
 		SurveyReportDTO res = null;
 		try {
@@ -265,5 +294,27 @@ public class SurveyController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyReportDTO>(res,status);
+	}
+	
+	@GetMapping("/report")
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
+		try {
+			Page<Survey> result = ser.searchReportWithPagination(term, page);
+			List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
+			result.getContent().forEach(s -> {
+				SurveyReportDTO dto = new SurveyReportDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status =HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
 	}
 }

@@ -25,6 +25,7 @@ public class JwtService {
 	public static final String SURVEY_ID = "surveyId";
 	public static final String ROLE = "role";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
+	public static final String WORKPLACE_ID = "workplaceId";
 	public static final int EXPIRE_TIME = 86400000;
 
 	public String generateTokenLogin(String email, String role) throws JOSEException {
@@ -41,12 +42,26 @@ public class JwtService {
 		return token;
 	}
 
-	public String createSurveyToken(String email, Integer surveyId) throws JOSEException {
+	public String createSurveyToken(Integer surveyId) throws JOSEException {
 		String token = null;
 		JWSSigner signer = new MACSigner(generateShareSecret());
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
-		builder.claim(EMAIL, email);
 		builder.claim(SURVEY_ID, surveyId);
+		builder.expirationTime(generateExpirationDate());
+		JWTClaimsSet claimsSet = builder.build();
+		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+		signedJWT.sign(signer);
+		token = signedJWT.serialize();
+		return token;
+	}
+	
+	public String createInviteToken(String email,Integer workplaceId) throws JOSEException {
+		String token = null;
+		System.out.println("JWT" + workplaceId);
+		JWSSigner signer = new MACSigner(generateShareSecret());
+		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+		builder.claim(EMAIL, email);
+		builder.claim(WORKPLACE_ID, workplaceId);
 		builder.expirationTime(generateExpirationDate());
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
@@ -146,6 +161,14 @@ public class JwtService {
 		surveyId = claims.getIntegerClaim(SURVEY_ID);
 		return surveyId;
 	}
+	
+	public Integer getWorkplaceId(String token) throws ParseException {
+		Integer workplaceId = null;
+		JWTClaimsSet claims = getClaimsFromToken(token);
+		workplaceId = claims.getIntegerClaim(WORKPLACE_ID);
+		return workplaceId;
+	}
+
 
 	public String getEmailFromToken(String token) throws ParseException {
 		String email = null;
@@ -184,10 +207,6 @@ public class JwtService {
 	
 	public Boolean validateTakeSurveyToken(String token) throws ParseException {
 		if (token == null || token.trim().length() == 0) {
-			return false;
-		}
-		String email = getEmailFromToken(token);
-		if (email == null || email.isEmpty()) {
 			return false;
 		}
 		Integer id = getSurveyId(token);

@@ -1,7 +1,29 @@
 package com.fpt.officelink.controller;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.fpt.officelink.dto.AccountDTO;
+import com.fpt.officelink.dto.AssignInforDTO;
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.WorkplaceDTO;
@@ -12,16 +34,6 @@ import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.service.AccountService;
 import com.fpt.officelink.service.JwtService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 @RestController
 @RequestMapping("/account")
@@ -64,7 +76,6 @@ public class AccountController {
                 WorkplaceDTO workplaceDTO = new WorkplaceDTO();
                 LocationDTO locationDTO = new LocationDTO();
 
-                BeanUtils.copyProperties(element.getLocation(), locationDTO);
                 BeanUtils.copyProperties(element.getWorkplace(), workplaceDTO);
                 BeanUtils.copyProperties(element,accountDTO);
 
@@ -174,7 +185,7 @@ public class AccountController {
         try {
             Account entity = new Account();
 
-
+            
             BeanUtils.copyProperties(dto, entity);
             boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
             if(res){
@@ -270,7 +281,6 @@ public class AccountController {
             Location location = new Location();
             Workplace workplace = new Workplace();
             BeanUtils.copyProperties(dto.getWorkplace(), workplace);
-            BeanUtils.copyProperties(dto.getLocation(), location);
             BeanUtils.copyProperties(dto,entity);
 
 
@@ -295,8 +305,7 @@ public class AccountController {
     public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo ){
         HttpStatus status = null;
             try{
-
-                mailService.sendMail(emailTo, "email-invite-temp.ftl", null);
+                service.sendInvitation(emailTo);
                 status = HttpStatus.OK;
 
         }catch (Exception ex){
@@ -320,6 +329,49 @@ public class AccountController {
             status = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<Integer>(status.value(), status);
+    }
+    
+    @GetMapping("/invitationInfor")
+    public ResponseEntity<AccountDTO> getInvitationInfor(@RequestParam("token") String token) {
+    	AccountDTO res = new AccountDTO();
+    	HttpStatus status = null;
+    	try {
+			res = service.getInvitationInfor(token);
+    		status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+    	
+    	return new ResponseEntity<AccountDTO>(res,status);
+    }
+    
+    @PostMapping("/acceptInvite")
+    public ResponseEntity<Number> acceptInvite(@RequestBody AccountDTO acc) {
+    	HttpStatus status = null;
+    	try {
+			Account entity = new Account();
+			BeanUtils.copyProperties(acc, entity);
+			service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
+    		status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+    	
+    	return new ResponseEntity<Number>(status.value(),status);
+    }
+    
+    @PutMapping("/assign")
+    public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
+    	HttpStatus status = null;
+    	try {
+			service.assignMember(dto.getLocationId(), dto.getTeamIdList(), dto.getAccountId());
+    		status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+    	
+    	return new ResponseEntity<Number>(status.value(),status);
     }
 
 

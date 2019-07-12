@@ -44,6 +44,18 @@ public class Survey implements Serializable {
 	private Date dateModified;
 	
 	@Column
+	private Date dateSendOut;
+	
+	@Column
+	private Date dateStop;
+	
+	@Column
+	private int receivedAnswer;
+	
+	@Column
+	private int sentOut;
+	
+	@Column
 	private boolean isDeleted;
 	
 	@OneToMany(mappedBy = "survey")
@@ -133,5 +145,38 @@ public class Survey implements Serializable {
 		this.configurations = configurations;
 	}
 
+	public Date getDateSendOut() {
+		return dateSendOut;
+	}
 
+	public void setDateSendOut(Date dateSendOut) {
+		this.dateSendOut = dateSendOut;
+	}
+
+	public Date getDateStop() {
+		return dateStop;
+	}
+
+	public void setDateStop(Date dateStop) {
+		this.dateStop = dateStop;
+	}
+
+	public int getReceivedAnswer() {
+		return receivedAnswer;
+	}
+
+	public void setReceivedAnswer(int receivedAnswer) {
+		this.receivedAnswer = receivedAnswer;
+	}
+
+	public int getSentOut() {
+		return sentOut;
+	}
+
+	public void setSentOut(int sentOut) {
+		this.sentOut = sentOut;
+	}
+	
+	
+	
 }
