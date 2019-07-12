@@ -26,17 +26,15 @@ import com.fpt.officelink.entity.Location;
 public interface LocationRepository extends JpaRepository<Location, Integer> {
 
     //get list location
+    Page<Location> findAllByAddressContainingAndIsDeleted(String address, Boolean isDeleted, Pageable pageable);
 
-    Page<Location> findAllByAddressContainingAndIsDeleted(String address , Boolean isDeleted , Pageable pageable);
-    Page<Location> findAllByNameContainingAndIsDeleted(String address , Boolean isDeleted , Pageable pageable);
-
-
+    Page<Location> findAllByNameContainingAndIsDeleted(String address, Boolean isDeleted, Pageable pageable);
 
     //check address has existed and be deleted
     List<Location> findByAddressAndIsDeleted(String address, Boolean isDeleted);
-    
+
     Optional<Location> findByNameContainingAndIsDeleted(String name, boolean isDeleted);
-    
+
     Optional<Location> findByAddressContainingAndIsDeleted(String address, boolean isDeleted);
 
     @Query("SELECT t FROM Location t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
@@ -44,7 +42,6 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
             @Param("workplaceId") Integer workplaceId,
             @Param("isDeleted") Boolean isDeleted);
 
-    
     @Query("SELECT l FROM Location l "
     		+ "JOIN Account a ON l.id = a.location.id "
     		+ "JOIN a.teams t "

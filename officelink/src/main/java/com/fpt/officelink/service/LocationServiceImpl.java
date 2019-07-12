@@ -31,18 +31,17 @@ import com.fpt.officelink.repository.LocationRepository;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-	private static final int MAXPAGESIZE = 9;
+    private static final int MAXPAGESIZE = 9;
 
-	@Autowired
-	LocationRepository locationRep;
+    @Autowired
+    LocationRepository locationRep;
 
-	@Autowired
-	DepartmentRepository departmentRep;
-	
-	private CustomUser getUserContext() {
-    	return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @Autowired
+    DepartmentRepository departmentRep;
+
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
 
     @Override
     public List<Location> getLocationsByWorkplace(int workplaceId) {
@@ -54,22 +53,22 @@ public class LocationServiceImpl implements LocationService {
         return locationRep.findById(id);
     }
 
-	@Override
-	public List<Location> getAllLocation() {
-		List<Location> result = locationRep.findAllByWorkplaceIdAndIsDeleted(
-				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
-				false);
-		System.out.print(result.size());
-		return result;
-	}
+    @Override
+    public List<Location> getAllLocation() {
+        List<Location> result = locationRep.findAllByWorkplaceIdAndIsDeleted(
+                ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+                false);
+        System.out.print(result.size());
+        return result;
+    }
 
     @Override
-    public Page<Location> searchWithPagination(String term, int pageNum) {
+    public Page<Location> searchWithPagination(String term, int pageNum
+    ) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
         return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
-	@Override
 	public boolean addLocation(Location location) {
 		Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
 		Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
@@ -101,11 +100,6 @@ public class LocationServiceImpl implements LocationService {
         });
         if (check == false) {
             return false;
-        } else {
-            locationRep.save(location);
-            return true;
-        }
-    }
 
 	@Override
 	public boolean removeLocation(int id) {

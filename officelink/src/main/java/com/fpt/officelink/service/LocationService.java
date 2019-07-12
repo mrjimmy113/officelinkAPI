@@ -19,6 +19,7 @@ import com.fpt.officelink.entity.Location;
  * @author Thai Phu Cuong
  */
 public interface LocationService {
+
     List<Location> getLocationsByWorkplace(int workplaceId);
 
     Optional<Location> searchById(int id);
@@ -26,15 +27,15 @@ public interface LocationService {
     Page<Location> searchWithPagination(String term, int pageNum);
 
     boolean addLocation(Location location);
-    
+
     boolean editLocation(Location location);
 
     boolean removeLocation(int id);
-    
+
     List<Location> getAllLocation();
 
-	List<Location> getWorkplaceLocation();
+    List<Location> getWorkplaceLocation();
 
-	List<Location> getByDepartmentId(int id);
+    List<Location> getByDepartmentId(int id);
 
 }
