@@ -86,11 +86,20 @@ public class LocationServiceImpl implements LocationService {
 
 
 
+    boolean check;
+
     @Override
     public boolean editLocation(Location location) {
-        Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-        Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-        if (loc1.isPresent() || loc2.isPresent()) {
+        check = true;
+        List<Location> loc = locationRep.findByIsDeleted(false);
+        loc.forEach(element -> {
+            if (element.getId().intValue() != location.getId().intValue()) {
+                if (element.getName().contains(location.getName()) || element.getAddress().contains(location.getAddress())) {
+                    check = false;
+                }
+            }
+        });
+        if (check == false) {
             return false;
         } else {
             locationRep.save(location);

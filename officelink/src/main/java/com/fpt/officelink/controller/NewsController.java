@@ -63,7 +63,7 @@ public class NewsController {
         return new ResponseEntity<List<ImageNewsDTO>>(res, status);
     }
 
-    @GetMapping(value = "/getId")
+    @GetMapping(value = "/detail")
     public ResponseEntity<ImageNewsDTO> searchById(@RequestParam("id") int id) {
         HttpStatus status = null;
         ImageNewsDTO res = new ImageNewsDTO();

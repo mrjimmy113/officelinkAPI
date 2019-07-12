@@ -91,4 +91,51 @@ public class Answer implements Serializable {
 		this.account = account;
 	}
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "date_created")
+    private Date dateCreated;
+
+    @Column
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "question_identity")
+    private SurveyQuestion surveyQuestion;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public SurveyQuestion getSurveyQuestion() {
+        return surveyQuestion;
+    }
+
+    public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
+        this.surveyQuestion = surveyQuestion;
+    }
+
+    
 }

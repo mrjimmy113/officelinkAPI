@@ -67,7 +67,7 @@ public class LocationController {
         return new ResponseEntity<List<LocationDTO>>(res, status);
     }
     
-    @GetMapping(value = "/getId")
+    @GetMapping(value = "/detail")
     public ResponseEntity<LocationDTO> searchById(@RequestParam("id") int id) {
         HttpStatus status = null;
         LocationDTO res = new LocationDTO();
@@ -102,30 +102,6 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity<PageSearchDTO<LocationDTO>> search(@RequestParam("term") String term) {
-        HttpStatus status = null;
-        PageSearchDTO<LocationDTO> res = new PageSearchDTO<LocationDTO>();
-        try {
-            //Call Service
-            Page<Location> result = service.searchWithPagination(term, 0);
-            //Convert to DTO
-            List<LocationDTO> resultList = new ArrayList<LocationDTO>();
-            result.getContent().forEach(element -> {
-                LocationDTO dto = new LocationDTO();
-                BeanUtils.copyProperties(element, dto);
-                resultList.add(dto);
-            });
-            res.setMaxPage(result.getTotalPages());
-            res.setObjList(resultList);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            status = HttpStatus.BAD_REQUEST;
-        }
-
-        return new ResponseEntity<PageSearchDTO<LocationDTO>>(res, status);
-    }
-
-    @GetMapping(value = "/getPage")
     public ResponseEntity<PageSearchDTO<LocationDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
         HttpStatus status = null;
         PageSearchDTO<LocationDTO> res = new PageSearchDTO<LocationDTO>();
