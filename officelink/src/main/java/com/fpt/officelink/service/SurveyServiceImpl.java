@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +34,13 @@ import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.SurveySendTarget;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
@@ -45,6 +50,7 @@ import com.fpt.officelink.repository.AnswerRepository;
 import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
+import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -78,6 +84,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	AccountRespository accRep;
+	
+	@Autowired
+	SurveySendTargetRepository targetRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -208,25 +217,44 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Override
 	@Transactional(rollbackOn = Exception.class)
-	public void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException {
+	@Async
+	public void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException {
 		Optional<Survey> opSurvey = surveyRep.findById(sendInfor.getSurveyId());
-		Integer workplaceId = getUserContext().getWorkplaceId();
 		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			survey.setActive(true);
 			survey.setDateSendOut(new Date(Calendar.getInstance().getTimeInMillis()));
 			survey.setDateStop(new Date(sendInfor.getExpireDate()));
 			Set<Account> sendList = new HashSet<Account>();
+			List<SurveySendTarget> sendTargets = new ArrayList<SurveySendTarget>();
+			SurveySendTarget targetEntity = new SurveySendTarget();
+			targetEntity.setSurvey(survey);
 			sendInfor.getTargetList().forEach(e -> {
+				Location location = new Location();
+				Department department = new Department();
+				Team team = new Team();
 				if (e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
 				} else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByDepartmentId(e.getDepartmentId(), workplaceId, false));
+					department.setId(e.getDepartmentId());
 				} else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
+					location.setId(e.getLocationId());
+				} else if (!e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
+					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(e.getDepartmentId(), e.getLocationId(), workplaceId, false));
+					department.setId(e.getDepartmentId());
+					location.setId(e.getLocationId());
 				} else if (!e.getTeamId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByTeamId(e.getTeamId(), workplaceId, false));
+					department.setId(e.getDepartmentId());
+					location.setId(e.getLocationId());
+					team.setId(e.getTeamId());
 				}
+				targetEntity.setLocation(location);
+				targetEntity.setDepartment(department);
+				targetEntity.setTeam(team);
+				sendTargets.add(targetEntity);
 			});
 
 			String token = jwtSer.createSurveyToken(sendInfor.getSurveyId());
@@ -239,6 +267,8 @@ public class SurveyServiceImpl implements SurveyService {
 			model.put("link", "http://localhost:4200/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 			surveyRep.save(survey);
+			targetRep.saveAll(sendTargets);
+			
 		}
 
 	}

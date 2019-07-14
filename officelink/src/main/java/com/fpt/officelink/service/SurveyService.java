@@ -31,7 +31,6 @@ public interface SurveyService {
 
 	SurveyReportDTO getReport(Integer id);
 
-	void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException;
 
 	String getSurveyToken(Integer surveyId) throws JOSEException;
 
@@ -40,4 +39,6 @@ public interface SurveyService {
 	Page<Survey> searchReportWithPagination(String term, int pageNum);
 
 	void saveAnswer(SurveyAnswerInforDTO dto);
+
+	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
 }
