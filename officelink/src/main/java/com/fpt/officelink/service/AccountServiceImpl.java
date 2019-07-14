@@ -37,7 +37,7 @@ import com.fpt.officelink.repository.WorkplaceRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+            public class AccountServiceImpl implements AccountService {
 
     private static final int PAGEMAXSIZE = 9;
 
@@ -245,6 +245,13 @@ public class AccountServiceImpl implements AccountService {
     		acc.setTeams(new HashSet<Team>(teams));
     		accountRespository.save(acc);
     	}
+    }
+
+    @Override
+    public Account getProfile(String email) {
+        Account account = null;
+        account = accountRespository.findAllByEmail(email);
+        return account;
     }
 
 

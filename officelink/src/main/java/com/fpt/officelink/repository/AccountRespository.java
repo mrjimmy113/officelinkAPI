@@ -56,4 +56,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
     
     @Query("SELECT COUNT(a) FROM Account a WHERE a.workplace.id = :id AND a.isDeleted = false")
     int countByWorkplaceId(@Param("id") Integer id);
+
+
+    Account findAllByEmail(String email);
 }

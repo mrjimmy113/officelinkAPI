@@ -1,5 +1,7 @@
 package com.fpt.officelink.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -30,14 +32,17 @@ public class Account implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Workplace workplace;
 
     @ManyToOne
     @JoinColumn(name = "locationId", nullable = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Location location;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
+    @JsonIgnore
     private Role role;
 
     @Column
