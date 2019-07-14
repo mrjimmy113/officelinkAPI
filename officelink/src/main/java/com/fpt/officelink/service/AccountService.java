@@ -29,4 +29,7 @@ public interface AccountService {
 	AccountDTO getInvitationInfor(String token) throws ParseException;
 	void acceptInvite(Account entity, Integer roleId, Integer workplaceId);
 	void assignMember(int locationId, int[] teamIdList, int accountId);
+
+
+	Account getProfile(String email);
 }

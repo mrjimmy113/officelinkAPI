@@ -117,6 +117,23 @@ public class AccountController {
 
     }
 
+    @GetMapping(value = "/profile")
+    public ResponseEntity<Account> getProfile(){
+        CustomUser user = getUserContext();
+        HttpStatus httpStatus = null;
+
+        Account entity = null;
+        try{
+
+             entity = service.getProfile(user.getUsername());
+
+            httpStatus = HttpStatus.OK;
+
+        }catch (Exception ex){
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Account>(entity, httpStatus);
+    }
 
 
     @GetMapping(value = "/getAccountByEmail")

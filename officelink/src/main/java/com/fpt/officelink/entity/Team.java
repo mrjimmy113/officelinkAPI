@@ -1,5 +1,7 @@
 package com.fpt.officelink.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -43,6 +45,7 @@ public class Team implements Serializable{
 	private Department department;
 	
 	@ManyToMany(mappedBy = "teams")
+	@JsonIgnore
 	private Set<Account> accounts = new HashSet<Account>();
 
 	// Getter Setter
