@@ -23,12 +23,16 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.AnswerReportDTO;
+import com.fpt.officelink.dto.DepartmentDTO;
+import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
+import com.fpt.officelink.dto.SurveySendDetailDTO;
+import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
@@ -84,7 +88,7 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	AccountRespository accRep;
-	
+
 	@Autowired
 	SurveySendTargetRepository targetRep;
 
@@ -242,7 +246,8 @@ public class SurveyServiceImpl implements SurveyService {
 					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
 					location.setId(e.getLocationId());
 				} else if (!e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
-					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(e.getDepartmentId(), e.getLocationId(), workplaceId, false));
+					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(e.getDepartmentId(),
+							e.getLocationId(), workplaceId, false));
 					department.setId(e.getDepartmentId());
 					location.setId(e.getLocationId());
 				} else if (!e.getTeamId().equals(0)) {
@@ -268,7 +273,7 @@ public class SurveyServiceImpl implements SurveyService {
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 			surveyRep.save(survey);
 			targetRep.saveAll(sendTargets);
-			
+
 		}
 
 	}
@@ -311,6 +316,133 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 	}
 
+	@Override
+	public SurveyReportDTO getReport(Integer id) {
+		SurveyReportDTO result = new SurveyReportDTO();
+		Optional<Survey> survey = surveyRep.findById(id);
+		if (survey.isPresent()) {
+			BeanUtils.copyProperties(survey.get(), result);
+			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
+			result.setQuestions(getQuestionReports(sqList));
+		}
+
+		return result;
+	}
+
+	@Override
+	public List<Survey> getWorkplaceSurvey(int workplaceId) {
+
+		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
+	}
+
+	public SurveySendDetailDTO getSendDetail(int surveyId) {
+		SurveySendDetailDTO result = new SurveySendDetailDTO();
+		List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
+		List<LocationDTO> locations = new ArrayList<LocationDTO>();
+		List<DepartmentDTO> departments = new ArrayList<DepartmentDTO>();
+		List<TeamDTO> teams = new ArrayList<TeamDTO>();
+		Optional<Account> currentLogin = accRep.findByEmail(getUserContext().getUsername());
+		
+		if (currentLogin.isPresent()) {
+			Account currentAcc = currentLogin.get();
+			for (SurveySendTarget e : targets) {
+				//Check team
+				boolean isFound = false;
+				if (e.getTeam() != null) {
+					for (Team t : currentAcc.getTeams()) {
+						if (e.getTeam().getId().equals(t.getId())) {
+							TeamDTO teamDTO = new TeamDTO();
+							BeanUtils.copyProperties(e.getTeam(), teamDTO);
+							teams.add(teamDTO);
+							isFound = true;
+							break;
+						}
+						if(e.getDepartment().getId().equals(t.getDepartment().getId())) {
+							DepartmentDTO departmentDTO = new DepartmentDTO();
+							BeanUtils.copyProperties(e.getDepartment(), departmentDTO);
+							departments.add(departmentDTO);
+							isFound = true;
+							break;
+						}
+					}
+				}
+				if(isFound) continue;
+				
+				if(e.getLocation() != null) {
+					if(e.getLocation().getId().equals(currentAcc.getLocation().getId())) {
+						LocationDTO locationDTO = new LocationDTO();
+						BeanUtils.copyProperties(e.getLocation(), locationDTO);
+						locations.add(locationDTO);
+						continue;
+					}
+				}
+
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
+		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
+		int workplaceId = getUserContext().getWorkplaceId();
+		if (locationId == 0 && departmentId == 0) {
+			result = getQuestionReports(surQuestRep.findAllBySurveyId(surveyId));
+		} else if (locationId != 0 && departmentId == 0) {
+			result = getQuestionReports(surQuestRep.findAllByLocationId(locationId, workplaceId, surveyId));
+		} else if (locationId == 0 && departmentId != 0) {
+			result = getQuestionReports(surQuestRep.findAllByDepartmentId(departmentId, workplaceId, surveyId));
+		} else if (locationId != 0 && departmentId != 0) {
+			result = getQuestionReports(
+					surQuestRep.findAllByLocationIdAndDepartmentId(departmentId, locationId, workplaceId, surveyId));
+		} else if (teamId != 0) {
+			result = getQuestionReports(surQuestRep.findAllByTeamId(teamId, workplaceId, surveyId));
+		}
+		return result;
+	}
+
+	// Report: Output
+	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList) {
+		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
+		sqList.forEach(sq -> {
+			QuestionReportDTO qr = new QuestionReportDTO();
+			Question e = sq.getQuestion();
+			// Change Question to Question DTO
+			QuestionDTO dto = new QuestionDTO();
+			BeanUtils.copyProperties(e, dto, "type", "options");
+			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
+			e.getOptions().forEach(op -> {
+				AnswerOptionDTO opDto = new AnswerOptionDTO();
+				BeanUtils.copyProperties(op, opDto);
+				opList.add(opDto);
+			});
+			dto.setOptions(opList);
+			TypeQuestionDTO typeDto = new TypeQuestionDTO();
+			BeanUtils.copyProperties(e.getType(), typeDto);
+			dto.setType(typeDto);
+			// Set Question
+			qr.setQuestion(dto);
+			// Get each question report
+			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
+			switch (sq.getQuestion().getType().getType()) {
+			case MULTIPLE:
+				arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				break;
+			case SINGLE:
+				arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				break;
+			case TEXT:
+				arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
+				break;
+
+			}
+			qr.setAnswers(arList);
+			qrList.add(qr);
+		});
+		return qrList;
+	}
+
+	// Report: Free Text
 	private List<AnswerReportDTO> getFreeTextReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
@@ -325,17 +457,16 @@ public class SurveyServiceImpl implements SurveyService {
 					}
 				}
 				if (!isFound) {
-					System.out.println(w.getWord());
 					result.add(new AnswerReportDTO(w.getWord(), w.getTimes()));
 				}
 
 			}
 
 		}
-		System.out.println(result.size());
 		return result;
 	}
 
+	// Report: Single choice
 	private List<AnswerReportDTO> getSingleChoiceReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
@@ -354,6 +485,7 @@ public class SurveyServiceImpl implements SurveyService {
 		return result;
 	}
 
+	// Report: Mutiple Choice
 	private List<AnswerReportDTO> getMutipleChoiceReport(List<Answer> answers) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
 		boolean isFound;
@@ -373,61 +505,6 @@ public class SurveyServiceImpl implements SurveyService {
 			}
 		}
 		return result;
-	}
-
-	@Override
-	public SurveyReportDTO getReport(Integer id) {
-		SurveyReportDTO result = new SurveyReportDTO();
-		Optional<Survey> survey = surveyRep.findById(id);
-		if (survey.isPresent()) {
-			BeanUtils.copyProperties(survey.get(), result);
-			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
-			List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
-			sqList.forEach(sq -> {
-				QuestionReportDTO qr = new QuestionReportDTO();
-				Question e = sq.getQuestion();
-				// Change Question to Question DTO
-				QuestionDTO dto = new QuestionDTO();
-				BeanUtils.copyProperties(e, dto, "type", "options");
-				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-				e.getOptions().forEach(op -> {
-					AnswerOptionDTO opDto = new AnswerOptionDTO();
-					BeanUtils.copyProperties(op, opDto);
-					opList.add(opDto);
-				});
-				dto.setOptions(opList);
-				TypeQuestionDTO typeDto = new TypeQuestionDTO();
-				BeanUtils.copyProperties(e.getType(), typeDto);
-				dto.setType(typeDto);
-				// Set Question
-				qr.setQuestion(dto);
-				// Get each question report
-				List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
-				switch (sq.getQuestion().getType().getType()) {
-				case MULTIPLE:
-					arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
-					break;
-				case SINGLE:
-					arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
-					break;
-				case TEXT:
-					arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
-					break;
-
-				}
-				qr.setAnswers(arList);
-				qrList.add(qr);
-			});
-			result.setQuestions(qrList);
-		}
-
-		return result;
-	}
-
-	@Override
-	public List<Survey> getWorkplaceSurvey(int workplaceId) {
-
-		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
 	}
 
 }

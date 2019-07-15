@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
@@ -41,4 +42,6 @@ public interface SurveyService {
 	void saveAnswer(SurveyAnswerInforDTO dto);
 
 	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
+
+	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
 }
