@@ -70,6 +70,7 @@ public class Account implements Serializable {
     @ManyToMany
 	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "team_id") })
+    @JsonIgnore
 	private Set<Team> teams = new HashSet<Team>();
     
     @OneToMany(mappedBy = "account")

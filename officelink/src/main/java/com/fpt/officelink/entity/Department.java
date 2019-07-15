@@ -1,5 +1,7 @@
 package com.fpt.officelink.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -38,10 +40,12 @@ public class Department implements Serializable{
 	private boolean isDeleted;
 	
 	@OneToMany(mappedBy = "department")
+	@JsonIgnore
 	private Set<Team> teams;
 	
 	@ManyToOne
 	@JoinColumn(name = "workplace_id", nullable = false)
+	@JsonIgnore
 	private Workplace workplace;
 	
 //	@ManyToMany

@@ -1,12 +1,15 @@
 package com.fpt.officelink.controller;
 
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fpt.officelink.dto.*;
+import com.fpt.officelink.service.LocationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,11 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.officelink.dto.AccountDTO;
-import com.fpt.officelink.dto.AssignInforDTO;
-import com.fpt.officelink.dto.LocationDTO;
-import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
@@ -56,6 +54,9 @@ public class AccountController {
 
     @Autowired
     JwtService jwt;
+
+    @Autowired
+    LocationService locationService;
 
 
     @GetMapping
@@ -128,6 +129,7 @@ public class AccountController {
              entity = service.getProfile(user.getUsername());
 
             httpStatus = HttpStatus.OK;
+
 
         }catch (Exception ex){
             httpStatus = HttpStatus.BAD_REQUEST;
@@ -360,6 +362,38 @@ public class AccountController {
 		}
     	
     	return new ResponseEntity<AccountDTO>(res,status);
+    }
+
+    @GetMapping("/getAccountAssign")
+    public ResponseEntity<AccountDTO> getAccountAssign(){
+        CustomUser user = getUserContext();
+        HttpStatus httpStatus = null;
+        AccountDTO dto = new AccountDTO();
+
+        Account account = null;
+        try{
+            account = service.getAccountAssign(user.getUsername());
+            LocationDTO locationDTO = new LocationDTO();
+            List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
+            account.getTeams().forEach(element -> {
+                TeamDTO teamDTO = new TeamDTO();
+                BeanUtils.copyProperties(element, teamDTO);
+                teamDTOS.add(teamDTO);
+            });
+
+
+            BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            BeanUtils.copyProperties(account, dto);
+
+            dto.setLocation(locationDTO);
+            dto.setTeams(teamDTOS);
+
+            httpStatus = HttpStatus.OK;
+
+        }catch (Exception ex){
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<AccountDTO>(dto, httpStatus);
     }
     
     @PostMapping("/acceptInvite")

@@ -20,11 +20,16 @@ public class AccountDTO implements Serializable {
     private Date dateCreated;
     private Date dateModified;
     private Integer roleId;
+    private List<TeamDTO> teams;
 
 
+    public List<TeamDTO> getTeams() {
+        return teams;
+    }
 
-
-
+    public void setTeams(List<TeamDTO> teams) {
+        this.teams = teams;
+    }
 
     public Date getDateCreated() {
         return dateCreated;

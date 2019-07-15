@@ -37,4 +37,5 @@ public interface LocationService {
 
 	List<Location> getByDepartmentId(int id);
 
+
 }

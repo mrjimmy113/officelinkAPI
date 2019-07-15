@@ -126,4 +126,6 @@ public class LocationServiceImpl implements LocationService {
 		return new ArrayList<Location>(locationRep.findAllByDepartmentId(id));
 	}
 
+
+
 }

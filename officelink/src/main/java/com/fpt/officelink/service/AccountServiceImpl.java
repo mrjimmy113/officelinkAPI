@@ -253,5 +253,15 @@ import com.nimbusds.jose.JOSEException;
         return account;
     }
 
+    @Override
+    public Account getAccountAssign(String email) {
+        Account account = accountRespository.findAllByEmail(email);
+        if(account != null){
+
+        }
+
+        return account;
+    }
+
 
 }
