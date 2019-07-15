@@ -7,6 +7,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
@@ -23,7 +25,9 @@ import com.fpt.officelink.entity.Configuration;
 @Service
 public class SchedulerService implements SchedulingConfigurer {
 	
-	private ThreadPoolTaskScheduler dailyScheduler;
+	private ThreadPoolTaskScheduler dailyScheduler; // daily schedule
+	
+	private List<ScheduledFuture<?>> dailyTaskList; // daily task list
 
 	private List<Configuration> configList; // list of configurations
 
@@ -41,22 +45,17 @@ public class SchedulerService implements SchedulingConfigurer {
 	
 	// constructor
 	private SchedulerService() {
+		//init value 
 		dailyScheduler = dailyPoolScheduler();
 		configScheduler = configurationPoolScheduler();
 		scheduleList = new ArrayList<ScheduledFuture<?>>();
+		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
+		
+		// start daily Tasks
+		this.configureDailyTasks(new ScheduledTaskRegistrar(), "* 1 15 * * *");
 	}
 
-	// singleton instance
-	private static SchedulerService instance;
-
-	public static SchedulerService getInstance() {
-		if (instance == null) {
-			instance = new SchedulerService();
-		}
-
-		return instance;
-	}
-
+	// Thread pool for configuration scheduler
 	private ThreadPoolTaskScheduler configurationPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 		scheduler.setThreadNamePrefix("ConfigurationThreadPool");
@@ -65,6 +64,7 @@ public class SchedulerService implements SchedulingConfigurer {
 		return scheduler;
 	}
 	
+	// Thread pool for daily task scheduler
 	private ThreadPoolTaskScheduler dailyPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 		scheduler.setThreadNamePrefix("DailyThreadPool");
@@ -72,10 +72,35 @@ public class SchedulerService implements SchedulingConfigurer {
 		scheduler.initialize();
 		return scheduler;
 	}
+	
+	// Config daily tasks
+	public void configureDailyTasks(ScheduledTaskRegistrar taskRegistrar, String cron) {
+		if (!dailyTaskList.isEmpty()) {
+			for (ScheduledFuture<?> schedule : dailyTaskList) {
+				schedule.cancel(false);
+			}
+		}
+		
+		ScheduledFuture<?> newSchedule = dailyScheduler.schedule(new Runnable() {
+			@Override
+			public void run() {
+				// Put task here
+				executor.setSurveysExpired();
+				executor.exportReportsDaily();
+			}
+			// schedule time here
+
+		}, new CronTrigger(cron));
+		
+		dailyTaskList.add(newSchedule);
+		
+		taskRegistrar.setScheduler(dailyScheduler);
+	}
 
 	// task registration
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		
 		// cancel any scheduled tasks
 		if (!scheduleList.isEmpty()) {
 			for (ScheduledFuture<?> schedule : scheduleList) {

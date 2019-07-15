@@ -17,7 +17,7 @@ public class SystemTaskExecutor {
 	private static final Logger log = Logger.getLogger(SurveyController.class.getName());
 	
 	@Autowired
-	SurveyService surveyService;
+	private SurveyService surveyService;
 	
 	@Async
 	public void sentRoutineSurvey(Configuration config) {

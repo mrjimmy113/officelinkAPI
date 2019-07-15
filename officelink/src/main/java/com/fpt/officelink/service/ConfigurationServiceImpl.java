@@ -53,6 +53,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public boolean addNewConfig(Configuration config) {
+		config.setDateCreated(new Date());
 		configRep.save(config);
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());
@@ -62,6 +63,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public boolean modifyConfig(Configuration config) {
+		config.setDateModified(new Date());
 		configRep.save(config);
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());
