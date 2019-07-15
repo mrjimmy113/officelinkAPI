@@ -47,7 +47,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 	@Query("SELECT a FROM Account a JOIN a.teams t WHERE t.department.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
 	List<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 	
-	@Query("SELECT a.id, a.email FROM Account a JOIN a.teams t WHERE t.department.id = :depId AND a.location.id = :loId AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
+	@Query("SELECT a FROM Account a JOIN a.teams t WHERE t.department.id = :depId AND a.location.id = :loId AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
 	List<Account> findAllEmailByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("isDeleted") boolean isDelete);
     @Query("SELECT t FROM Account t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
     List<Account> findAllByWorkplaceId(

@@ -258,7 +258,7 @@ public class SurveyController {
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			ser.sendOutSurvey(target);
+			ser.sendOutSurvey(target,getUserContext().getWorkplaceId());
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();

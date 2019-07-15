@@ -1,8 +1,6 @@
 package com.fpt.officelink.dto;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 public class ConfigurationDTO {
 	@NotNull
@@ -17,6 +15,11 @@ public class ConfigurationDTO {
 	
     @NotNull
 	private SurveyDTO survey;
+    
+    
+    private int duration;
+    
+    private SendSurveyDTO sendSurvey;
 
 	// Getter setter
 	public int getId() {
@@ -58,4 +61,22 @@ public class ConfigurationDTO {
 	public void setSurvey(SurveyDTO survey) {
 		this.survey = survey;
 	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	public SendSurveyDTO getSendSurvey() {
+		return sendSurvey;
+	}
+
+	public void setSendSurvey(SendSurveyDTO sendSurvey) {
+		this.sendSurvey = sendSurvey;
+	}
+	
+	
 }

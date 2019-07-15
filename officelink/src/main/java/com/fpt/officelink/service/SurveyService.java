@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
@@ -31,7 +32,6 @@ public interface SurveyService {
 
 	SurveyReportDTO getReport(Integer id);
 
-	void sendOutSurvey(SendSurveyDTO sendInfor) throws JOSEException;
 
 	String getSurveyToken(Integer surveyId) throws JOSEException;
 
@@ -40,4 +40,8 @@ public interface SurveyService {
 	Page<Survey> searchReportWithPagination(String term, int pageNum);
 
 	void saveAnswer(SurveyAnswerInforDTO dto);
+
+	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
+
+	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
 }
