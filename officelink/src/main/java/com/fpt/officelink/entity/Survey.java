@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -58,12 +59,18 @@ public class Survey implements Serializable {
 	@Column
 	private boolean isDeleted;
 	
-	@OneToMany(mappedBy = "survey")
+	@OneToMany(mappedBy = "survey", cascade = CascadeType.PERSIST)
 	private Set<Configuration> configurations;
 	
 	@ManyToOne
 	@JoinColumn(name = "workplace_id")
 	private Workplace workplace;
+	
+	@OneToMany(mappedBy = "survey")
+	private Set<SurveySendTarget> targets;
+	
+	@Column
+	private Integer templateId;
 
 	public Integer getId() {
 		return id;
@@ -176,7 +183,21 @@ public class Survey implements Serializable {
 	public void setSentOut(int sentOut) {
 		this.sentOut = sentOut;
 	}
-	
-	
+
+	public Set<SurveySendTarget> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(Set<SurveySendTarget> targets) {
+		this.targets = targets;
+	}
+
+	public Integer getTemplateId() {
+		return templateId;
+	}
+
+	public void setTemplateId(Integer templateId) {
+		this.templateId = templateId;
+	}
 	
 }

@@ -3,6 +3,8 @@ package com.fpt.officelink.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +13,9 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Configuration;
+import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.repository.ConfigurationRepository;
+import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.utils.Constants;
 
 @Service
@@ -22,6 +26,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	
 	@Autowired
 	SchedulerService schedService;
+	
+	@Autowired
+	SurveySendTargetRepository targetRep;
 
 	private List<Configuration> configurationList;
 	
@@ -52,17 +59,22 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
 	@Override
-	public boolean addNewConfig(Configuration config) {
+	public boolean addNewConfig(Configuration config, List<SurveySendTarget> targets) {
+		targetRep.saveAll(targets);
 		configRep.save(config);
+		
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());
 		
 		return true;
 	}
 
+	@Transactional
 	@Override
-	public boolean modifyConfig(Configuration config) {
+	public boolean modifyConfig(Configuration config, List<SurveySendTarget> targets) {
 		configRep.save(config);
+		targetRep.deleteBySurveyId(config.getSurvey().getId());
+		targetRep.saveAll(targets);
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());
 		

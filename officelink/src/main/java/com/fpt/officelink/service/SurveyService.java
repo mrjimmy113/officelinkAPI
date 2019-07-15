@@ -44,4 +44,7 @@ public interface SurveyService {
 	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
 
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
+
+
+	void sendRoutineSurvey(int surveyId, int duration) throws JOSEException;
 }

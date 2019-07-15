@@ -277,6 +277,63 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 
 	}
+	
+	@Override
+	public void sendRoutineSurvey(int surveyId, int duration) throws JOSEException {
+		Optional<Survey> survey = surveyRep.findById(surveyId);
+		if(survey.isPresent()) {
+			Survey newSurvey = survey.get();
+			List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
+			int workplaceId = newSurvey.getWorkplace().getId();
+			newSurvey.setTemplateId(surveyId);
+			newSurvey.setId(null);
+			newSurvey.setConfigurations(null);
+			Calendar c = Calendar.getInstance();
+			Date date = new Date(c.getTimeInMillis());
+			newSurvey.setName(newSurvey.getName() +" " + date.toString());
+			List<SurveyQuestion> surQuests = surQuestRep.findAllBySurveyId(surveyId);
+			surQuests.forEach(e -> {
+				e.setId(null);
+				e.setSurvey(newSurvey);
+			});
+			newSurvey.setSurveyQuestions(new HashSet<SurveyQuestion>(surQuests));
+			newSurvey.setDateSendOut(date);
+			c.add(Calendar.DATE, duration);
+			newSurvey.setDateStop(new Date(c.getTimeInMillis()));
+			
+			Set<Account> sendList = new HashSet<Account>();
+			for (SurveySendTarget target : targets) {
+				if(target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
+					break;
+				}else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
+							target.getDepartment().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() != null) {
+					sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
+					continue;
+				}
+				
+			}
+			String token = jwtSer.createSurveyToken(surveyId);
+			List<String> emailList = new ArrayList<String>();
+			sendList.forEach(e -> {
+				emailList.add(e.getEmail());
+			});
+			newSurvey.setSentOut(emailList.size());
+			surveyRep.save(newSurvey);
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("link", "http://localhost:4200/take/" + token);
+			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
+		}
+	}
 
 	@Override
 	public boolean checkIfUserTakeSurvey() {
