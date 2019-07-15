@@ -51,7 +51,8 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     		+ "WHERE t.department.id = :id")
 	Set<Location> findAllByDepartmentId(@Param("id") Integer id);
     
-    List<Location> findAllByWorkplaceIdAndIsDeleted(int workplaceId, boolean isDeleted); 
+    List<Location> findAllByWorkplaceIdAndIsDeleted(int workplaceId, boolean isDeleted);
+
     
     @Query("SELECT COUNT(l) FROM Location l WHERE l.workplace.id = :id")
     int countByWorkplaceId(@Param("id") Integer id);
