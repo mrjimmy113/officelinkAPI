@@ -34,7 +34,7 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
 
     private static int count = 0;
     private final Path fileStorageLocation;
-    
+
     @Autowired
     SurveyQuestionRepository surveyQuestionRep;
 
@@ -50,7 +50,8 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
         }
     }
 
-    public Resource loadFileAsResource(String fileName, int id) {      
+    public Resource loadFileAsResource(String fileName, int id) {
+        deleteExcel();
         createExcel(fileName, id);
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
@@ -64,6 +65,16 @@ public class SurveyQuestionServiceImpl implements SurveyQuestionService {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void deleteExcel() {
+        File directory = new File("C:\\Users\\Thai Phu Cuong\\Desktop\\GitHub\\officelinkAPI\\officelink\\Excel");
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (!file.delete()) {
+                System.out.println("Failed to delete " + file);
+            }
+        }
     }
 
     public void createExcel(String fileName, int id) {
