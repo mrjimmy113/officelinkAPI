@@ -40,12 +40,10 @@ public class Department implements Serializable{
 	private boolean isDeleted;
 	
 	@OneToMany(mappedBy = "department")
-	@JsonIgnore
 	private Set<Team> teams;
 	
 	@ManyToOne
 	@JoinColumn(name = "workplace_id", nullable = false)
-	@JsonIgnore
 	private Workplace workplace;
 	
 //	@ManyToMany

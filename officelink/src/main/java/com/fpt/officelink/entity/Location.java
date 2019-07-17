@@ -1,6 +1,5 @@
 package com.fpt.officelink.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -59,7 +58,6 @@ public class Location implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "workplaceId")
-    @JsonIgnore
     private Workplace workplace;
 
     //Getter and Setter

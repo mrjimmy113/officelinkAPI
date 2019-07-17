@@ -1,6 +1,5 @@
 package com.fpt.officelink.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,7 +40,6 @@ public class Workplace implements Serializable {
     private Set<Configuration> configurations;
 
     @OneToMany(mappedBy = "workplace")
-    @JsonIgnore
     private Set<Account> accounts;
 
     @OneToMany(mappedBy = "workplace")
