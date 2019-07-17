@@ -126,14 +126,18 @@ public class AccountController {
     }
 
     @GetMapping(value = "/profile")
-    public ResponseEntity<Account> getProfile(){
+    public ResponseEntity<AccountDTO> getProfile(){
         CustomUser user = getUserContext();
         HttpStatus httpStatus = null;
+        AccountDTO accountDTO = new AccountDTO();
+
+
 
         Account entity = null;
         try{
 
              entity = service.getProfile(user.getUsername());
+             BeanUtils.copyProperties(entity, accountDTO);
 
             httpStatus = HttpStatus.OK;
 
@@ -141,19 +145,21 @@ public class AccountController {
         }catch (Exception ex){
             httpStatus = HttpStatus.BAD_REQUEST;
         }
-        return new ResponseEntity<Account>(entity, httpStatus);
+        return new ResponseEntity<AccountDTO>(accountDTO, httpStatus);
     }
 
 
     @GetMapping(value = "/getAccountByEmail")
-    public ResponseEntity<Optional<Account>> getAccountByEmail(@RequestParam("emailToken") String emailToken){
+    public ResponseEntity<AccountDTO> getAccountByEmail(@RequestParam("emailToken") String emailToken){
         HttpStatus status = null;
-        Optional<Account> account = null;
+        Account account = null;
+        AccountDTO accountDTO = new AccountDTO();
 
         try{
             String email = jwt.getEmailFromToken(emailToken);
 
-            account = service.getAccountByEmail(email);
+            account = service.getAccountByEmail(email).get();
+            BeanUtils.copyProperties(account, accountDTO);
             status = HttpStatus.OK;
 
         }catch (Exception ex){
@@ -161,7 +167,7 @@ public class AccountController {
 
         }
 
-        return new ResponseEntity<Optional<Account>>(account, status);
+        return new ResponseEntity<AccountDTO>(accountDTO, status);
     }
 
 
@@ -211,7 +217,7 @@ public class AccountController {
         try {
             Account entity = new Account();
 
-            
+
             BeanUtils.copyProperties(dto, entity);
             boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
             if(res){
@@ -269,6 +275,25 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
+    @PostMapping(value = "/sendMailReset")
+    public ResponseEntity<Number> sendMailResetPassword(@RequestBody String email){
+        HttpStatus status = null;
+        AccountDTO dto = new AccountDTO();
+        String token = null;
+        Map<String, Object> model = new HashMap<>();
+        List<String> listEmail = new ArrayList<>();
+        try{
+            listEmail.add(email);
+            token =  jwt.createTokenWithEmail(email);
+            service.sendMailResetPassword(listEmail, token);
+            status = HttpStatus.OK;
+
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
 
     @PostMapping(value = "/confirm")
     public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken ){
@@ -356,7 +381,7 @@ public class AccountController {
         }
         return new ResponseEntity<Integer>(status.value(), status);
     }
-    
+
     @GetMapping("/invitationInfor")
     public ResponseEntity<AccountDTO> getInvitationInfor(@RequestParam("token") String token) {
     	AccountDTO res = new AccountDTO();
@@ -367,7 +392,7 @@ public class AccountController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-    	
+
     	return new ResponseEntity<AccountDTO>(res,status);
     }
 
@@ -402,7 +427,7 @@ public class AccountController {
         }
         return new ResponseEntity<AccountDTO>(dto, httpStatus);
     }
-    
+
     @PostMapping("/acceptInvite")
     public ResponseEntity<Number> acceptInvite(@RequestBody AccountDTO acc) {
     	HttpStatus status = null;
@@ -414,10 +439,10 @@ public class AccountController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-    	
+
     	return new ResponseEntity<Number>(status.value(),status);
     }
-    
+
     @PutMapping("/assign")
     public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
     	HttpStatus status = null;
@@ -428,10 +453,62 @@ public class AccountController {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-    	
+
     	return new ResponseEntity<Number>(status.value(),status);
     }
 
+    @PutMapping(value = "/resetPassword")
+    public ResponseEntity<Number> ResetPassword(@RequestBody ResetAccountDTO resetAccountDTO) {
+        HttpStatus status = null;
+        String email = null;
+        try {
+            email = jwt.getEmailFromToken(resetAccountDTO.getEmailToken());
+            service.resetPassword(email, resetAccountDTO.getNewPassword());
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<Number>(status.value(),status);
+    }
+
+    @PutMapping("/changeProfile")
+    public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto){
+        HttpStatus status = null;
+        Account account = new Account();
+        try{
+            BeanUtils.copyProperties(dto, account);
+            boolean res = service.changeProfile(account);
+            if(res){
+                status = HttpStatus.OK;
+            }
+
+        }catch (Exception ex){
+                status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+
+    @PutMapping("/changePassword")
+    public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto){
+        HttpStatus status = null;
+
+        try{
+
+            boolean res = service.changePassword(dto.getEmail(), dto.getCurrentPassword(), dto.getNewPassword() );
+            if(res){
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.BAD_REQUEST;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
 
 
 

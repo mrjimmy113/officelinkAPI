@@ -42,11 +42,9 @@ public class Team implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn(name = "department_id", nullable = false)
-	@JsonIgnore
 	private Department department;
 	
 	@ManyToMany(mappedBy = "teams")
-	@JsonIgnore
 	private Set<Account> accounts = new HashSet<Account>();
 
 	// Getter Setter

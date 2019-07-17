@@ -34,4 +34,14 @@ public interface AccountService {
 	Account getProfile(String email);
 
 	Account getAccountAssign( String email);
+
+	boolean changeProfile(Account account );
+
+	boolean changePassword(String email, String currentPass, String newPass);
+	void sendMailResetPassword(List<String> listEmail , String accountToken);
+
+	void resetPassword(String email ,String newPassword);
+
+
+
 }
