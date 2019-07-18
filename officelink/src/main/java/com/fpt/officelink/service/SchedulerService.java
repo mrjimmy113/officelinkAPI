@@ -29,11 +29,11 @@ public class SchedulerService implements SchedulingConfigurer {
 	
 	private List<ScheduledFuture<?>> dailyTaskList; // daily task list
 
-	private List<Configuration> configList; // list of configurations
-
 	private ThreadPoolTaskScheduler configScheduler; // scheduler properties
 
-	private List<ScheduledFuture<?>> scheduleList; // store scheduled schedule
+	private List<ScheduledFuture<?>> configTaskList; // store scheduled schedule
+	
+	private List<Configuration> configList; // list of configurations
 	
 	private static final Logger log = Logger.getLogger(SchedulerService.class.getName());
 
@@ -48,7 +48,7 @@ public class SchedulerService implements SchedulingConfigurer {
 		//init value 
 		dailyScheduler = dailyPoolScheduler();
 		configScheduler = configurationPoolScheduler();
-		scheduleList = new ArrayList<ScheduledFuture<?>>();
+		configTaskList = new ArrayList<ScheduledFuture<?>>();
 		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
 		
 		// start daily Tasks
@@ -86,7 +86,6 @@ public class SchedulerService implements SchedulingConfigurer {
 			public void run() {
 				// Put task here
 				executor.setSurveysExpired();
-				executor.exportReportsDaily();
 			}
 			// schedule time here
 
@@ -102,8 +101,8 @@ public class SchedulerService implements SchedulingConfigurer {
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 		
 		// cancel any scheduled tasks
-		if (!scheduleList.isEmpty()) {
-			for (ScheduledFuture<?> schedule : scheduleList) {
+		if (!configTaskList.isEmpty()) {
+			for (ScheduledFuture<?> schedule : configTaskList) {
 				schedule.cancel(false);
 			}
 		}
@@ -131,12 +130,12 @@ public class SchedulerService implements SchedulingConfigurer {
 				// ignore scheduled task nor update the scheduled task
 				// insteed the scheduled tasks need to be cancel first, then replaced with the
 				// new schedule
-				if (i >= scheduleList.size()) {
+				if (i >= configTaskList.size()) {
 					// add new schedule to pool
-					scheduleList.add(newSchedule);
+					configTaskList.add(newSchedule);
 				} else {
 					// replace existed schedule with new one
-					scheduleList.set(i, newSchedule);
+					configTaskList.set(i, newSchedule);
 				}
 				i++;
 			}

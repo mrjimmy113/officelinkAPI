@@ -1,9 +1,34 @@
 package com.fpt.officelink.entity;
 
-public class AnswerReport {
+import javax.persistence.Id;
+
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+@Entity
+public class AnswerReport implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	private int Id;
+	
+	@Column
 	private String term;
+	
+	@Column
 	private Integer weight;
 	
+	@ManyToOne
+	@JoinColumn(name = "questionReport_id")
+	private TeamQuestionReport questionReport;
 	
 	
 	public AnswerReport() {
@@ -26,7 +51,11 @@ public class AnswerReport {
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
-
-	
+	public TeamQuestionReport getQuestionReport() {
+		return questionReport;
+	}
+	public void setQuestionReport(TeamQuestionReport questionReport) {
+		this.questionReport = questionReport;
+	}
 
 }

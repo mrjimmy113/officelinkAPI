@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -44,4 +45,10 @@ public interface SurveyService {
 	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
 
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
+	
+	void updateStatus(Survey survey);
+	
+	List<Survey> getActiveSurveyByDate(Date date);
+
+	void generateTeamQuestionReport(int surveyId);
 }

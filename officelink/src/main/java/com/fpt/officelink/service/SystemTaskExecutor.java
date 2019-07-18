@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.controller.SurveyController;
 import com.fpt.officelink.entity.Configuration;
+import com.fpt.officelink.entity.Survey;
 
 @Service
 public class SystemTaskExecutor {
@@ -43,6 +45,18 @@ public class SystemTaskExecutor {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.log(Level.FINEST, e.toString());
+		}
+	}
+	
+	// set surveys active status and generate report for that team
+	@Async
+	public void setSurveysExpired() {
+		// get list of active surveys with end date is to day or before
+		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date());
+		for (Survey survey : surveys) {
+			surveyService.generateTeamQuestionReport(survey.getId());
+			survey.setActive(false);
+			surveyService.updateStatus(survey);
 		}
 	}
 	

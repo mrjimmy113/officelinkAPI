@@ -37,10 +37,12 @@ import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.AnswerReport;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Question;
+import com.fpt.officelink.entity.TeamQuestionReport;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
@@ -55,6 +57,7 @@ import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
+import com.fpt.officelink.repository.TeamQuestionReportRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -91,6 +94,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	SurveySendTargetRepository targetRep;
+	
+	@Autowired
+	TeamQuestionReportRepository reportRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -342,11 +348,11 @@ public class SurveyServiceImpl implements SurveyService {
 		List<DepartmentDTO> departments = new ArrayList<DepartmentDTO>();
 		List<TeamDTO> teams = new ArrayList<TeamDTO>();
 		Optional<Account> currentLogin = accRep.findByEmail(getUserContext().getUsername());
-		
+
 		if (currentLogin.isPresent()) {
 			Account currentAcc = currentLogin.get();
 			for (SurveySendTarget e : targets) {
-				//Check team
+				// Check team
 				boolean isFound = false;
 				if (e.getTeam() != null) {
 					for (Team t : currentAcc.getTeams()) {
@@ -357,7 +363,7 @@ public class SurveyServiceImpl implements SurveyService {
 							isFound = true;
 							break;
 						}
-						if(e.getDepartment().getId().equals(t.getDepartment().getId())) {
+						if (e.getDepartment().getId().equals(t.getDepartment().getId())) {
 							DepartmentDTO departmentDTO = new DepartmentDTO();
 							BeanUtils.copyProperties(e.getDepartment(), departmentDTO);
 							departments.add(departmentDTO);
@@ -366,10 +372,11 @@ public class SurveyServiceImpl implements SurveyService {
 						}
 					}
 				}
-				if(isFound) continue;
-				
-				if(e.getLocation() != null) {
-					if(e.getLocation().getId().equals(currentAcc.getLocation().getId())) {
+				if (isFound)
+					continue;
+
+				if (e.getLocation() != null) {
+					if (e.getLocation().getId().equals(currentAcc.getLocation().getId())) {
 						LocationDTO locationDTO = new LocationDTO();
 						BeanUtils.copyProperties(e.getLocation(), locationDTO);
 						locations.add(locationDTO);
@@ -502,6 +509,122 @@ public class SurveyServiceImpl implements SurveyService {
 				}
 				if (!isFound)
 					result.add(new AnswerReportDTO(options[i], 1));
+			}
+		}
+		return result;
+	}
+
+	// change active status of a survey to false
+	@Override
+	public void updateStatus(Survey survey) {
+		survey.setActive(false);
+		surveyRep.save(survey);
+	}
+
+	// get all active survey with end date is today or before
+	@Override
+	public List<Survey> getActiveSurveyByDate(java.util.Date date) {
+		List<Survey> result = surveyRep.findAllByDateStopAndIsActiveAndIsDeleted(date, true, false);
+
+		return result;
+	}
+
+	@Async
+	@Override
+	public void generateTeamQuestionReport(int surveyId) {
+		// get list of teams that this survey was send to
+		List<Team> teams = targetRep.getSurveyTeams(surveyId);
+
+		// Get survey question of each team
+		for (Team team : teams) {
+			TeamQuestionReport questionReport = new TeamQuestionReport();
+			List<SurveyQuestion> teamSurveyQuestions = surQuestRep.findAllByTeamIdOnly(team.getId(), surveyId);
+
+			// set team for report
+			for (SurveyQuestion sQuestion : teamSurveyQuestions) {
+				questionReport.setTeam(team);
+				questionReport.setSurveyQuestion(sQuestion);
+				
+				// get answer report
+				List<AnswerReport> arList = new ArrayList<AnswerReport>();
+				switch (sQuestion.getQuestion().getType().getType()) {
+				case MULTIPLE:
+					arList = generateMutipleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
+					break;
+				case SINGLE:
+					arList = generateSingleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
+					break;
+				case TEXT:
+					arList = generateFreeTextReport(new ArrayList<Answer>(sQuestion.getAnswers()));
+					break;
+				}
+				
+				questionReport.setAnswerReports(arList);
+				reportRep.save(questionReport);
+			}
+		}
+	}
+
+	// Report: Free Text
+	private List<AnswerReport> generateFreeTextReport(List<Answer> answers) {
+		List<AnswerReport> result = new ArrayList<AnswerReport>();
+		boolean isFound;
+		for (Answer a : answers) {
+			for (WordCloud w : a.getWordClouds()) {
+				isFound = false;
+				for (AnswerReport r : result) {
+					if (r.getTerm().equalsIgnoreCase(w.getWord())) {
+						r.setWeight(r.getWeight() + w.getTimes());
+						isFound = true;
+						break;
+					}
+				}
+				if (!isFound) {
+					result.add(new AnswerReport(w.getWord(), w.getTimes()));
+				}
+
+			}
+
+		}
+		return result;
+	}
+
+	// Report: Single choice
+	private List<AnswerReport> generateSingleChoiceReport(List<Answer> answers) {
+		List<AnswerReport> result = new ArrayList<AnswerReport>();
+		boolean isFound;
+		for (Answer answer : answers) {
+			isFound = false;
+			for (AnswerReport ansReport : result) {
+				if (answer.getContent().equalsIgnoreCase(ansReport.getTerm())) {
+					ansReport.setWeight(ansReport.getWeight() + 1);
+					isFound = true;
+					break;
+				}
+			}
+			if (!isFound)
+				result.add(new AnswerReport(answer.getContent(), 1));
+		}
+		return result;
+	}
+
+	// Report: Mutiple Choice
+	private List<AnswerReport> generateMutipleChoiceReport(List<Answer> answers) {
+		List<AnswerReport> result = new ArrayList<AnswerReport>();
+		boolean isFound;
+		for (Answer answer : answers) {
+			String[] options = answer.getContent().split(",");
+			for (int i = 0; i < options.length; i++) {
+				isFound = false;
+				for (AnswerReport AnswerReport : result) {
+					if (options[i].equalsIgnoreCase(AnswerReport.getTerm())) {
+						AnswerReport.setWeight(AnswerReport.getWeight() + 1);
+						isFound = true;
+						break;
+					}
+				}
+				if (!isFound)
+					result.add(new AnswerReport(options[i], 1));
 			}
 		}
 		return result;
