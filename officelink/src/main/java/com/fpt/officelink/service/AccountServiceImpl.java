@@ -77,9 +77,10 @@ import com.nimbusds.jose.JOSEException;
 
 
     @Override
-    public Page<Account> searchWithPagination(String term, Integer workplaceId, int pageNum) {
+    public Page<Account> searchWithPagination(String term, Integer workplaceId, Integer roleId ,  int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
-        return accountRespository.findAllByFirstnameAndWorkplace(term, workplaceId, false , pageable);
+        //return accountRespository.find(term, workplaceId, false , pageable);
+        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
     }
 
     @Transactional
