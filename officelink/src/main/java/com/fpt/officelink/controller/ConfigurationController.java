@@ -22,10 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.SendSurveyDTO;
+import com.fpt.officelink.dto.SendTargetDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.entity.Configuration;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.entity.SurveySendTarget;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.ConfigurationService;
 import com.fpt.officelink.service.WorkplaceService;
@@ -72,7 +78,8 @@ public class ConfigurationController {
 	 * 
 	 * */
 	@GetMapping(value = "/searchGetPage")
-	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
+	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> searchGetPage(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
 		PageSearchDTO<ConfigurationDTO> res = new PageSearchDTO<ConfigurationDTO>();
@@ -83,6 +90,30 @@ public class ConfigurationController {
 			//
 			List<ConfigurationDTO> resultList = new ArrayList<ConfigurationDTO>();
 			result.forEach(element -> {
+				SendSurveyDTO sendDto = new SendSurveyDTO();
+				List<SendTargetDTO> targetDtos = new ArrayList<SendTargetDTO>();
+				element.getSurvey().getTargets().forEach(e -> {
+					SendTargetDTO targetDto = new SendTargetDTO();
+					if (e.getDepartment() != null) {
+						targetDto.setDepartmentId(e.getDepartment().getId());
+						targetDto.setDepartmentName(e.getDepartment().getName());
+					} else {
+						targetDto.setDepartmentId(0);
+					}
+					if (e.getLocation() != null) {
+						targetDto.setLocationId(e.getLocation().getId());
+						targetDto.setLocationName(e.getLocation().getName());
+					} else {
+						targetDto.setLocationId(0);
+					}
+					if (e.getTeam() != null) {
+						targetDto.setTeamId(e.getTeam().getId());
+						targetDto.setTeamName(e.getTeam().getName());
+					} else {
+						targetDto.setTeamId(0);
+					}
+					targetDtos.add(targetDto);
+				});
 				ConfigurationDTO dto = new ConfigurationDTO();
 				SurveyDTO surveyDto = new SurveyDTO();
 
@@ -93,6 +124,8 @@ public class ConfigurationController {
 
 				dto.setSurvey(surveyDto);
 				dto.setWorkplaceId(element.getWorkplace().getId());
+				sendDto.setTargetList(targetDtos);
+				dto.setSendSurvey(sendDto);
 				resultList.add(dto);
 			});
 			//
@@ -108,7 +141,7 @@ public class ConfigurationController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Integer> create(@Valid @RequestBody ConfigurationDTO dto) {
+	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
 		this.user = this.getUserContext();
 		HttpStatus status = null;
 
@@ -125,14 +158,39 @@ public class ConfigurationController {
 			wEntity.setId(user.getWorkplaceId());
 			entity.setWorkplace(wEntity);
 			entity.setSurvey(sEntity);
+			List<SurveySendTarget> targets = new ArrayList<SurveySendTarget>();
+			dto.getSendSurvey().getTargetList().forEach(e -> {
+				SurveySendTarget targetEntity = new SurveySendTarget();
 
-			boolean isSucceed = configService.addNewConfig(entity);
+				if (e.getLocationId() != 0) {
+					Location location = new Location();
+					location.setId(e.getLocationId());
+					targetEntity.setLocation(location);
+				}
+
+				if (e.getDepartmentId() != 0) {
+					Department department = new Department();
+					department.setId(e.getDepartmentId());
+					targetEntity.setDepartment(department);
+				}
+
+				if (e.getTeamId() != 0) {
+					Team team = new Team();
+					team.setId(e.getTeamId());
+					targetEntity.setTeam(team);
+				}
+				targetEntity.setSurvey(sEntity);
+				targets.add(targetEntity);
+
+			});
+			boolean isSucceed = configService.addNewConfig(entity, targets);
 			if (isSucceed) {
 				status = HttpStatus.CREATED;
 			} else {
 				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -155,8 +213,32 @@ public class ConfigurationController {
 			wEntity.setId(dto.getWorkplaceId());
 			entity.setWorkplace(wEntity);
 			entity.setSurvey(sEntity);
+			List<SurveySendTarget> targets = new ArrayList<SurveySendTarget>();
+			dto.getSendSurvey().getTargetList().forEach(e -> {
+				SurveySendTarget targetEntity = new SurveySendTarget();
 
-			configService.modifyConfig(entity);
+				if (e.getLocationId() != 0) {
+					Location location = new Location();
+					location.setId(e.getLocationId());
+					targetEntity.setLocation(location);
+				}
+
+				if (e.getDepartmentId() != 0) {
+					Department department = new Department();
+					department.setId(e.getDepartmentId());
+					targetEntity.setDepartment(department);
+				}
+
+				if (e.getTeamId() != 0) {
+					Team team = new Team();
+					team.setId(e.getTeamId());
+					targetEntity.setTeam(team);
+				}
+				targetEntity.setSurvey(sEntity);
+				targets.add(targetEntity);
+			});
+
+			configService.modifyConfig(entity, targets);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;

@@ -18,19 +18,4 @@ public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, 
 	
 	@Query("SELECT sq FROM SurveyQuestion sq WHERE sq.survey.id = :id ORDER BY questionIndex ASC")
 	List<SurveyQuestion> findAllBySurveyId(@Param("id") Integer id);
-	
-	@Query("SELECT a.surveyQuestion FROM Answer a WHERE a.account.location.id = :id AND a.account.workplace.id = :workId AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("surveyId") Integer surveyId);
-
-	@Query("SELECT a.surveyQuestion FROM Answer a JOIN a.account.teams t WHERE t.id = :id AND a.account.workplace.id = :workId AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("surveyId") Integer surveyId);
-	
-	@Query("SELECT a.surveyQuestion FROM Answer a JOIN a.account.teams t WHERE t.department.id = :id AND a.account.workplace.id = :workId AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("surveyId") Integer surveyId);
-	
-	@Query("SELECT a.surveyQuestion FROM Answer a JOIN a.account.teams t WHERE t.department.id = :depId AND a.account.location.id = :loId AND a.account.workplace.id = :workId AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("surveyId") Integer surveyId);
-	
-	@Query("SELECT a.surveyQuestion FROM Answer a JOIN a.account.teams t WHERE t.id = :id AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByTeamIdOnly(@Param("id") Integer id, @Param("surveyId") Integer surveyId);
 }

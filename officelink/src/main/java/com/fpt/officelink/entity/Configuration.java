@@ -49,6 +49,9 @@ public class Configuration implements Serializable{
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "survey_id")
     private Survey survey;
+    
+    @Column
+    private int duration;
 
 	//Getter setter
 	public int getId() {
@@ -114,4 +117,14 @@ public class Configuration implements Serializable{
 	public void setSurvey(Survey survey) {
 		this.survey = survey;
 	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+	
+	
 }

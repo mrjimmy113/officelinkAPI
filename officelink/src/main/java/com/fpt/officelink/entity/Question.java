@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 @Entity
 public class Question implements Serializable {
@@ -34,7 +36,8 @@ public class Question implements Serializable {
 	private TypeQuestion type;
 
 	@OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
-	private Set<AnswerOption> options;
+	@OrderBy("id")
+	private List<AnswerOption> options;
 
 	@OneToMany(mappedBy = "question")
 	private Set<SurveyQuestion> surveyQuestions;
@@ -66,11 +69,11 @@ public class Question implements Serializable {
 		this.type = type;
 	}
 
-	public Set<AnswerOption> getOptions() {
+	public List<AnswerOption> getOptions() {
 		return options;
 	}
 
-	public void setOptions(Set<AnswerOption> options) {
+	public void setOptions(List<AnswerOption> options) {
 		this.options = options;
 	}
 

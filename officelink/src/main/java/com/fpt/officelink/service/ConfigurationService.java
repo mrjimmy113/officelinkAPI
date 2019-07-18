@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.fpt.officelink.entity.Configuration;
+import com.fpt.officelink.entity.SurveySendTarget;
 
 public interface ConfigurationService {
 	
@@ -14,9 +15,10 @@ public interface ConfigurationService {
 	
 	public Configuration getConfigById(int configId);
 	
-	public boolean addNewConfig(Configuration config);
-	
-	public boolean modifyConfig(Configuration config);
 	
 	public boolean removeConfig(int id);
+
+	boolean addNewConfig(Configuration config, List<SurveySendTarget> targets);
+
+	boolean modifyConfig(Configuration config, List<SurveySendTarget> targets);
 }

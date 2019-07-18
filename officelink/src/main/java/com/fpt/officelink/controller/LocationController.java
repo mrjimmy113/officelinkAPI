@@ -5,14 +5,6 @@
  */
 package com.fpt.officelink.controller;
 
-import com.fpt.officelink.dto.LocationDTO;
-import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.dto.TeamDTO;
-import com.fpt.officelink.entity.CustomUser;
-import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Location;
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.service.LocationService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.service.LocationService;
 
