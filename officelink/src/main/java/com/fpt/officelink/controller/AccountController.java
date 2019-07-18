@@ -149,6 +149,44 @@ public class AccountController {
     }
 
 
+    @GetMapping(value = "/getAccountAssign")
+    public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id){
+        CustomUser user = getUserContext();
+        HttpStatus httpStatus = null;
+        AccountDTO dto = new AccountDTO();
+
+
+
+        Account account = null;
+        try{
+
+            account = service.getAccountAssign(id);
+            LocationDTO locationDTO = new LocationDTO();
+            List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
+            account.getTeams().forEach(element -> {
+                TeamDTO teamDTO = new TeamDTO();
+                BeanUtils.copyProperties(element, teamDTO);
+                teamDTOS.add(teamDTO);
+            });
+
+
+
+            BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            BeanUtils.copyProperties(account, dto);
+
+            dto.setLocation(locationDTO);
+            dto.setTeams(teamDTOS);
+
+            httpStatus = HttpStatus.OK;
+
+
+        }catch (Exception ex){
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<AccountDTO>(dto, httpStatus);
+    }
+
+
     @GetMapping(value = "/getAccountByEmail")
     public ResponseEntity<AccountDTO> getAccountByEmail(@RequestParam("emailToken") String emailToken){
         HttpStatus status = null;
@@ -283,11 +321,15 @@ public class AccountController {
         Map<String, Object> model = new HashMap<>();
         List<String> listEmail = new ArrayList<>();
         try{
-            listEmail.add(email);
-            token =  jwt.createTokenWithEmail(email);
-            service.sendMailResetPassword(listEmail, token);
-            status = HttpStatus.OK;
-
+            boolean res = service.checkAccountExisted(email);
+            if(res == false){
+                listEmail.add(email);
+                token =  jwt.createTokenWithEmail(email);
+                service.sendMailResetPassword(listEmail, token);
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
 
         }catch (Exception ex){
             status = HttpStatus.BAD_REQUEST;
@@ -396,46 +438,22 @@ public class AccountController {
     	return new ResponseEntity<AccountDTO>(res,status);
     }
 
-    @GetMapping("/getAccountAssign")
-    public ResponseEntity<AccountDTO> getAccountAssign(){
-        CustomUser user = getUserContext();
-        HttpStatus httpStatus = null;
-        AccountDTO dto = new AccountDTO();
 
-        Account account = null;
-        try{
-            account = service.getAccountAssign(user.getUsername());
-            LocationDTO locationDTO = new LocationDTO();
-            List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
-            account.getTeams().forEach(element -> {
-                TeamDTO teamDTO = new TeamDTO();
-                BeanUtils.copyProperties(element, teamDTO);
-                teamDTOS.add(teamDTO);
-            });
-
-
-            BeanUtils.copyProperties(account.getLocation(), locationDTO);
-            BeanUtils.copyProperties(account, dto);
-
-            dto.setLocation(locationDTO);
-            dto.setTeams(teamDTOS);
-
-            httpStatus = HttpStatus.OK;
-
-        }catch (Exception ex){
-            httpStatus = HttpStatus.BAD_REQUEST;
-        }
-        return new ResponseEntity<AccountDTO>(dto, httpStatus);
-    }
 
     @PostMapping("/acceptInvite")
     public ResponseEntity<Number> acceptInvite(@RequestBody AccountDTO acc) {
     	HttpStatus status = null;
     	try {
-			Account entity = new Account();
-			BeanUtils.copyProperties(acc, entity);
-			service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
-    		status = HttpStatus.OK;
+    	    boolean res = service.checkAccountExisted(acc.getEmail());
+    	    if(res){
+                Account entity = new Account();
+                BeanUtils.copyProperties(acc, entity);
+                service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
+                status = HttpStatus.OK;
+            }
+
+    	    status = HttpStatus.CONFLICT;
+
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

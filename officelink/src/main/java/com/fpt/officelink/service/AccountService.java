@@ -33,7 +33,7 @@ public interface AccountService {
 
 	Account getProfile(String email);
 
-	Account getAccountAssign( String email);
+	Account getAccountAssign( Integer id);
 
 	boolean changeProfile(Account account );
 

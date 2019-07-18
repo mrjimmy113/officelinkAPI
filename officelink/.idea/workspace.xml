@@ -14,11 +14,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="69" column="99" selection-start-line="69" selection-start-column="99" selection-end-line="69" selection-end-column="99" />
+            <state relative-caret-position="175">
+              <caret line="486" column="23" selection-start-line="486" selection-start-column="18" selection-end-line="486" selection-end-column="23" />
+              <folding>
+                <element signature="e#4784#4793#0" expanded="true" />
+                <element signature="e#5529#5541#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
             </state>
           </provider>
         </entry>
@@ -26,8 +39,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="18" column="71" selection-start-line="18" selection-start-column="71" selection-end-line="18" selection-end-column="71" />
+            <state relative-caret-position="391">
+              <caret line="35" column="40" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -62,8 +75,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="79" column="95" selection-start-line="79" selection-start-column="78" selection-end-line="79" selection-end-column="95" />
+            <state relative-caret-position="474">
+              <caret line="296" column="27" selection-start-line="296" selection-start-column="19" selection-end-line="296" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -71,7 +84,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/repository/AccountRespository.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
+            <state relative-caret-position="52">
               <caret line="24" column="55" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
             </state>
           </provider>
@@ -104,18 +117,22 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>Json</find>
-      <find>assign</find>
       <find>getAuthenticationInfor</find>
       <find>ass</find>
-      <find>getAcc</find>
       <find>accountToken</find>
       <find>passwordIn</find>
       <find>j</find>
       <find>ja</find>
       <find>com.fasterxml.jackson</find>
       <find>send</find>
-      <find>findAllByFirstnameAndWorkplace</find>
       <find>searchWithPagination</find>
+      <find>assign</find>
+      <find>findAllByFirstnameAndWorkplace</find>
+      <find>getAcc</find>
+      <find>sendMailRe</find>
+      <find>getAccountAssign</find>
+      <find>chang</find>
+      <find>changePa</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -134,8 +151,8 @@
         <option value="$PROJECT_DIR$/src/main/resources/templates/reset-password-temp.ftl" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/dto/ResetAccountDTO.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/repository/AccountRespository.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java" />
       </list>
     </option>
@@ -321,6 +338,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1721" height="1041" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2588802" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -331,7 +349,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3817382" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3817382" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -381,13 +399,6 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/resources/data.sql">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/entity/Team.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -641,29 +652,40 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/repository/AccountRespository.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
+        <state relative-caret-position="52">
           <caret line="24" column="55" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="18" column="71" selection-start-line="18" selection-start-column="71" selection-end-line="18" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="79" column="95" selection-start-line="79" selection-start-column="78" selection-end-line="79" selection-end-column="95" />
+        <state relative-caret-position="391">
+          <caret line="35" column="40" selection-start-line="35" selection-start-column="40" selection-end-line="35" selection-end-column="40" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/controller/AccountController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="69" column="99" selection-start-line="69" selection-start-column="99" selection-end-line="69" selection-end-column="99" />
+        <state relative-caret-position="175">
+          <caret line="486" column="23" selection-start-line="486" selection-start-column="18" selection-end-line="486" selection-end-column="23" />
+          <folding>
+            <element signature="e#4784#4793#0" expanded="true" />
+            <element signature="e#5529#5541#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/fpt/officelink/service/AccountServiceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="474">
+          <caret line="296" column="27" selection-start-line="296" selection-start-column="19" selection-end-line="296" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/application.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="43" selection-start-line="7" selection-start-column="43" selection-end-line="7" selection-end-column="43" />
         </state>
       </provider>
     </entry>
