@@ -1,9 +1,7 @@
 package com.fpt.officelink.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,7 +177,7 @@ public class QuestionController {
 		try {
 			Question q = new Question();
 			BeanUtils.copyProperties(dto, q,"typeId","options");
-			Set<AnswerOption> options = new HashSet<AnswerOption>();
+			List<AnswerOption> options = new ArrayList<AnswerOption>();
 			dto.getOptions().forEach(op -> {
 				AnswerOption tmp = new AnswerOption();
 				BeanUtils.copyProperties(op, tmp);

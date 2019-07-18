@@ -2,6 +2,7 @@ package com.fpt.officelink.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,10 +28,9 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	@Query(value= "SELECT d FROM Department d WHERE d.id = ?1")
     Department findDepartmentById(int depId) ;
 	
-	@Query("SELECT d FROM Department d "
-			+ "JOIN Team t ON d.id = t.department.id "
-			+ "JOIN t.accounts a "
-			+ "WHERE a.location.id = :id"
-			)
-	List<Department> findAllByLocationId(@Param("id") Integer id);
+	@Query("SELECT t.department FROM Team t JOIN t.accounts a WHERE a.location.id = :id")
+	Set<Department> findAllByLocationId(@Param("id") Integer id);
+	
+	@Query("SELECT COUNT(d) FROM Department d WHERE d.workplace.id = :id AND d.isDeleted = false")
+	int countDepartmentOnWorkplace(@Param("id") Integer id);
 }

@@ -13,37 +13,30 @@ import com.fpt.officelink.entity.Configuration;
 
 @Service
 public class SystemTaskExecutor {
-	
+
 	private static final Logger log = Logger.getLogger(SurveyController.class.getName());
-	
+
 	@Autowired
 	SurveyService surveyService;
-	
+
 	@Async
 	public void sentRoutineSurvey(Configuration config) {
 		try {
-			boolean success = true;
 			
-			
-			if (success) {
-				String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
-						config.getWorkplace().getName(),
-						config.getSurvey().getName(),
-						new Date().toString());
+			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
 
-				log.log(Level.INFO, msg);
-			} else {
-				String msg = String.format("Fail to sent scheduled survey for %s, survey name: %s, scheduled time: %s",
-						config.getWorkplace().getName(),
-						config.getSurvey().getName(),
-						config.getScheduleTime());
+			String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
+					config.getWorkplace().getName(), config.getSurvey().getName(), new Date().toString());
 
-				log.log(Level.INFO, msg);
-			}
+			log.log(Level.INFO, msg);
+
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.log(Level.FINEST, e.toString());
+			String msg = String.format("Fail to sent scheduled survey for %s, survey name: %s, scheduled time: %s",
+					config.getWorkplace().getName(), config.getSurvey().getName(), config.getScheduleTime());
+
+			log.log(Level.INFO, msg);
 		}
 	}
-	
+
 }

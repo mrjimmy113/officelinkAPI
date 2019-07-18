@@ -5,13 +5,8 @@
  */
 package com.fpt.officelink.service;
 
-import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Location;
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.entity.Workplace;
-import com.fpt.officelink.repository.DepartmentRepository;
-import com.fpt.officelink.repository.LocationRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 
@@ -127,7 +123,7 @@ public class LocationServiceImpl implements LocationService {
 
 	@Override
 	public List<Location> getByDepartmentId(int id) {
-		return locationRep.findAllByDepartmentId(id);
+		return new ArrayList<Location>(locationRep.findAllByDepartmentId(id));
 	}
 
 }

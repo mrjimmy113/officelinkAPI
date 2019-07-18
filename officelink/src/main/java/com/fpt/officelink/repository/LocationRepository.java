@@ -7,8 +7,8 @@ package com.fpt.officelink.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-import com.fpt.officelink.entity.Team;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,8 +49,11 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     		+ "JOIN Account a ON l.id = a.location.id "
     		+ "JOIN a.teams t "
     		+ "WHERE t.department.id = :id")
-	List<Location> findAllByDepartmentId(@Param("id") Integer id);
+	Set<Location> findAllByDepartmentId(@Param("id") Integer id);
     
     List<Location> findAllByWorkplaceIdAndIsDeleted(int workplaceId, boolean isDeleted); 
+    
+    @Query("SELECT COUNT(l) FROM Location l WHERE l.workplace.id = :id")
+    int countByWorkplaceId(@Param("id") Integer id);
     
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.transaction.Transactional;
 
@@ -23,16 +24,12 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.AnswerReportDTO;
-import com.fpt.officelink.dto.DepartmentDTO;
-import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
-import com.fpt.officelink.dto.SurveySendDetailDTO;
-import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
@@ -129,7 +126,6 @@ public class SurveyServiceImpl implements SurveyService {
 	public void updateSurvey(Survey survey, List<SurveyQuestion> sqList) {
 		survey.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		surveyRep.save(survey);
-		System.out.println("delete");
 		surQuestRep.deleteBySurveyId(survey.getId());
 		sqList.forEach(sq -> {
 			Question q = sq.getQuestion();
@@ -234,27 +230,36 @@ public class SurveyServiceImpl implements SurveyService {
 			SurveySendTarget targetEntity = new SurveySendTarget();
 			targetEntity.setSurvey(survey);
 			sendInfor.getTargetList().forEach(e -> {
-				Location location = new Location();
-				Department department = new Department();
-				Team team = new Team();
+				Location location = null;
+				Department department = null;
+				Team team  = null;
 				if (e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
 				} else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByDepartmentId(e.getDepartmentId(), workplaceId, false));
+					department = new Department();
 					department.setId(e.getDepartmentId());
+					
 				} else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
+					location = new Location();
 					location.setId(e.getLocationId());
 				} else if (!e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(e.getDepartmentId(),
 							e.getLocationId(), workplaceId, false));
+					location = new Location();
+					department = new Department();
 					department.setId(e.getDepartmentId());
 					location.setId(e.getLocationId());
 				} else if (!e.getTeamId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByTeamId(e.getTeamId(), workplaceId, false));
+					team = new Team();
+					location = new Location();
+					department = new Department();
 					department.setId(e.getDepartmentId());
 					location.setId(e.getLocationId());
 					team.setId(e.getTeamId());
+					
 				}
 				targetEntity.setLocation(location);
 				targetEntity.setDepartment(department);
@@ -276,6 +281,65 @@ public class SurveyServiceImpl implements SurveyService {
 
 		}
 
+	}
+	
+	@Override
+	public void sendRoutineSurvey(int surveyId, int duration) throws JOSEException {
+		Optional<Survey> survey = surveyRep.findById(surveyId);
+		if(survey.isPresent()) {
+			Survey newSurvey = survey.get();
+			List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
+			int workplaceId = newSurvey.getWorkplace().getId();
+			newSurvey.setTemplateId(surveyId);
+			newSurvey.setId(null);
+			newSurvey.setConfigurations(null);
+			newSurvey.setActive(true);
+			Calendar c = Calendar.getInstance();
+			Date date = new Date(c.getTimeInMillis());
+			newSurvey.setName(newSurvey.getName() +" " + date.toString());
+			List<SurveyQuestion> surQuests = surQuestRep.findAllBySurveyId(surveyId);
+			surQuests.forEach(e -> {
+				e.setId(null);
+				e.setSurvey(newSurvey);
+			});
+			surQuestRep.saveAll(surQuests);
+			newSurvey.setSurveyQuestions(new HashSet<SurveyQuestion>(surQuests));
+			newSurvey.setDateSendOut(date);
+			c.add(Calendar.DATE, duration);
+			newSurvey.setDateStop(new Date(c.getTimeInMillis()));
+			
+			Set<Account> sendList = new HashSet<Account>();
+			for (SurveySendTarget target : targets) {
+				if(target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
+					break;
+				}else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
+							target.getDepartment().getId(), workplaceId, false));
+					continue;
+				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() != null) {
+					sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
+					continue;
+				}
+				
+			}
+			newSurvey.setSentOut(sendList.size());
+			surveyRep.save(newSurvey);
+			String token = jwtSer.createSurveyToken(newSurvey.getId());
+			List<String> emailList = new ArrayList<String>();
+			sendList.forEach(e -> {
+				emailList.add(e.getEmail());
+			});
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("link", "http://localhost:4200/take/" + token);
+			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
+		}
 	}
 
 	@Override
@@ -323,7 +387,8 @@ public class SurveyServiceImpl implements SurveyService {
 		if (survey.isPresent()) {
 			BeanUtils.copyProperties(survey.get(), result);
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
-			result.setQuestions(getQuestionReports(sqList));
+			Function<Integer, List<Answer>> method = indentity -> answerRep.findAllByIndentity(indentity);
+			result.setQuestions(getQuestionReports(sqList,method));
 		}
 
 		return result;
@@ -335,74 +400,62 @@ public class SurveyServiceImpl implements SurveyService {
 		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
 	}
 
-	public SurveySendDetailDTO getSendDetail(int surveyId) {
-		SurveySendDetailDTO result = new SurveySendDetailDTO();
-		List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
-		List<LocationDTO> locations = new ArrayList<LocationDTO>();
-		List<DepartmentDTO> departments = new ArrayList<DepartmentDTO>();
-		List<TeamDTO> teams = new ArrayList<TeamDTO>();
-		Optional<Account> currentLogin = accRep.findByEmail(getUserContext().getUsername());
-		
-		if (currentLogin.isPresent()) {
-			Account currentAcc = currentLogin.get();
-			for (SurveySendTarget e : targets) {
-				//Check team
-				boolean isFound = false;
-				if (e.getTeam() != null) {
-					for (Team t : currentAcc.getTeams()) {
-						if (e.getTeam().getId().equals(t.getId())) {
-							TeamDTO teamDTO = new TeamDTO();
-							BeanUtils.copyProperties(e.getTeam(), teamDTO);
-							teams.add(teamDTO);
-							isFound = true;
-							break;
-						}
-						if(e.getDepartment().getId().equals(t.getDepartment().getId())) {
-							DepartmentDTO departmentDTO = new DepartmentDTO();
-							BeanUtils.copyProperties(e.getDepartment(), departmentDTO);
-							departments.add(departmentDTO);
-							isFound = true;
-							break;
-						}
-					}
-				}
-				if(isFound) continue;
-				
-				if(e.getLocation() != null) {
-					if(e.getLocation().getId().equals(currentAcc.getLocation().getId())) {
-						LocationDTO locationDTO = new LocationDTO();
-						BeanUtils.copyProperties(e.getLocation(), locationDTO);
-						locations.add(locationDTO);
-						continue;
-					}
-				}
-
-			}
-		}
-		return result;
-	}
-
+	
 	@Override
 	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
 		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
-		int workplaceId = getUserContext().getWorkplaceId();
-		if (locationId == 0 && departmentId == 0) {
-			result = getQuestionReports(surQuestRep.findAllBySurveyId(surveyId));
-		} else if (locationId != 0 && departmentId == 0) {
-			result = getQuestionReports(surQuestRep.findAllByLocationId(locationId, workplaceId, surveyId));
-		} else if (locationId == 0 && departmentId != 0) {
-			result = getQuestionReports(surQuestRep.findAllByDepartmentId(departmentId, workplaceId, surveyId));
-		} else if (locationId != 0 && departmentId != 0) {
-			result = getQuestionReports(
-					surQuestRep.findAllByLocationIdAndDepartmentId(departmentId, locationId, workplaceId, surveyId));
-		} else if (teamId != 0) {
-			result = getQuestionReports(surQuestRep.findAllByTeamId(teamId, workplaceId, surveyId));
+		List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
+		Function<Integer, List<Answer>> method = null;
+		if (locationId == 0 && departmentId == 0 && teamId == 0) {
+			method = indentity -> answerRep.findAllByIndentity(indentity);
+			System.out.println("ALL");
+		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
+			method = indentity -> answerRep.findAllByIndentityAndLocationId(indentity, locationId);
+			System.out.println("Location");
+		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
+			method = indentity -> answerRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
+			System.out.println("Department");
+		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
+			method = indentity -> answerRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId, departmentId);
+			System.out.println("Location - Department");
+		} else if (locationId != 0 && departmentId != 0 && teamId != 0) {
+			method = indentity -> answerRep.findAllByIndentityAndTeamId(indentity, teamId);
+			System.out.println("Team");
 		}
+		result = getQuestionReports(sqList,method);
+		
 		return result;
+	}
+	
+	@Override
+	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId) {
+		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		
+		Question question = questionRep.findById(questionId).get();
+		List<Answer> answers = answerRep.findAllBySurveyIdAndQuestionId(surveyId, questionId);
+		switch (question.getType().getType()) {
+		case MULTIPLE:
+			result = getMutipleChoiceReport(answers);
+			break;
+		case SINGLE:
+			result = getSingleChoiceReport(answers);
+			break;
+		case TEXT:
+			result = getFreeTextReport(answers);
+			break;
+		}
+		
+		
+		return result;
+	}
+	
+	@Override
+	public List<Survey> getSurveyByQuestionId(int id) {
+		return surveyRep.findAllByQuestionId(id);
 	}
 
 	// Report: Output
-	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList) {
+	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList, Function<Integer, List<Answer>> loadAnswer) {
 		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
 		sqList.forEach(sq -> {
 			QuestionReportDTO qr = new QuestionReportDTO();
@@ -424,15 +477,16 @@ public class SurveyServiceImpl implements SurveyService {
 			qr.setQuestion(dto);
 			// Get each question report
 			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
+			List<Answer> answers = loadAnswer.apply(sq.getId());
 			switch (sq.getQuestion().getType().getType()) {
 			case MULTIPLE:
-				arList = getMutipleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				arList = getMutipleChoiceReport(answers);
 				break;
 			case SINGLE:
-				arList = getSingleChoiceReport(new ArrayList<Answer>(sq.getAnswers()));
+				arList = getSingleChoiceReport(answers);
 				break;
 			case TEXT:
-				arList = getFreeTextReport(new ArrayList<Answer>(sq.getAnswers()));
+				arList = getFreeTextReport(answers);
 				break;
 
 			}
