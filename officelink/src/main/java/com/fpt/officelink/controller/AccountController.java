@@ -74,7 +74,7 @@ public class AccountController {
         PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
         try{
-            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 0);
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(),2, 0);
 
             List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
 
@@ -179,7 +179,7 @@ public class AccountController {
         PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
         try{
-            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), page);
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 2,  page);
 
             List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
 

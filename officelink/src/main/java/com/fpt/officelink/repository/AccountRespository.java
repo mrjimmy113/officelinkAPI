@@ -21,11 +21,12 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 
     Page<Account> findAllByFirstnameContainingAndIsDeleted(String firstname , Boolean isDeleted , Pageable pageable);
 
-    @Query("SELECT t FROM Account t WHERE t.firstname LIKE %:firstName% AND t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
-    Page<Account> findAllByFirstnameAndWorkplace(
+    @Query("SELECT t FROM Account t WHERE t.firstname LIKE %:firstName% AND t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId AND t.role.id = :roleId")
+    Page<Account> findAllByFirstnameAndWorkplaceAndRole(
             @Param("firstName") String firstName,
             @Param("workplaceId") Integer workplaceId,
             @Param("isDeleted") Boolean isDeleted,
+    		@Param("roleId") Integer roleId,
     Pageable pageable);
 
 	Optional<Account> findAccountByEmail(String email);
