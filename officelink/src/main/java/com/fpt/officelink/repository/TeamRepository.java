@@ -43,7 +43,12 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 
 	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :id")
 	List<Team> findAllByLocationId(@Param("id") Integer id);
+	
+	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :locationId AND t.department.id = :depId")
+	List<Team> findAllByLocationIdAndDepartmentId(@Param("locationId") Integer locationId,@Param("depId") Integer depId);
 
+	@Query("SELECT COUNT(t) FROM Team t WHERE t.department.workplace.id = :id AND t.isDeleted = false")
+	int countByWorkplaceId(@Param("id") Integer id);
 
 
 }

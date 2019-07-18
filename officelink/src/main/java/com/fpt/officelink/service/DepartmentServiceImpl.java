@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +86,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 	
 	@Override
 	public List<Department> getByLocationId(int id) {
-		return depRep.findAllByLocationId(id);
+		return new ArrayList<Department>(depRep.findAllByLocationId(id));
 	}
 
 }

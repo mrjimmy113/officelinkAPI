@@ -53,4 +53,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
     List<Account> findAllByWorkplaceId(
             @Param("workplaceId") Integer workplaceId,
             @Param("isDeleted") Boolean isDeleted);
+    
+    @Query("SELECT COUNT(a) FROM Account a WHERE a.workplace.id = :id AND a.isDeleted = false")
+    int countByWorkplaceId(@Param("id") Integer id);
 }

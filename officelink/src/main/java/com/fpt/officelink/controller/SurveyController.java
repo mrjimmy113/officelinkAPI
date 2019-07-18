@@ -1,9 +1,7 @@
 package com.fpt.officelink.controller;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.springframework.beans.BeanUtils;
@@ -128,7 +126,7 @@ public class SurveyController {
 				Question tmpQ = new Question();
 				SurveyQuestion tmpSQ = new SurveyQuestion();
 				tmpSQ.setQuestionIndex(q.getQuestionIndex());
-				Set<AnswerOption> options = new HashSet<AnswerOption>();
+				List<AnswerOption> options = new ArrayList<AnswerOption>();
 				if (q.getOptions() != null) {
 					q.getOptions().forEach(o -> {
 						AnswerOption tmpOp = new AnswerOption();
@@ -166,7 +164,7 @@ public class SurveyController {
 				Question tmpQ = new Question();
 				SurveyQuestion tmpSQ = new SurveyQuestion();
 				tmpSQ.setQuestionIndex(q.getQuestionIndex());
-				Set<AnswerOption> options = new HashSet<AnswerOption>();
+				List<AnswerOption> options = new ArrayList<AnswerOption>();
 				if (q.getOptions() != null) {
 					q.getOptions().forEach(o -> {
 						AnswerOption tmpOp = new AnswerOption();
