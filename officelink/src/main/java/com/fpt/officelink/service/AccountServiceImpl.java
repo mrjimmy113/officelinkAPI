@@ -271,8 +271,8 @@ import com.nimbusds.jose.JOSEException;
     }
 
     @Override
-    public Account getAccountAssign(String email) {
-        Account account = accountRespository.findAllByEmail(email);
+    public Account getAccountAssign(Integer id) {
+        Account account = accountRespository.findById(id).get();
         if(account != null){
 
         }
