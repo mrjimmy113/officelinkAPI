@@ -19,6 +19,7 @@ public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, 
 	@Query("SELECT sq FROM SurveyQuestion sq WHERE sq.survey.id = :id ORDER BY questionIndex ASC")
 	List<SurveyQuestion> findAllBySurveyId(@Param("id") Integer id);
 	
-	@Query("SELECT a.surveyQuestion FROM Answer a JOIN a.account.teams t WHERE t.id = :id AND a.surveyQuestion.survey.id = :surveyId")
-	List<SurveyQuestion> findAllByTeamIdOnly(@Param("id") Integer id, @Param("surveyId") Integer surveyId);
+	@Query("SELECT sq FROM SurveyQuestion sq WHERE sq.survey.id = :surId AND sq.question.id = :questId")
+	SurveyQuestion findBySurveyIdAndQuestionId(@Param("surId") Integer surId, @Param("questId") Integer questId);
+	
 }

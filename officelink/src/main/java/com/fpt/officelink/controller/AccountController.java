@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +43,10 @@ import com.fpt.officelink.service.JwtService;
 public class AccountController {
 
     private CustomUser user;
+    
+    
+    @Value("${angular.path}")
+    private String angularPath;
 
     private CustomUser getUserContext() {
         return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -227,7 +234,7 @@ public class AccountController {
                 Integer role_id = dto.getRole_id();
 
                 token = jwt.createTokenWithAccount(dto);
-                model.put("link", "http://localhost:4200/confirm/" + token);
+                model.put("link", angularPath+"/confirm/" + token);
 
                 mailService.sendMail(listEmail.toArray(new String[listEmail.size()]),"email-temp.ftl", model);
 

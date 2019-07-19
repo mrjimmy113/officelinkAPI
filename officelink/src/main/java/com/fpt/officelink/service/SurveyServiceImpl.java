@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -93,11 +94,8 @@ public class SurveyServiceImpl implements SurveyService {
 	@Autowired
 	SurveySendTargetRepository targetRep;
 	
-	@Autowired
-	TeamQuestionReportRepository reportRep;
-	
-	@Autowired
-	AnswerReportRepository answerReportRep;
+	@Value("${angular.path}")
+    private String angularPath;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -192,6 +190,8 @@ public class SurveyServiceImpl implements SurveyService {
 			Integer id = jwtSer.getSurveyId(token);
 			Optional<Survey> survey = surveyRep.findById(id);
 			if (survey.isPresent()) {
+				if (checkIfUserTakeSurvey(id))
+					return result;
 				result = new SurveyDTO();
 				BeanUtils.copyProperties(survey.get(), result);
 				List<SurveyQuestion> questions = surQuestRep.findAllBySurveyId(id);
@@ -242,14 +242,14 @@ public class SurveyServiceImpl implements SurveyService {
 			sendInfor.getTargetList().forEach(e -> {
 				Location location = null;
 				Department department = null;
-				Team team  = null;
+				Team team = null;
 				if (e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
 				} else if (!e.getDepartmentId().equals(0) && e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByDepartmentId(e.getDepartmentId(), workplaceId, false));
 					department = new Department();
 					department.setId(e.getDepartmentId());
-					
+
 				} else if (e.getDepartmentId().equals(0) && !e.getLocationId().equals(0)) {
 					sendList.addAll(accRep.findAllEmailByLocationId(e.getLocationId(), workplaceId, false));
 					location = new Location();
@@ -269,7 +269,7 @@ public class SurveyServiceImpl implements SurveyService {
 					department.setId(e.getDepartmentId());
 					location.setId(e.getLocationId());
 					team.setId(e.getTeamId());
-					
+
 				}
 				targetEntity.setLocation(location);
 				targetEntity.setDepartment(department);
@@ -284,7 +284,7 @@ public class SurveyServiceImpl implements SurveyService {
 			});
 			survey.setSentOut(emailList.size());
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("link", "http://localhost:4200/take/" + token);
+			model.put("link", angularPath+"/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 			surveyRep.save(survey);
 			targetRep.saveAll(sendTargets);
@@ -292,76 +292,88 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 
 	}
-	
+
+	@Transactional(rollbackOn = Exception.class)
 	@Override
 	public void sendRoutineSurvey(int surveyId, int duration) throws JOSEException {
+
 		Optional<Survey> survey = surveyRep.findById(surveyId);
-		if(survey.isPresent()) {
-			Survey newSurvey = survey.get();
-			List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
-			int workplaceId = newSurvey.getWorkplace().getId();
-			newSurvey.setTemplateId(surveyId);
-			newSurvey.setId(null);
-			newSurvey.setConfigurations(null);
-			newSurvey.setActive(true);
+		if (survey.isPresent()) {
+			Survey templateSurvey = survey.get();
+			Survey newSurvey = new Survey();
+			//Set Information for Duplicate Survey
 			Calendar c = Calendar.getInstance();
 			Date date = new Date(c.getTimeInMillis());
-			newSurvey.setName(newSurvey.getName() +" " + date.toString());
-			List<SurveyQuestion> surQuests = surQuestRep.findAllBySurveyId(surveyId);
-			surQuests.forEach(e -> {
-				e.setId(null);
-				e.setSurvey(newSurvey);
-			});
-			surQuestRep.saveAll(surQuests);
-			newSurvey.setSurveyQuestions(new HashSet<SurveyQuestion>(surQuests));
+			newSurvey.setName(templateSurvey.getName() + " " + date.toString());
+			newSurvey.setDateCreated(date);
 			newSurvey.setDateSendOut(date);
 			c.add(Calendar.DATE, duration);
 			newSurvey.setDateStop(new Date(c.getTimeInMillis()));
+			newSurvey.setDeleted(false);
+			newSurvey.setActive(true);
+			newSurvey.setReceivedAnswer(0);
+			newSurvey.setWorkplace(templateSurvey.getWorkplace());
+			newSurvey.setTemplateId(templateSurvey.getId());
+			List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
+			int workplaceId = templateSurvey.getWorkplace().getId();
 			
+			//Find Target
 			Set<Account> sendList = new HashSet<Account>();
 			for (SurveySendTarget target : targets) {
-				if(target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
+				if (target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
 					sendList.addAll(accRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false));
 					break;
-				}else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
-					sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
+				} else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(
+							accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
 					continue;
-				}else if(target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
+				} else if (target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
 					sendList.addAll(accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
 					continue;
-				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
+				} else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
 					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
 							target.getDepartment().getId(), workplaceId, false));
 					continue;
-				}else if(target.getDepartment() != null && target.getLocation() != null && target.getTeam() != null) {
+				} else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() != null) {
 					sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
 					continue;
 				}
-				
+
 			}
 			newSurvey.setSentOut(sendList.size());
 			surveyRep.save(newSurvey);
+			List<SurveyQuestion> surQuests = surQuestRep.findAllBySurveyId(surveyId);
+			List<SurveyQuestion> newSurQuests = new ArrayList<SurveyQuestion>();
+			surQuests.forEach(e -> {
+				SurveyQuestion tmp = new SurveyQuestion();
+				tmp.setQuestion(e.getQuestion());
+				tmp.setQuestionIndex(e.getQuestionIndex());
+				tmp.setSurvey(newSurvey);
+				newSurQuests.add(tmp);
+			});
+			surQuestRep.saveAll(newSurQuests);
+
 			String token = jwtSer.createSurveyToken(newSurvey.getId());
 			List<String> emailList = new ArrayList<String>();
 			sendList.forEach(e -> {
 				emailList.add(e.getEmail());
 			});
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("link", "http://localhost:4200/take/" + token);
+			model.put("link", angularPath+"/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 		}
+
 	}
 
 	@Override
-	public boolean checkIfUserTakeSurvey() {
+	public boolean checkIfUserTakeSurvey(Integer surveyId) {
 		boolean isTake = false;
 		Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
-		int result = answerRep.countAnswerByAccountId(acc.getId());
+		int result = answerRep.countAnswerByAccountId(acc.getId(), surveyId);
 
 		if (result > 0) {
 			isTake = true;
 		}
-		System.out.println(isTake);
 		return isTake;
 	}
 
@@ -398,7 +410,7 @@ public class SurveyServiceImpl implements SurveyService {
 			BeanUtils.copyProperties(survey.get(), result);
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
 			Function<Integer, List<Answer>> method = indentity -> answerRep.findAllByIndentity(indentity);
-			result.setQuestions(getQuestionReports(sqList,method));
+			result.setQuestions(getQuestionReports(sqList, method));
 		}
 
 		return result;
@@ -410,11 +422,16 @@ public class SurveyServiceImpl implements SurveyService {
 		return surveyRep.findAllByWorkplaceAndIsDeleted(workplaceId, false);
 	}
 
-	
 	@Override
 	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
 		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
 		List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
+		Function<Integer, List<Answer>> method = getAnswerFunction(locationId, departmentId, teamId);
+		result = getQuestionReports(sqList, method);
+		return result;
+	}
+
+	private Function<Integer, List<Answer>> getAnswerFunction(int locationId, int departmentId, int teamId) {
 		Function<Integer, List<Answer>> method = null;
 		if (locationId == 0 && departmentId == 0 && teamId == 0) {
 			method = indentity -> answerRep.findAllByIndentity(indentity);
@@ -426,24 +443,24 @@ public class SurveyServiceImpl implements SurveyService {
 			method = indentity -> answerRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
 			System.out.println("Department");
 		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = indentity -> answerRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId, departmentId);
+			method = indentity -> answerRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
+					departmentId);
 			System.out.println("Location - Department");
-		} else if (locationId != 0 && departmentId != 0 && teamId != 0) {
+		} else if (teamId != 0) {
 			method = indentity -> answerRep.findAllByIndentityAndTeamId(indentity, teamId);
 			System.out.println("Team");
 		}
-		result = getQuestionReports(sqList,method);
-		
-		return result;
+		return method;
 	}
-	
+
 	@Override
-	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId) {
+	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
+			int teamId) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		
-		Question question = questionRep.findById(questionId).get();
-		List<Answer> answers = answerRep.findAllBySurveyIdAndQuestionId(surveyId, questionId);
-		switch (question.getType().getType()) {
+		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+		Function<Integer, List<Answer>> method = getAnswerFunction(locationId, departmentId, teamId);
+		List<Answer> answers = method.apply(surveyQuestion.getId());
+		switch (surveyQuestion.getQuestion().getType().getType()) {
 		case MULTIPLE:
 			result = getMutipleChoiceReport(answers);
 			break;
@@ -454,18 +471,20 @@ public class SurveyServiceImpl implements SurveyService {
 			result = getFreeTextReport(answers);
 			break;
 		}
-		
-		
+
 		return result;
 	}
-	
+
 	@Override
-	public List<Survey> getSurveyByQuestionId(int id) {
-		return surveyRep.findAllByQuestionId(id);
+	public List<Survey> getSurveyByQuestionId(int id, int notId) {
+		List<Integer> notIdList = new ArrayList<Integer>();
+		notIdList.add(notId);
+		return surveyRep.findAllByQuestionId(id, notIdList);
 	}
 
 	// Report: Output
-	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList, Function<Integer, List<Answer>> loadAnswer) {
+	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList,
+			Function<Integer, List<Answer>> loadAnswer) {
 		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
 		sqList.forEach(sq -> {
 			QuestionReportDTO qr = new QuestionReportDTO();

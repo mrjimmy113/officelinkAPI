@@ -195,7 +195,7 @@ public class AccountServiceImpl implements AccountService {
 			tokenList.add(jwtSer.createInviteToken(listEmail[i], getUserContext().getWorkplaceId()));
 		}
     	for (String token : tokenList) {
-    		model.put("link", "http://localhost:4200/join/" + token);
+    		model.put("link", "http://192.168.137.1:3000/join/" + token);
     		String[] mail = new String[1];
     		mail[0] = jwtSer.getEmailFromToken(token);
     		System.out.println(jwtSer.getWorkplaceId(token));
@@ -206,6 +206,7 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     public AccountDTO getInvitationInfor(String token) throws ParseException {
+    	System.out.println("Hello");
     	AccountDTO dto = new AccountDTO();
     	dto.setEmail(jwtSer.getEmailFromToken(token));
     	WorkplaceDTO workplaceDTO = new WorkplaceDTO();
