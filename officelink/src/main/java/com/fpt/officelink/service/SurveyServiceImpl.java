@@ -322,17 +322,13 @@ public class SurveyServiceImpl implements SurveyService {
 				} else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
 					sendList.addAll(
 							accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
-					continue;
 				} else if (target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
 					sendList.addAll(accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
-					continue;
 				} else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
 					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
 							target.getDepartment().getId(), workplaceId, false));
-					continue;
 				} else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() != null) {
 					sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
-					continue;
 				}
 
 			}

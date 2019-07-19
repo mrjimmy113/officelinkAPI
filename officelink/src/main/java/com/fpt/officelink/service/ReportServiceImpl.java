@@ -91,34 +91,34 @@ public class ReportServiceImpl implements ReportService {
 		if (currentLogin.isPresent()) {
 			Account currentAcc = currentLogin.get();
 			boolean isAll = false;
-			if (targets.get(0).getDepartment() == null && targets.get(0).getLocation() == null
-					&& targets.get(0).getTeam() == null) {
-				isAll = true;
+			for (SurveySendTarget target : targets) {
+				if (target.getDepartment() == null && targets.get(0).getLocation() == null
+						&& targets.get(0).getTeam() == null) {
+					isAll = true;
+					break;
+				}
 			}
+			
 			if (!isAll) {
 				for (SurveySendTarget target : targets) {
 					if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
 						departments.add(target.getDepartment());
 						locations.addAll(locationRep.findAllByDepartmentId(target.getDepartment().getId()));
 						teams.addAll(teamRep.findAllByDepartmentId(target.getDepartment().getId()));
-						continue;
 					} else if (target.getDepartment() == null && target.getLocation() != null
 							&& target.getTeam() == null) {
 						locations.add(target.getLocation());
 						departments.addAll(depRep.findAllByLocationId(target.getLocation().getId()));
 						teams.addAll(teamRep.findAllByLocationId(target.getLocation().getId()));
-						continue;
 					} else if (target.getDepartment() != null && target.getLocation() != null
 							&& target.getTeam() == null) {
 						locations.add(target.getLocation());
 						departments.add(target.getDepartment());
 						teams.addAll(teamRep.findAllByLocationIdAndDepartmentId(target.getLocation().getId(),
 								target.getDepartment().getId()));
-						continue;
 					}else if (target.getDepartment() != null && target.getLocation() != null
 							&& target.getTeam() != null) {
 						teams.add(target.getTeam());
-						continue;
 					}
 					
 				}
