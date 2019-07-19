@@ -36,8 +36,6 @@ public interface SurveyService {
 
 	String getSurveyToken(Integer surveyId) throws JOSEException;
 
-	boolean checkIfUserTakeSurvey();
-
 	Page<Survey> searchReportWithPagination(String term, int pageNum);
 
 	void saveAnswer(SurveyAnswerInforDTO dto);
@@ -48,7 +46,10 @@ public interface SurveyService {
 
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
 
-	List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId);
 
-	List<Survey> getSurveyByQuestionId(int id);
+	List<Survey> getSurveyByQuestionId(int id, int notId);
+
+	List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId, int teamId);
+
+	boolean checkIfUserTakeSurvey(Integer surveyId);
 }

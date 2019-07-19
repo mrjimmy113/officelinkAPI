@@ -239,8 +239,9 @@ public class SurveyController {
 		HttpStatus status = null;
 		SurveyDTO res = null;
 		try {
-			if(!ser.checkIfUserTakeSurvey()) {
-				res = ser.getTakeSurvey(token);
+			res = ser.getTakeSurvey(token);
+			if(res != null) {
+				
 				status = HttpStatus.OK;
 			}else {
 				status = HttpStatus.ACCEPTED;

@@ -21,7 +21,10 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
 			boolean isDeleted, boolean isActive, Pageable pageable);
 
-	@Query("SELECT s FROM Survey s JOIN s.surveyQuestions q WHERE q.question.id = :id")
-	List<Survey> findAllByQuestionId(@Param("id") Integer id);
+	@Query("SELECT s FROM Survey s JOIN s.surveyQuestions q WHERE q.question.id = :id AND s.id NOT IN (:notId) AND s.isActive = true")
+	List<Survey> findAllByQuestionId(@Param("id") Integer id,@Param("notId") List<Integer> notId);
+	
+	@Query("SELECT s FROM Survey s WHERE s.workplace.id = :id AND s.dateSendOut != null ORDER BY s.dateSendOut DESC")
+	Page<Survey> findTop5LastestSendOutSurvey(@Param("id") Integer workplaceId, Pageable pageable);
 	
 }

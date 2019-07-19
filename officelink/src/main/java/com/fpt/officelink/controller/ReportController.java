@@ -7,15 +7,18 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.AnswerReportDTO;
+import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.service.ReportService;
 import com.fpt.officelink.service.SurveyService;
@@ -29,6 +32,10 @@ public class ReportController {
 
 	@Autowired
 	SurveyService surSer;
+	
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
 
 	@GetMapping("/target")
 	public ResponseEntity<SurveySendDetailDTO> getTarget(@RequestParam("id") int surveyId) {
@@ -62,11 +69,12 @@ public class ReportController {
 	}
 
 	@GetMapping("/getSameSurvey")
-	public ResponseEntity<List<SurveyDTO>> getSurveyHasSameQuestion(@RequestParam("id") int id) {
+	public ResponseEntity<List<SurveyDTO>> getSurveyHasSameQuestion(@RequestParam("id") int id,
+			@RequestParam("notId") int notId) {
 		List<SurveyDTO> res = new ArrayList<SurveyDTO>();
 		HttpStatus status = null;
 		try {
-			List<Survey> result = surSer.getSurveyByQuestionId(id);
+			List<Survey> result = surSer.getSurveyByQuestionId(id, notId);
 
 			result.forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
@@ -80,19 +88,37 @@ public class ReportController {
 
 		return new ResponseEntity<List<SurveyDTO>>(res, status);
 	}
-	
+
 	@GetMapping("/getCompareQuestion")
-	public ResponseEntity<List<AnswerReportDTO>> getOneQuestionAnswerReportForCompare(@RequestParam("surveyId") int surveyId, @RequestParam("questionId") int questionId) {
+	public ResponseEntity<List<AnswerReportDTO>> getOneQuestionAnswerReportForCompare(
+			@RequestParam("surveyId") int surveyId, @RequestParam("questionId") int questionId,
+			@RequestParam("locationId") int locationId, @RequestParam("departmentId") int departmentId,
+			@RequestParam("teamId") int teamId) {
 		List<AnswerReportDTO> res = new ArrayList<AnswerReportDTO>();
 		HttpStatus status = null;
 		try {
-			res = surSer.getAnswerReport(surveyId, questionId);
-			
+			res = surSer.getAnswerReport(surveyId, questionId, locationId, departmentId, teamId);
+
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return new ResponseEntity<List<AnswerReportDTO>>(res, status);
+	}
+	
+	@GetMapping("/dashboard")
+	public ResponseEntity<DashBoardDTO> getDashBoard() {
+		DashBoardDTO res = new DashBoardDTO();
+		HttpStatus status = null;
+		try {
+			res = reportSer.getDashBoard(getUserContext().getWorkplaceId());
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
-		return new ResponseEntity<List<AnswerReportDTO>>(res,status);
+		return new ResponseEntity<DashBoardDTO>(res, status);
 	}
+	
 }

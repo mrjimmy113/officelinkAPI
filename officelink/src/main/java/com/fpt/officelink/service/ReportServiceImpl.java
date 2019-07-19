@@ -1,31 +1,42 @@
 package com.fpt.officelink.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.DepartmentDTO;
+import com.fpt.officelink.dto.ImageNewsDTO;
 import com.fpt.officelink.dto.LocationDTO;
+import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
 import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.News;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
+import com.fpt.officelink.repository.NewsRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamRepository;
@@ -50,6 +61,12 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired
 	SurveyRepository surRep;
+	
+	@Autowired
+	NewsRepository newsRep;
+	
+	@Autowired
+    ServletContext context;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -98,7 +115,12 @@ public class ReportServiceImpl implements ReportService {
 						teams.addAll(teamRep.findAllByLocationIdAndDepartmentId(target.getLocation().getId(),
 								target.getDepartment().getId()));
 						continue;
+					}else if (target.getDepartment() != null && target.getLocation() != null
+							&& target.getTeam() != null) {
+						teams.add(target.getTeam());
+						continue;
 					}
+					
 				}
 			}
 
@@ -190,8 +212,10 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public DashBoardDTO getDashBoard(Integer id) {
+	public DashBoardDTO getDashBoard(Integer id) throws IOException {
 		DashBoardDTO result = new DashBoardDTO();
+		PageRequest top5 = PageRequest.of(0, 5);
+		PageRequest top1 = PageRequest.of(0, 1);
 		result.setAccount(accRep.countByWorkplaceId(id));
 		result.setTeam(teamRep.countByWorkplaceId(id));
 		result.setDepartment(depRep.countDepartmentOnWorkplace(id));
@@ -203,6 +227,27 @@ public class ReportServiceImpl implements ReportService {
 			res.add(dto);
 		});
 		result.setLocation(res);
+		
+		List<News> newsList = newsRep.findLastestNews(id,top1).getContent();
+		System.out.print(newsList.size());
+		if(!newsList.isEmpty()) {
+			ImageNewsDTO dto = new ImageNewsDTO();
+	        BeanUtils.copyProperties(newsList.get(0), dto);
+	        String tmp = context.getRealPath("") + "image\\" + dto.getImage();
+	        Path byteImage = Paths.get(tmp);
+	        byte[] data = Files.readAllBytes(byteImage);
+	        dto.setByte_image(data);
+	        result.setNews(dto);
+		}
+        List<Survey> surveys = surRep.findTop5LastestSendOutSurvey(id,top5).getContent();
+        List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
+        for (Survey sur : surveys) {
+        	SurveyReportDTO dtoReport = new SurveyReportDTO();
+			BeanUtils.copyProperties(sur, dtoReport);
+			dtoList.add(dtoReport);
+		}
+        result.setReports(dtoList);
+     
 		return result;
 	}
 }
