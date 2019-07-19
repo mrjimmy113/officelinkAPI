@@ -5,14 +5,13 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.access.method.P;
 
 import com.fpt.officelink.entity.Answer;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
-	@Query("SELECT COUNT(a) FROM Answer a WHERE a.account.id = :id")
-	Integer countAnswerByAccountId(@Param("id") Integer id);
+	@Query("SELECT COUNT(a) FROM Answer a WHERE a.account.id = :id AND a.surveyQuestion.survey.id = :surveyId")
+	Integer countAnswerByAccountId(@Param("id") Integer id, @Param("surveyId") Integer surveyId);
 
 	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.id = :id")
 	List<Answer> findAllByIndentity(@Param("id") Integer id);

@@ -5,18 +5,11 @@
  */
 package com.fpt.officelink.service;
 
-import com.fpt.officelink.dto.ImageNewsDTO;
-import com.fpt.officelink.dto.NewsDTO;
-import com.fpt.officelink.entity.News;
-import com.fpt.officelink.repository.NewsRepository;
-import com.google.gson.Gson;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,17 +17,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
-import org.apache.commons.io.FilenameUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fpt.officelink.dto.ImageNewsDTO;
+import com.fpt.officelink.dto.NewsDTO;
+import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.News;
+import com.fpt.officelink.entity.Workplace;
+import com.fpt.officelink.repository.NewsRepository;
+import com.google.gson.Gson;
 
 /**
  *
@@ -48,6 +49,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Autowired
     NewsRepository newsRep;
+    
+    private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
 
     @Override
     public Optional<News> searchById(int id) {
@@ -63,6 +68,9 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public boolean addNews(News news) {
         try {
+        	Workplace workplace = new Workplace();
+        	workplace.setId(getUserContext().getWorkplaceId());
+        	news.setWorkplace(workplace);
             newsRep.save(news);
             return true;
         } catch (Exception e) {
@@ -73,7 +81,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public boolean editNews(News news) {
         try {
-            newsRep.save(news);
+        	
             return true;
         } catch (Exception e) {
             return false;

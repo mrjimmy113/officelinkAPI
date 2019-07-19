@@ -109,12 +109,14 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	public Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity) {
 		Set<WordCloud> details = new HashSet<WordCloud>();
 		Optional<WordCloudFilter> opFilter = filterRep.findById(id);
+		rawText = rawText.replaceAll("\\W^\\s", ""); 
 		rawText = rawText.toLowerCase();
 		String[] words = rawText.trim().split(" ");
 		if(opFilter.isPresent()) {
 			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());
 			boolean isFound;
 			for(int i = 0; i< words.length; i++) {
+				
 				if(words[i].trim() == "") {
 					continue;
 				}
