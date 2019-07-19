@@ -31,7 +31,7 @@ public class TeamQuestionReport implements Serializable{
 	@JoinColumn(name = "surveyQuestion_id", nullable = false)
 	private SurveyQuestion surveyQuestion;
 	
-	@OneToMany(mappedBy = "questionReport")
+	@OneToMany(mappedBy = "questionReport", cascade = CascadeType.ALL)
 	private List<AnswerReport> answerReports;
 
 	@ManyToOne

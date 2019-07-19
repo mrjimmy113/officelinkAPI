@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
-import java.util.Date;
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +22,9 @@ public class SystemTaskExecutor {
 	@Autowired
 	private SurveyService surveyService;
 	
+	@Autowired
+	private TeamReportService teamReportService;
+	
 	@Async
 	public void sentRoutineSurvey(Configuration config) {
 		try {
@@ -28,7 +32,7 @@ public class SystemTaskExecutor {
 			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
 
 			String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
-					config.getWorkplace().getName(), config.getSurvey().getName(), new Date().toString());
+					config.getWorkplace().getName(), config.getSurvey().getName(), new java.util.Date().toString());
 
 			log.log(Level.INFO, msg);
 
@@ -45,11 +49,11 @@ public class SystemTaskExecutor {
 	@Async
 	public void setSurveysExpired() {
 		// get list of active surveys with end date is to day or before
-		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date());
+		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date(Calendar.getInstance().getTimeInMillis()));
 		for (Survey survey : surveys) {
-			surveyService.generateTeamQuestionReport(survey.getId());
-			survey.setActive(false);
-			surveyService.updateStatus(survey);
+			teamReportService.generateTeamQuestionReport(survey.getId());
+//			survey.setActive(false);
+//			surveyService.updateStatus(survey);
 		}
 	}
 	

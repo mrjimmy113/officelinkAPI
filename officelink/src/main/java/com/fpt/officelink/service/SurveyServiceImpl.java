@@ -49,6 +49,7 @@ import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
+import com.fpt.officelink.repository.AnswerReportRepository;
 import com.fpt.officelink.repository.AnswerRepository;
 import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
@@ -94,6 +95,9 @@ public class SurveyServiceImpl implements SurveyService {
 	
 	@Autowired
 	TeamQuestionReportRepository reportRep;
+	
+	@Autowired
+	AnswerReportRepository answerReportRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -576,110 +580,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	// get all active survey with end date is today or before
 	@Override
-	public List<Survey> getActiveSurveyByDate(java.util.Date date) {
+	public List<Survey> getActiveSurveyByDate(Date date) {
 		List<Survey> result = surveyRep.findAllByDateStopAndIsActiveAndIsDeleted(date, true, false);
 
-		return result;
-	}
-
-	@Async
-	@Override
-	public void generateTeamQuestionReport(int surveyId) {
-		// get list of teams that this survey was send to
-		List<Team> teams = targetRep.getSurveyTeams(surveyId);
-
-		// Get survey question of each team
-		for (Team team : teams) {
-			TeamQuestionReport questionReport = new TeamQuestionReport();
-			List<SurveyQuestion> teamSurveyQuestions = surQuestRep.findAllByTeamIdOnly(team.getId(), surveyId);
-
-			// set team for report
-			for (SurveyQuestion sQuestion : teamSurveyQuestions) {
-				questionReport.setTeam(team);
-				questionReport.setSurveyQuestion(sQuestion);
-				
-				// get answer report
-				List<AnswerReport> arList = new ArrayList<AnswerReport>();
-				switch (sQuestion.getQuestion().getType().getType()) {
-				case MULTIPLE:
-					arList = generateMutipleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				case SINGLE:
-					arList = generateSingleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				case TEXT:
-					arList = generateFreeTextReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				}
-				
-				questionReport.setAnswerReports(arList);
-				reportRep.save(questionReport);
-			}
-		}
-	}
-
-	// Report: Free Text
-	private List<AnswerReport> generateFreeTextReport(List<Answer> answers) {
-		List<AnswerReport> result = new ArrayList<AnswerReport>();
-		boolean isFound;
-		for (Answer a : answers) {
-			for (WordCloud w : a.getWordClouds()) {
-				isFound = false;
-				for (AnswerReport r : result) {
-					if (r.getTerm().equalsIgnoreCase(w.getWord())) {
-						r.setWeight(r.getWeight() + w.getTimes());
-						isFound = true;
-						break;
-					}
-				}
-				if (!isFound) {
-					result.add(new AnswerReport(w.getWord(), w.getTimes()));
-				}
-
-			}
-
-		}
-		return result;
-	}
-
-	// Report: Single choice
-	private List<AnswerReport> generateSingleChoiceReport(List<Answer> answers) {
-		List<AnswerReport> result = new ArrayList<AnswerReport>();
-		boolean isFound;
-		for (Answer answer : answers) {
-			isFound = false;
-			for (AnswerReport ansReport : result) {
-				if (answer.getContent().equalsIgnoreCase(ansReport.getTerm())) {
-					ansReport.setWeight(ansReport.getWeight() + 1);
-					isFound = true;
-					break;
-				}
-			}
-			if (!isFound)
-				result.add(new AnswerReport(answer.getContent(), 1));
-		}
-		return result;
-	}
-
-	// Report: Mutiple Choice
-	private List<AnswerReport> generateMutipleChoiceReport(List<Answer> answers) {
-		List<AnswerReport> result = new ArrayList<AnswerReport>();
-		boolean isFound;
-		for (Answer answer : answers) {
-			String[] options = answer.getContent().split(",");
-			for (int i = 0; i < options.length; i++) {
-				isFound = false;
-				for (AnswerReport AnswerReport : result) {
-					if (options[i].equalsIgnoreCase(AnswerReport.getTerm())) {
-						AnswerReport.setWeight(AnswerReport.getWeight() + 1);
-						isFound = true;
-						break;
-					}
-				}
-				if (!isFound)
-					result.add(new AnswerReport(options[i], 1));
-			}
-		}
 		return result;
 	}
 

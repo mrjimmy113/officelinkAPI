@@ -1,6 +1,6 @@
 package com.fpt.officelink.repository;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
 			boolean isDeleted, boolean isActive, Pageable pageable);
 	
-	@Query("SELECT s FROM Survey s WHERE s.dateStop < :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")
+	@Query("SELECT s FROM Survey s WHERE s.dateStop <= :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")
 	List<Survey> findAllByDateStopAndIsActiveAndIsDeleted(Date date, boolean isActive, boolean isDeleted);
 
 	@Query("SELECT s FROM Survey s JOIN s.surveyQuestions q WHERE q.question.id = :id")

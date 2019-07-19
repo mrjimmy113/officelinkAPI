@@ -20,8 +20,4 @@ public interface SurveySendTargetRepository extends JpaRepository<SurveySendTarg
 	@Modifying
 	@Query("DELETE FROM SurveySendTarget s WHERE s.survey.id = :id")
 	void deleteBySurveyId(@Param("id") Integer id);
-
-	// retrieve list of team-ids that the given survey is sent to
-	@Query("SELECT s.team FROM SurveySendTarget s WHERE s.survey.id = : surveyId")
-	List<Team> getSurveyTeams(@Param("surveyId") Integer surveyId);
 }

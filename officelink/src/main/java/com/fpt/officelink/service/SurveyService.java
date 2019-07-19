@@ -1,7 +1,7 @@
 package com.fpt.officelink.service;
 
+import java.sql.Date;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -52,8 +52,6 @@ public interface SurveyService {
 	void updateStatus(Survey survey);
 	
 	List<Survey> getActiveSurveyByDate(Date date);
-
-	void generateTeamQuestionReport(int surveyId);
 
 	List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId);
 
