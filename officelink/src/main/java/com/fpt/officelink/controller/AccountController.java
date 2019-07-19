@@ -450,9 +450,11 @@ public class AccountController {
                 BeanUtils.copyProperties(acc, entity);
                 service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
                 status = HttpStatus.OK;
+            }else{
+                status = HttpStatus.CONFLICT;
             }
 
-    	    status = HttpStatus.CONFLICT;
+
 
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
