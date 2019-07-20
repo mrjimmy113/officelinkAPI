@@ -1,13 +1,10 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,22 +28,14 @@ public class TeamQuestionReport implements Serializable{
 	@JoinColumn(name = "surveyQuestion_id", nullable = false)
 	private SurveyQuestion surveyQuestion;
 	
-	@OneToMany(mappedBy = "questionReport", cascade = CascadeType.ALL)
-	private List<AnswerReport> answerReports;
+	@OneToMany(mappedBy = "teamQuestionReport", cascade = CascadeType.PERSIST)
+	private Set<AnswerReport> answerReports;
 
 	@ManyToOne
 	@JoinColumn(name = "team_id", nullable = false)
 	private Team team;
 
 	//Getter setter
-	public List<AnswerReport> getAnswerReports() {
-		return answerReports;
-	}
-
-	public void setAnswerReports(List<AnswerReport> answers) {
-		this.answerReports = answers;
-	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -63,6 +52,14 @@ public class TeamQuestionReport implements Serializable{
 		this.surveyQuestion = surveyQuestion;
 	}
 
+	public Set<AnswerReport> getAnswerReports() {
+		return answerReports;
+	}
+
+	public void setAnswerReports(Set<AnswerReport> answers) {
+		this.answerReports = answers;
+	}
+	
 	public Team getTeam() {
 		return team;
 	}

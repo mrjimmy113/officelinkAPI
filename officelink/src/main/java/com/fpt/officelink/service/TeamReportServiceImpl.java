@@ -18,55 +18,114 @@ import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.TeamQuestionReport;
 import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.repository.AnswerReportRepository;
+import com.fpt.officelink.repository.AnswerRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamQuestionReportRepository;
 import com.fpt.officelink.repository.TeamRepository;
 
+/**
+ * @author phduo
+ *
+ */
 @Service
 public class TeamReportServiceImpl implements TeamReportService {
 
 	@Autowired
 	SurveyRepository surRep;
-	
+
 	@Autowired
 	SurveySendTargetRepository targetRep;
-	
+
 	@Autowired
 	SurveyQuestionRepository surQuestRep;
-	
+
+	@Autowired
+	AnswerRepository answerRep;
+
 	@Autowired
 	TeamQuestionReportRepository teamQuestionReportRep;
-	
+
 	@Autowired
 	AnswerReportRepository answerReportRep;
-	
+
 	@Autowired
 	TeamRepository teamRep;
-	
+
+	/**
+	  Generate a TeamQuestionReport entity for a survey
+	 */
 	@Async
 	@Override
 	public void generateTeamQuestionReport(int surveyId) {
-		// get list of teams that this survey was send to
+		// get all the team the survey was sent to
+		Set<Team> teams = this.getTeamsSent(surveyId);
+		
+		// Get the list of survey-questions
+		List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
+		
+		for (Team team : teams) {
+			for (SurveyQuestion sQuestion : surveyQuestions) {
+				// init a team question report
+				TeamQuestionReport questionReport = new TeamQuestionReport();
+				questionReport.setTeam(team);
+				questionReport.setSurveyQuestion(sQuestion);
+
+				List<AnswerReport> arList = new ArrayList<AnswerReport>();
+				// get team's answer of survey question
+				List<Answer> answers = answerRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+				// get team's answer report
+				switch (sQuestion.getQuestion().getType().getType()) {
+				case MULTIPLE:
+					arList = generateMutipleChoiceReport(answers);
+					break;
+				case SINGLE:
+					arList = generateSingleChoiceReport(answers);
+					break;
+				case TEXT:
+					arList = generateFreeTextReport(answers);
+					break;
+				}
+				
+				// Save report
+				questionReport.setAnswerReports(new HashSet<AnswerReport>(arList));
+				teamQuestionReportRep.save(questionReport);
+			}
+		}
+	}
+
+	/**
+	 * Get list of teams that a survey was sent to
+	 * @param surveyId
+	 * @return list of teams
+	 */
+	private Set<Team> getTeamsSent(int surveyId) {
+		Set<Team> teams = new HashSet<Team>();
+		
+		// find the survey
 		Survey survey = surRep.findById(surveyId).get();
+
+		// Find the survey target
 		List<SurveySendTarget> targets = null;
+
 		if (survey.getTemplateId() != 0) {
 			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
 		} else {
 			targets = targetRep.findAllBySurveyId(surveyId);
 		}
-		
-		Set<Team> teams = new HashSet<Team>();
+
+		// if the survey was sent to the whole company
 		boolean isAll = false;
 		if (targets.get(0).getDepartment() == null && targets.get(0).getLocation() == null
 				&& targets.get(0).getTeam() == null) {
 			isAll = true;
 		}
-		
+
+		// get all team in company if the above flag is true
 		if (isAll) {
 			teams.addAll(teamRep.findAllByWorkplaceId(survey.getWorkplace().getId(), false));
-		} else {
+		} else { // get all respective teams if isAll flag is false
 			for (SurveySendTarget target : targets) {
 				// department is present
 				if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
@@ -77,7 +136,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 				else if (target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
 					teams.addAll(teamRep.findAllByLocationId(target.getLocation().getId()));
 					continue;
-				} 
+				}
 				// department and location is present
 				else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
 					teams.addAll(teamRep.findAllByLocationIdAndDepartmentId(target.getLocation().getId(),
@@ -91,44 +150,11 @@ public class TeamReportServiceImpl implements TeamReportService {
 				}
 			}
 		}
-
-		// Get survey question of each team
-		List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
-		for (Team team : teams) {
-			TeamQuestionReport questionReport = new TeamQuestionReport();
-
-			// set team for report
-			for (SurveyQuestion sQuestion : surveyQuestions) {
-				questionReport.setTeam(team);
-				questionReport.setSurveyQuestion(sQuestion);
-				
-				// get answer report
-				List<AnswerReport> arList = new ArrayList<AnswerReport>();
-				switch (sQuestion.getQuestion().getType().getType()) {
-				case MULTIPLE:
-					arList = generateMutipleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				case SINGLE:
-					arList = generateSingleChoiceReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				case TEXT:
-					arList = generateFreeTextReport(new ArrayList<Answer>(sQuestion.getAnswers()));
-					break;
-				}
-				
-				teamQuestionReportRep.save(questionReport);
-				
-				for (AnswerReport answerReport : arList) {
-					answerReport.setQuestionReport(questionReport);
-				}
-				
-				questionReport.setAnswerReports(arList);
-				teamQuestionReportRep.save(questionReport);
-			}
-		}
+		
+		return teams;
 	}
+
 	
-	// Report: Free Text
 	private List<AnswerReport> generateFreeTextReport(List<Answer> answers) {
 		List<AnswerReport> result = new ArrayList<AnswerReport>();
 		boolean isFound;
@@ -171,6 +197,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 		return result;
 	}
 
+	
 	// Report: Mutiple Choice
 	private List<AnswerReport> generateMutipleChoiceReport(List<Answer> answers) {
 		List<AnswerReport> result = new ArrayList<AnswerReport>();

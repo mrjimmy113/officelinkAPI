@@ -592,9 +592,10 @@ public class SurveyServiceImpl implements SurveyService {
 
 	// change active status of a survey to false
 	@Override
-	public void updateStatus(Survey survey) {
+	public Survey updateStatus(Survey survey) {
 		survey.setActive(false);
-		surveyRep.save(survey);
+		
+		return surveyRep.save(survey);
 	}
 
 	// get all active survey with end date is today or before

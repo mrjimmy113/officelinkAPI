@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,16 +46,27 @@ public class SystemTaskExecutor {
 		}
 	}
 	
-	// set surveys active status and generate report for that team
+
+	/**
+	 * set surveys active status and generate report for teams
+	 */
 	@Async
-	public void setSurveysExpired() {
+	public List<Survey> generateReportDaily() {
 		// get list of active surveys with end date is to day or before
 		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date(Calendar.getInstance().getTimeInMillis()));
+		if (surveys.isEmpty()) {
+			return null;
+		}
+		
+		List<Survey> successSurveys = new ArrayList<Survey>();
+		
 		for (Survey survey : surveys) {
 			teamReportService.generateTeamQuestionReport(survey.getId());
-//			survey.setActive(false);
-//			surveyService.updateStatus(survey);
+			//update active status
+			successSurveys.add(surveyService.updateStatus(survey));
 		}
+		
+		return successSurveys;
 	}
 	
 }

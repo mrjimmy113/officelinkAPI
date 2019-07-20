@@ -47,7 +47,7 @@ public interface SurveyService {
 
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
 	
-	void updateStatus(Survey survey);
+	Survey updateStatus(Survey survey);
 	
 	List<Survey> getActiveSurveyByDate(Date date);
 
