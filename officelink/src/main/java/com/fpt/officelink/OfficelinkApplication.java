@@ -23,12 +23,12 @@ public class OfficelinkApplication {
 	
 	@Autowired
 	SystemTaskExecutor executor;
-	
-	public static void main(String[] args) {
-		SpringApplication.run(OfficelinkApplication.class, args);
-	}
-	
-	@Bean
+
+    public static void main(String[] args) {
+        SpringApplication.run(OfficelinkApplication.class, args);
+    }
+
+    @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
