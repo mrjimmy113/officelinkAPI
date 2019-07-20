@@ -31,18 +31,17 @@ import com.fpt.officelink.repository.LocationRepository;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-	private static final int MAXPAGESIZE = 9;
+    private static final int MAXPAGESIZE = 9;
 
-	@Autowired
-	LocationRepository locationRep;
+    @Autowired
+    LocationRepository locationRep;
 
-	@Autowired
-	DepartmentRepository departmentRep;
-	
-	private CustomUser getUserContext() {
-    	return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @Autowired
+    DepartmentRepository departmentRep;
+
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
 
     @Override
     public List<Location> getLocationsByWorkplace(int workplaceId) {
@@ -54,14 +53,14 @@ public class LocationServiceImpl implements LocationService {
         return locationRep.findById(id);
     }
 
-	@Override
-	public List<Location> getAllLocation() {
-		List<Location> result = locationRep.findAllByWorkplaceIdAndIsDeleted(
-				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
-				false);
-		System.out.print(result.size());
-		return result;
-	}
+    @Override
+    public List<Location> getAllLocation() {
+        List<Location> result = locationRep.findAllByWorkplaceIdAndIsDeleted(
+                ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+                false);
+        System.out.print(result.size());
+        return result;
+    }
 
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
@@ -69,62 +68,72 @@ public class LocationServiceImpl implements LocationService {
         return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
     }
 
-	@Override
-	public boolean addLocation(Location location) {
-		Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-		Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-		if (loc1.isPresent() || loc2.isPresent()) {
-			return false;
-		} else {
-			Workplace workplace = new Workplace();
-			workplace.setId(getUserContext().getWorkplaceId());
-			location.setWorkplace(workplace);
-			locationRep.save(location);
-			return true;
-		}
-	}
-
-
-
     @Override
-    public boolean editLocation(Location location) {
+    public boolean addLocation(Location location) {
         Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
         Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
         if (loc1.isPresent() || loc2.isPresent()) {
             return false;
         } else {
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            location.setWorkplace(workplace);
             locationRep.save(location);
             return true;
         }
     }
 
-	@Override
-	public boolean removeLocation(int id) {
-		Location loc = locationRep.findById(id).get();
-		if (loc != null) {
-			try {
-				loc.setIsDeleted(true);
-				loc.setDateDeleted(Date.from(Instant.now()));
-				locationRep.save(loc);
-				return true;
-			} catch (Exception e) {
-				return false;
-			}
-		}
-		return true;
-	}
+    boolean check;
 
-	@Override
-	public List<Location> getWorkplaceLocation() {
-		return locationRep.findAllByWorkplaceIdAndIsDeleted(
-				((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
-				false);
-	}
+    @Override
+    public boolean editLocation(Location location) {
+        check = true;
+        List<Location> loc = locationRep.findAllByWorkplaceIdAndIsDeleted(getUserContext().getWorkplaceId(), false);
+        loc.forEach(element -> {
+            if (element.getId().intValue() != location.getId().intValue()) {
+                if (element.getName().contains(location.getName()) || element.getAddress().contains(location.getAddress())) {
+                    check = false;
+                }
+            }
+        });
+        if (check == false) {
+            return false;
+        } else {
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            location.setWorkplace(workplace);
+            locationRep.save(location);
+            return true;
+        }
+    }
 
-	@Override
-	public List<Location> getByDepartmentId(int id) {
-		return new ArrayList<Location>(locationRep.findAllByDepartmentId(id));
-	}
+    @Override
+    public boolean removeLocation(int id) {
+        Location loc = locationRep.findById(id).get();
+        if (loc != null) {
+            try {
+                loc.setIsDeleted(true);
+                loc.setDateDeleted(Date.from(Instant.now()));
+                locationRep.save(loc);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<Location> getWorkplaceLocation() {
+        return locationRep.findAllByWorkplaceIdAndIsDeleted(
+                ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getWorkplaceId(),
+                false);
+    }
+
+    @Override
+    public List<Location> getByDepartmentId(int id) {
+        return new ArrayList<Location>(locationRep.findAllByDepartmentId(id));
+    }
 
 
 

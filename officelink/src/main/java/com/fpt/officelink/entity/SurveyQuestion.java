@@ -37,7 +37,7 @@ public class SurveyQuestion implements Serializable {
 	@JoinColumn(name = "survey_id")
 	private Survey survey;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "question_id")
 	private Question question;
 	
