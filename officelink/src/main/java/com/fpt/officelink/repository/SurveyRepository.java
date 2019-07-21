@@ -52,4 +52,9 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
             @Param("name") String name,
             @Param("answers") Set<Answer> answers,
             Pageable pageable);
+    Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
+
+    Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
+            boolean isDeleted, boolean isActive, Pageable pageable);
+
 }

@@ -68,24 +68,7 @@ public class SurveyController {
 		List<SurveyDTO> res = new ArrayList<SurveyDTO>();
 		try {
 			List<Survey> result = ser.getWorkplaceSurvey(user.getWorkplaceId());
-    @GetMapping("/take")
-    public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
-        HttpStatus status = null;
-        SurveyDTO res = null;
-        try {
-            res = ser.getTakeSurvey(token);
-            if (res != null) {
-
-                status = HttpStatus.OK;
-            } else {
-                status = HttpStatus.ACCEPTED;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            status = HttpStatus.BAD_REQUEST;
-        }
-        return new ResponseEntity<SurveyDTO>(res, status);
-    }
+    
 
 			result.forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
@@ -184,50 +167,9 @@ public class SurveyController {
 			log.info(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
-    @GetMapping("/report")
-    public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term, @RequestParam("page") int page) {
-        HttpStatus status = null;
-        PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
-        try {
-            Page<Survey> result = ser.searchReportWithPagination(term, page);
-            List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
-            result.getContent().forEach(s -> {
-                SurveyReportDTO dto = new SurveyReportDTO();
-                BeanUtils.copyProperties(s, dto);
-                dtoList.add(dto);
-            });
-            res.setMaxPage(result.getTotalPages());
-            res.setObjList(dtoList);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            e.printStackTrace();
-            status = HttpStatus.BAD_REQUEST;
-        }
-        return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
-    }
-    
-    @GetMapping(value = "/history")
-    public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term, @RequestParam("page") int page) {
-        HttpStatus status = null;
-        PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
-        try {
-            //Call Service
-            Page<Survey> result = ser.getHistorySurveyWithPagination(term, page);
-            //Convert to DTO
-            List<SurveyDTO> resultList = new ArrayList<SurveyDTO>();
-            result.getContent().forEach(element -> {
-                SurveyDTO dto = new SurveyDTO();
-                BeanUtils.copyProperties(element, dto);
-                resultList.add(dto);
-            });
-            res.setMaxPage(result.getTotalPages());
-            res.setObjList(resultList);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-
-		return new ResponseEntity<Integer>(status.value(), status);
+     return new ResponseEntity<Integer>(status.value(), status);
 	}
-
+		
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody SurveyDTO dto) {
