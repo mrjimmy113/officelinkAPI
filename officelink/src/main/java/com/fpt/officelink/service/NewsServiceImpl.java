@@ -66,6 +66,10 @@ public class NewsServiceImpl implements NewsService {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
     @Override
     public Optional<News> searchById(int id) {
         return newsRep.findById(id);
@@ -80,9 +84,9 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public boolean addNews(News news) {
         try {
-        	Workplace workplace = new Workplace();
-        	workplace.setId(getUserContext().getWorkplaceId());
-        	news.setWorkplace(workplace);
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            news.setWorkplace(workplace);
             newsRep.save(news);
             return true;
         } catch (Exception e) {
