@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.entity.Answer;
+import java.util.Set;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 

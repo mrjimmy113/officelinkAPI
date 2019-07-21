@@ -5,6 +5,13 @@
  */
 package com.fpt.officelink.service;
 
+import com.fpt.officelink.dto.ImageNewsDTO;
+import com.fpt.officelink.dto.NewsDTO;
+import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.News;
+import com.fpt.officelink.entity.Workplace;
+import com.fpt.officelink.repository.NewsRepository;
+import com.google.gson.Gson;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
@@ -59,6 +66,10 @@ public class NewsServiceImpl implements NewsService {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
     @Override
     public Optional<News> searchById(int id) {
         return newsRep.findById(id);
@@ -67,7 +78,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public Page<News> searchByTitleWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return newsRep.findAllByTitleContainingAndIsDeleted(term, false, pageRequest);
+        return newsRep.findAllByTitleContainingAndIsDeletedAndWorkplaceId(term, false, getUserContext().getWorkplaceId(), pageRequest);
     }
 
     @Override
@@ -87,6 +98,10 @@ public class NewsServiceImpl implements NewsService {
     public boolean editNews(News news) {
         try {
         	
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            news.setWorkplace(workplace);
+            newsRep.save(news);
             return true;
         } catch (Exception e) {
             return false;
@@ -173,11 +188,11 @@ public class NewsServiceImpl implements NewsService {
         List<ImageNewsDTO> listNews = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
-        List<News> news = newsRep.findByIsDeleted(false);
+        List<News> news = newsRep.findByIsDeletedAndWorkplaceId(false, getUserContext().getWorkplaceId());
         try {
             c.setTime(sdf.parse(endDate));
             c.add(Calendar.DATE, 1);
-            news = newsRep.findNewstByDateCreated(sdf.parse(startDate), c.getTime());
+            news = newsRep.findNewstByDateCreatedAndWorkplaceId(sdf.parse(startDate), c.getTime(), getUserContext().getWorkplaceId());
         } catch (Exception e) {
             e.printStackTrace();
         }

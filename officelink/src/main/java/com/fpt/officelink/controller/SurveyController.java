@@ -46,8 +46,8 @@ import com.fpt.officelink.service.SurveyService;
 @RequestMapping("/survey")
 public class SurveyController {
 
-	@Autowired
-	SurveyService ser;
+    @Autowired
+    SurveyService ser;
 
 	@Autowired
 	ConfigurationService configService;

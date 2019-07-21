@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.Survey;
+import java.util.Set;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer> {
-	Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
 
 	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:name% AND s.workplace.id = :id AND s.isDeleted = :isDeleted")
 	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeleted(@Param("name") String name, @Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable pageable);

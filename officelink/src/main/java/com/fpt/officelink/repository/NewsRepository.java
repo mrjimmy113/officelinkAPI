@@ -32,4 +32,22 @@ public interface NewsRepository extends JpaRepository<News, Integer>{
     
     @Query("SELECT n FROM News n WHERE n.workplace.id = :id AND n.isDeleted = false ORDER BY n.dateCreated DESC")
     Page<News> findLastestNews(@Param("id") Integer workplaceId, Pageable pageable);
+
+    @Query("Select n from News n where n.title like %:title% and n.isDeleted = :isDeleted and n.workplace.id = :workplaceId")
+    Page<News> findAllByTitleContainingAndIsDeletedAndWorkplaceId(
+            @Param("title") String title,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId,
+            Pageable pageable);
+
+    @Query("Select n from News n where n.isDeleted = :isDeleted and n.workplace.id = :workplaceId")
+    List<News> findByIsDeletedAndWorkplaceId(
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId);
+
+    @Query(value = "Select n FROM News n WHERE n.workplace.id = :workplaceId AND n.dateCreated >= :startDate AND n.dateCreated <= :endDate ORDER BY n.dateCreated DESC")
+    List<News> findNewstByDateCreatedAndWorkplaceId(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("workplaceId") Integer workplaceId);
 }

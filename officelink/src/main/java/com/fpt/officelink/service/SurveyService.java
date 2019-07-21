@@ -61,4 +61,7 @@ public interface SurveyService {
     List<QuestionDTO> getTakeSurveyHistory(int id);
     
     List<AnswerDTO> getAnswerBySurveyId(int surveyId);
+	List<Survey> getSurveyByQuestionId(int id);
+        
+        Page<Survey> getHistorySurveyWithPagination(String term, int pageNum);
 }

@@ -12,6 +12,8 @@ public class CustomUser extends User {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+        private int accountId;
+        
 	private int workplaceId;
 	
 	public CustomUser(String username, String password, boolean enabled, boolean accountNonExpired,
@@ -19,6 +21,7 @@ public class CustomUser extends User {
 			Collection<? extends GrantedAuthority> authorities, int workplaceId) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
 		this.workplaceId = workplaceId;
+                this.accountId = accountId;
 	}
 
 	public int getWorkplaceId() {
@@ -29,5 +32,11 @@ public class CustomUser extends User {
 		this.workplaceId = workplaceId;
 	}
 
-	
+    public int getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
+    }
 }
