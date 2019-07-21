@@ -45,7 +45,6 @@ public interface SurveyService {
 	
 	List<Survey> getActiveSurveyByDate(Date date);
 
-
 	List<Survey> getSurveyByQuestionId(int id, int notId);
 
 	boolean checkIfUserTakeSurvey(Integer surveyId);
