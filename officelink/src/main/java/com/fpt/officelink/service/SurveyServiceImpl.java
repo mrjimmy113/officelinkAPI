@@ -35,10 +35,12 @@ import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.AnswerReport;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Question;
+import com.fpt.officelink.entity.TeamQuestionReport;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
@@ -48,12 +50,14 @@ import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
+import com.fpt.officelink.repository.AnswerReportRepository;
 import com.fpt.officelink.repository.AnswerRepository;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
+import com.fpt.officelink.repository.TeamQuestionReportRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -598,6 +602,22 @@ public class SurveyServiceImpl implements SurveyService {
 					result.add(new AnswerReportDTO(options[i], 1));
 			}
 		}
+		return result;
+	}
+
+	// change active status of a survey to false
+	@Override
+	public Survey updateStatus(Survey survey) {
+		survey.setActive(false);
+		
+		return surveyRep.save(survey);
+	}
+
+	// get all active survey with end date is today or before
+	@Override
+	public List<Survey> getActiveSurveyByDate(Date date) {
+		List<Survey> result = surveyRep.findAllByDateStopAndIsActiveAndIsDeleted(date, true, false);
+
 		return result;
 	}
 

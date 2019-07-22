@@ -1,37 +1,34 @@
 package com.fpt.officelink.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
-import com.fpt.officelink.controller.SurveyController;
 import com.fpt.officelink.entity.Configuration;
 
+/**
+ * @author phduo
+ *
+ */
 @Service
 public class SchedulerService implements SchedulingConfigurer {
 	
-	private ThreadPoolTaskScheduler dailyScheduler;
-
-	private List<Configuration> configList; // list of configurations
+	private ThreadPoolTaskScheduler dailyScheduler; // daily schedule
+	
+	private List<ScheduledFuture<?>> dailyTaskList; // daily task list
 
 	private ThreadPoolTaskScheduler configScheduler; // scheduler properties
 
-	private List<ScheduledFuture<?>> scheduleList; // store scheduled schedule
+	private List<ScheduledFuture<?>> configTaskList; // store scheduled schedule
 	
-	private static final Logger log = Logger.getLogger(SchedulerService.class.getName());
+	private List<Configuration> configList; // list of configurations
 
 	@Autowired
 	ConfigurationService configurationService;
@@ -41,22 +38,20 @@ public class SchedulerService implements SchedulingConfigurer {
 	
 	// constructor
 	private SchedulerService() {
+		//init value 
 		dailyScheduler = dailyPoolScheduler();
 		configScheduler = configurationPoolScheduler();
-		scheduleList = new ArrayList<ScheduledFuture<?>>();
+		configTaskList = new ArrayList<ScheduledFuture<?>>();
+		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
+		
+		// start daily Tasks
+		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0 5 0 * * *");
 	}
 
-	// singleton instance
-	private static SchedulerService instance;
-
-	public static SchedulerService getInstance() {
-		if (instance == null) {
-			instance = new SchedulerService();
-		}
-
-		return instance;
-	}
-
+	/**
+	 * Thread pool for configuration scheduler
+	 * @return a ThreadPoolTaskScheduler for survey routine relate tasks
+	 */
 	private ThreadPoolTaskScheduler configurationPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 		scheduler.setThreadNamePrefix("ConfigurationThreadPool");
@@ -65,6 +60,10 @@ public class SchedulerService implements SchedulingConfigurer {
 		return scheduler;
 	}
 	
+	/**
+	 * Thread pool for daily task scheduler
+	 * @return a ThreadPoolTaskScheduler for daily tasks
+	 */
 	private ThreadPoolTaskScheduler dailyPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 		scheduler.setThreadNamePrefix("DailyThreadPool");
@@ -72,16 +71,47 @@ public class SchedulerService implements SchedulingConfigurer {
 		scheduler.initialize();
 		return scheduler;
 	}
-
-	// task registration
-	@Override
-	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-		// cancel any scheduled tasks
-		if (!scheduleList.isEmpty()) {
-			for (ScheduledFuture<?> schedule : scheduleList) {
+	
+	/**
+	 * Configure daily tasks
+	 * @param taskRegistrar
+	 * @param cron
+	 */
+	public void configureDailyTasks(ScheduledTaskRegistrar taskRegistrar, String cron) {
+		if (!dailyTaskList.isEmpty()) {
+			for (ScheduledFuture<?> schedule : dailyTaskList) {
 				schedule.cancel(false);
 			}
 		}
+		
+		ScheduledFuture<?> newSchedule = dailyScheduler.schedule(new Runnable() {
+			@Override
+			public void run() {
+				// Put task here
+				executor.generateReportDaily();
+			}
+			// schedule time here
+
+		}, new CronTrigger(cron));
+		
+		dailyTaskList.add(newSchedule);
+		
+		taskRegistrar.setScheduler(dailyScheduler);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		
+		// cancel any scheduled tasks
+		if (!configTaskList.isEmpty()) {
+			for (ScheduledFuture<?> schedule : configTaskList) {
+				schedule.cancel(false);
+			}
+		}
+		
 		// load configs
 		configList = configurationService.getConfigurations();
 		//
@@ -89,15 +119,7 @@ public class SchedulerService implements SchedulingConfigurer {
 		// set schedules
 		for (Configuration config : configList) {
 			if (config.getSurvey() != null && !config.getScheduleTime().isEmpty()) {
-				ScheduledFuture<?> newSchedule = configScheduler.schedule(new Runnable() {
-					@Override
-					public void run() {
-						// Put task here
-						executor.sentRoutineSurvey(config);
-					}
-					// schedule time here
-
-				}, new CronTrigger(config.getScheduleTime()));
+				ScheduledFuture<?> newSchedule = this.getSchedule(config);
 
 				// store scheduled task
 				// why need to store scheduled tasks? Because once a task is scheduled, it is
@@ -106,16 +128,34 @@ public class SchedulerService implements SchedulingConfigurer {
 				// ignore scheduled task nor update the scheduled task
 				// insteed the scheduled tasks need to be cancel first, then replaced with the
 				// new schedule
-				if (i >= scheduleList.size()) {
+				if (i >= configTaskList.size()) {
 					// add new schedule to pool
-					scheduleList.add(newSchedule);
+					configTaskList.add(newSchedule);
 				} else {
 					// replace existed schedule with new one
-					scheduleList.set(i, newSchedule);
+					configTaskList.set(i, newSchedule);
 				}
 				i++;
 			}
 			taskRegistrar.setScheduler(configScheduler);
 		}
+	}
+	
+	/**
+	 * @param config
+	 * @return
+	 */
+	public ScheduledFuture<?> getSchedule(Configuration config) {
+		ScheduledFuture<?> newSchedule = configScheduler.schedule(new Runnable() {
+			@Override
+			public void run() {
+				// Put task here
+				executor.sentRoutineSurvey(config);
+			}
+			// schedule time here
+
+		}, new CronTrigger(config.getScheduleTime()));
+		
+		return newSchedule;
 	}
 }

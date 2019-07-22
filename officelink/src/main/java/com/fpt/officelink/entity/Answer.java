@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +37,7 @@ public class Answer implements Serializable {
 	@JoinColumn(name = "question_identity")
 	private SurveyQuestion surveyQuestion;
 	
-	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
 	private Set<WordCloud> wordClouds;
 	
 	@ManyToOne

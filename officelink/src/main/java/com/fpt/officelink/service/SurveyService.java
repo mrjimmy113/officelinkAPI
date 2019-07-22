@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
 
@@ -45,6 +46,10 @@ public interface SurveyService {
 	void sendRoutineSurvey(int surveyId, int duration) throws JOSEException;
 
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
+	
+	Survey updateStatus(Survey survey);
+	
+	List<Survey> getActiveSurveyByDate(Date date);
 
 
 	List<Survey> getSurveyByQuestionId(int id, int notId);

@@ -61,6 +61,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public boolean addNewConfig(Configuration config, List<SurveySendTarget> targets) {
 		targetRep.saveAll(targets);
+
+		config.setDateCreated(new Date());
 		configRep.save(config);
 		
 		// update schedule
@@ -72,7 +74,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	@Override
 	public boolean modifyConfig(Configuration config, List<SurveySendTarget> targets) {
+		config.setDateModified(new Date());
 		configRep.save(config);
+		
 		targetRep.deleteBySurveyId(config.getSurvey().getId());
 		targetRep.saveAll(targets);
 		// update schedule
