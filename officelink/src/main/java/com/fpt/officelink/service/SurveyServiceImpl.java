@@ -49,6 +49,7 @@ import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
 import com.fpt.officelink.repository.AnswerRepository;
+import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
@@ -89,9 +90,12 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	SurveySendTargetRepository targetRep;
-	
+
+	@Autowired
+	DepartmentRepository depRep;
+
 	@Value("${angular.path}")
-    private String angularPath;
+	private String angularPath;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -280,7 +284,7 @@ public class SurveyServiceImpl implements SurveyService {
 			});
 			survey.setSentOut(emailList.size());
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("link", angularPath+"/take/" + token);
+			model.put("link", angularPath + "/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 			surveyRep.save(survey);
 			targetRep.saveAll(sendTargets);
@@ -297,7 +301,7 @@ public class SurveyServiceImpl implements SurveyService {
 		if (survey.isPresent()) {
 			Survey templateSurvey = survey.get();
 			Survey newSurvey = new Survey();
-			//Set Information for Duplicate Survey
+			// Set Information for Duplicate Survey
 			Calendar c = Calendar.getInstance();
 			Date date = new Date(c.getTimeInMillis());
 			newSurvey.setName(templateSurvey.getName() + " " + date.toString());
@@ -312,8 +316,8 @@ public class SurveyServiceImpl implements SurveyService {
 			newSurvey.setTemplateId(templateSurvey.getId());
 			List<SurveySendTarget> targets = targetRep.findAllBySurveyId(surveyId);
 			int workplaceId = templateSurvey.getWorkplace().getId();
-			
-			//Find Target
+
+			// Find Target
 			Set<Account> sendList = new HashSet<Account>();
 			for (SurveySendTarget target : targets) {
 				if (target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
@@ -351,7 +355,7 @@ public class SurveyServiceImpl implements SurveyService {
 				emailList.add(e.getEmail());
 			});
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("link", angularPath+"/take/" + token);
+			model.put("link", angularPath + "/take/" + token);
 			mailSer.sendMail(emailList.toArray(new String[emailList.size()]), "email-survey.ftl", model);
 		}
 
@@ -401,7 +405,22 @@ public class SurveyServiceImpl implements SurveyService {
 		if (survey.isPresent()) {
 			BeanUtils.copyProperties(survey.get(), result);
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
-			Function<Integer, List<Answer>> method = indentity -> answerRep.findAllByIndentity(indentity);
+			Function<Integer, List<Answer>> method = null;
+			Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
+			switch (acc.getRole().getRole()) {
+			case "employer":
+				method = indentity -> answerRep.findAllByIndentity(indentity);
+				break;
+
+			case "manager":
+				method = indentity -> answerRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
+						acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
+				break;
+			case "employee":
+				method = indentity -> answerRep.findAllByIndentityAndDepartmentId(indentity,
+						depRep.findByAccountId(acc.getId()).get(0).getId());
+				break;
+			}
 			result.setQuestions(getQuestionReports(sqList, method));
 		}
 
