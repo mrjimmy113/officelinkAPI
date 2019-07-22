@@ -33,4 +33,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	
 	@Query("SELECT COUNT(d) FROM Department d WHERE d.workplace.id = :id AND d.isDeleted = false")
 	int countDepartmentOnWorkplace(@Param("id") Integer id);
+	
+	@Query("SELECT t.department FROM Team t JOIN t.accounts a WHERE a.id =:id")
+	List<Department> findByAccountId(@Param("id") Integer id);
 }

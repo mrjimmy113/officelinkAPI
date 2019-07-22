@@ -29,6 +29,10 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 	List<Answer> findAllByIndentityAndLocationIdAndDepartmentId(@Param("id") Integer id,
 			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
 	
+	@Query("SELECT a FROM Answer a JOIN a.account.teams t WHERE a.surveyQuestion.id = :id OR a.account.location.id = :locationId AND t.department.id = :departmentId")
+	List<Answer> findAllByIndentityAndLocationIdOrDepartmentId(@Param("id") Integer id,
+			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
+	
 	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.surveyQuestion.question.id = :questionId")
 	List<Answer> findAllBySurveyIdAndQuestionId(@Param("surveyId") Integer surveyId, @Param("questionId") Integer questionId);
 
