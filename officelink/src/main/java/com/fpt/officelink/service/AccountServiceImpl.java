@@ -37,7 +37,7 @@ import com.fpt.officelink.repository.WorkplaceRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+            public class AccountServiceImpl implements AccountService {
 
     private static final int PAGEMAXSIZE = 9;
 
@@ -77,9 +77,10 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
-    public Page<Account> searchWithPagination(String term, Integer workplaceId, int pageNum) {
+    public Page<Account> searchWithPagination(String term, Integer workplaceId, Integer roleId ,  int pageNum) {
         Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
-        return accountRespository.findAllByFirstnameAndWorkplace(term, workplaceId, false , pageable);
+        //return accountRespository.find(term, workplaceId, false , pageable);
+        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
     }
 
     @Transactional
@@ -203,7 +204,23 @@ public class AccountServiceImpl implements AccountService {
 		}
     	
     }
-    
+
+    @Override
+    public void sendMailResetPassword(List<String> listEmail , String token) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("link", "http://localhost:4200/change-password/" + token);
+        mailService.sendMail(listEmail.toArray(new String[listEmail.size()]),"reset-password-temp.ftl", model );
+
+    }
+
+    @Override
+    public void resetPassword(String email , String newPassword) {
+        Account account = accountRespository.findAllByEmail(email);
+        account.setPassword(passwordEncoder().encode(newPassword));
+        accountRespository.save(account);
+    }
+
+
     @Override
     public AccountDTO getInvitationInfor(String token) throws ParseException {
     	System.out.println("Hello");
@@ -246,6 +263,50 @@ public class AccountServiceImpl implements AccountService {
     		accountRespository.save(acc);
     	}
     }
+
+    @Override
+    public Account getProfile(String email) {
+        Account account = null;
+        account = accountRespository.findAllByEmail(email);
+        return account;
+    }
+
+    @Override
+    public Account getAccountAssign(Integer id) {
+        Account account = accountRespository.findById(id).get();
+        if(account != null){
+
+        }
+
+        return account;
+    }
+
+    @Override
+    public boolean changeProfile(Account account) {
+        Optional<Account> optionalAccount = accountRespository.findByEmail(account.getEmail());
+        if(optionalAccount.isPresent()){
+            optionalAccount.get().setFirstname(account.getFirstname());
+            optionalAccount.get().setLastname(account.getLastname());
+            optionalAccount.get().setAddress(account.getAddress());
+            accountRespository.save(optionalAccount.get());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean changePassword(String email, String currentPass, String newPass) {
+        Optional<Account> optionalAccount = accountRespository.findByEmail(email);
+        if(optionalAccount.isPresent()){
+            if(passwordEncoder().matches(currentPass, optionalAccount.get().getPassword())){
+                optionalAccount.get().setPassword(passwordEncoder().encode(newPass));
+                accountRespository.save(optionalAccount.get());
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
 }

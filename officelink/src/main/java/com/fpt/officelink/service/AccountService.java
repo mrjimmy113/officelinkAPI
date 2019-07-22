@@ -16,7 +16,7 @@ import com.fpt.officelink.entity.Account;
 
 public interface AccountService {
 
-    Page<Account> searchWithPagination(String term, Integer workplaceId, int pageNum);
+    Page<Account> searchWithPagination(String term, Integer workplaceId , Integer roleId , int pageNum);
     boolean addNewAccount(Account account, Integer roleId ,  String workplaceName);
     boolean modifyAccount(Account account , Integer roleId , Location address , Workplace workplace);
     void removeAccount(int id);
@@ -29,4 +29,19 @@ public interface AccountService {
 	AccountDTO getInvitationInfor(String token) throws ParseException;
 	void acceptInvite(Account entity, Integer roleId, Integer workplaceId);
 	void assignMember(int locationId, int[] teamIdList, int accountId);
+
+
+	Account getProfile(String email);
+
+	Account getAccountAssign( Integer id);
+
+	boolean changeProfile(Account account );
+
+	boolean changePassword(String email, String currentPass, String newPass);
+	void sendMailResetPassword(List<String> listEmail , String accountToken);
+
+	void resetPassword(String email ,String newPassword);
+
+
+
 }

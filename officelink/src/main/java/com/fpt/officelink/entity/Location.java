@@ -1,5 +1,6 @@
 package com.fpt.officelink.entity;
 
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -51,6 +52,7 @@ public class Location implements Serializable {
     private Date dateDeleted;
 
     @OneToMany(mappedBy = "location")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Set<Account> accounts;
 
 

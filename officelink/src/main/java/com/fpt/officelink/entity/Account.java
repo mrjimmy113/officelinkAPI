@@ -1,5 +1,6 @@
 package com.fpt.officelink.entity;
 
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
