@@ -47,14 +47,17 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	Page<Survey> findReportableSurvey(@Param("term") String term,@Param("workplaceId") Integer workplaceId,@Param("email") String email,Pageable pageable);
 	
 	@Query("SELECT DISTINCT s FROM Survey s JOIN s.surveyQuestions q JOIN q.answers a WHERE s.isDeleted = :isDeleted AND s.name like %:name% AND a in :answers")
+
+    Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
+
+    Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
+            boolean isDeleted, boolean isActive, Pageable pageable);
+
+    @Query("SELECT DISTINCT s FROM Survey s JOIN s.surveyQuestions q JOIN q.answers a WHERE s.isDeleted = :isDeleted AND s.name like %:name% AND a in :answers")
     Page<Survey> findAllByAnswersAndIsDeleted(
             @Param("isDeleted") boolean isDeleted,
             @Param("name") String name,
             @Param("answers") Set<Answer> answers,
             Pageable pageable);
-    Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
-
-    Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
-            boolean isDeleted, boolean isActive, Pageable pageable);
 
 }

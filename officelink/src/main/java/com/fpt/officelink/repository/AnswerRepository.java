@@ -45,8 +45,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 	List<AnswerReportDTO> testReport();
 
 	Set<Answer> findAllByAccountId(int id);
-
-	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.account.id = :accountId")
-	List<Answer> findAllByAccountIdAndSurveyId(@Param("surveyId") Integer surveyId,
-			@Param("accountId") Integer accountId);
+        
+        @Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.account.id = :accountId")
+        List<Answer> findAllByAccountIdAndSurveyId(@Param("surveyId") Integer surveyId, @Param("accountId") Integer accountId);
 }

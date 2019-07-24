@@ -7,36 +7,37 @@ import org.springframework.security.core.userdetails.User;
 
 public class CustomUser extends User {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-        private int accountId;
-        
-	private int workplaceId;
-	
-	public CustomUser(String username, String password, boolean enabled, boolean accountNonExpired,
-			boolean credentialsNonExpired, boolean accountNonLocked,
-			Collection<? extends GrantedAuthority> authorities, int workplaceId) {
-		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-		this.workplaceId = workplaceId;
-                this.accountId = accountId;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public int getWorkplaceId() {
-		return workplaceId;
-	}
+    private String username;
 
-	public void setWorkplaceId(int workplaceId) {
-		this.workplaceId = workplaceId;
-	}
+    private int workplaceId;
 
-    public int getAccountId() {
-        return accountId;
+    public CustomUser(String username, String password, boolean enabled, boolean accountNonExpired,
+            boolean credentialsNonExpired, boolean accountNonLocked,
+            Collection<? extends GrantedAuthority> authorities, int workplaceId) {
+        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+        this.workplaceId = workplaceId;
+        this.username = username;
     }
 
-    public void setAccountId(int accountId) {
-        this.accountId = accountId;
+    public int getWorkplaceId() {
+        return workplaceId;
     }
+
+    public void setWorkplaceId(int workplaceId) {
+        this.workplaceId = workplaceId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
 }

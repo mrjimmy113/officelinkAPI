@@ -265,7 +265,6 @@ public class SurveyController {
 		try {
 			res = ser.getTakeSurvey(token);
 			if (res != null) {
-
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.CONFLICT;
