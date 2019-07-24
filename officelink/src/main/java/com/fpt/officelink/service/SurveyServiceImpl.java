@@ -472,7 +472,7 @@ public class SurveyServiceImpl implements SurveyService {
 	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
 			int teamId) {
 		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
 		Function<Integer, List<Answer>> method = getAnswerFunction(locationId, departmentId, teamId);
 		List<Answer> answers = method.apply(surveyQuestion.getId());
 		switch (surveyQuestion.getQuestion().getType().getType()) {

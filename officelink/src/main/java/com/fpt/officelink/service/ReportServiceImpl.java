@@ -31,12 +31,14 @@ import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.News;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.NewsRepository;
+import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamRepository;
@@ -67,6 +69,9 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Autowired
     ServletContext context;
+	
+	@Autowired
+	SurveyQuestionRepository surQuestRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -250,4 +255,10 @@ public class ReportServiceImpl implements ReportService {
      
 		return result;
 	}
+
+	@Override
+	public Optional<SurveyQuestion> getDownloadDetail(Integer surveyId, Integer questionId) {
+		return surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+	}
+
 }

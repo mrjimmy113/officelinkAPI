@@ -1,10 +1,21 @@
 package com.fpt.officelink.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,8 +29,11 @@ import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
+import com.fpt.officelink.entity.Answer;
+import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.service.ReportService;
 import com.fpt.officelink.service.SurveyService;
 
@@ -119,6 +133,32 @@ public class ReportController {
 		}
 		
 		return new ResponseEntity<DashBoardDTO>(res, status);
+	}
+	
+	@GetMapping("/download")
+	public void downloadFile(HttpServletResponse rep,@RequestParam("surveyId") Integer surveyId, @RequestParam("questionId") Integer questionId) throws IOException {
+		Optional<SurveyQuestion> opSurQuest = reportSer.getDownloadDetail(surveyId, questionId);
+		if(opSurQuest.isPresent()) {
+			SurveyQuestion surQuest = opSurQuest.get();
+			rep.setHeader("Content-Disposition", "attachment; filename="+surQuest.getSurvey().getName()+".docx");
+			PrintWriter pw = rep.getWriter();
+			pw.println("Question: " + surQuest.getQuestion().getQuestion());
+			List<AnswerOption> options = surQuest.getQuestion().getOptions();
+			for (int i = 0; i < options.size(); i++) {
+				pw.println((i + 1) + ". " + options.get(i).getAnswerText());
+			}
+			pw.println("");
+			pw.println("Answers");
+			List<Answer> answers = new ArrayList<Answer>(surQuest.getAnswers());
+			for (int i = 0; i < answers.size(); i++) {
+				pw.println((i + 1) + "/ " + answers.get(i).getContent());
+			}
+			pw.flush();
+		}
+		
+		
+		
+       
 	}
 	
 }
