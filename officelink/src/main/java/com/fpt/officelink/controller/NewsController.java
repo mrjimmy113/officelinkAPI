@@ -5,18 +5,14 @@
  */
 package com.fpt.officelink.controller;
 
-import com.fpt.officelink.dto.ImageNewsDTO;
-import com.fpt.officelink.dto.NewsDTO;
-import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.entity.News;
-import com.fpt.officelink.service.NewsService;
-import com.google.gson.Gson;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 import javax.servlet.ServletContext;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,12 +23,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fpt.officelink.dto.ImageNewsDTO;
+import com.fpt.officelink.dto.NewsDTO;
+import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.entity.News;
+import com.fpt.officelink.service.NewsService;
+import com.google.gson.Gson;
 
 /**
  *
@@ -217,5 +218,19 @@ public class NewsController {
         }
 
         return new ResponseEntity<Integer>(status.value(), status);
+    }
+    
+    @GetMapping("/lastest")
+    public ResponseEntity<PageSearchDTO<ImageNewsDTO>> getLastest(@RequestParam("page") int pageNum) {
+    	PageSearchDTO<ImageNewsDTO> res = new PageSearchDTO<ImageNewsDTO>();
+    	HttpStatus status = null;
+    	try {
+			res = service.getLastestNewsList(pageNum);
+    		status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+    	
+    	return new ResponseEntity<PageSearchDTO<ImageNewsDTO>>(res,status);
     }
 }
