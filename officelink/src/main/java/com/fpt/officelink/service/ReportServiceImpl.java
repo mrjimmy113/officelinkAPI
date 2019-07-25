@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamRepository;
+import com.nimbusds.jose.JOSEException;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -72,6 +74,9 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Autowired
 	SurveyQuestionRepository surQuestRep;
+	
+	@Autowired
+	JwtService jwtSer;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -257,8 +262,18 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
-	public Optional<SurveyQuestion> getDownloadDetail(Integer surveyId, Integer questionId) {
-		return surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+	public Optional<SurveyQuestion> getDownloadDetail(String token) throws ParseException {
+		if(jwtSer.validateDownLoadToken(token)) {
+			Integer surveyId = jwtSer.getSurveyId(token);
+			Integer questionId = jwtSer.getQuestionId(token);
+			return surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+		}
+		return null;
+	}
+	
+	@Override
+	public String getDownLoadToken(Integer surveyId, Integer questionId) throws JOSEException {
+		return jwtSer.createDownloadToken(surveyId, questionId);
 	}
 
 }

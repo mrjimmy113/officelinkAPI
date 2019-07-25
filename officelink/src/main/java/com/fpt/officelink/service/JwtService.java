@@ -3,10 +3,10 @@ package com.fpt.officelink.service;
 import java.text.ParseException;
 import java.util.Date;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.officelink.dto.AccountDTO;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpt.officelink.dto.AccountDTO;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -23,6 +23,7 @@ public class JwtService {
 	public static final String EMAIL = "email";
 	public static final String DTO = "dto";
 	public static final String SURVEY_ID = "surveyId";
+	public static final String QUESTION_ID = "questionId";
 	public static final String ROLE = "role";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
 	public static final String WORKPLACE_ID = "workplaceId";
@@ -57,11 +58,24 @@ public class JwtService {
 	
 	public String createInviteToken(String email,Integer workplaceId) throws JOSEException {
 		String token = null;
-		System.out.println("JWT" + workplaceId);
 		JWSSigner signer = new MACSigner(generateShareSecret());
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(EMAIL, email);
 		builder.claim(WORKPLACE_ID, workplaceId);
+		builder.expirationTime(generateExpirationDate());
+		JWTClaimsSet claimsSet = builder.build();
+		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+		signedJWT.sign(signer);
+		token = signedJWT.serialize();
+		return token;
+	}
+	
+	public String createDownloadToken(Integer surveyId, Integer questionId) throws JOSEException {
+		String token = null;
+		JWSSigner signer = new MACSigner(generateShareSecret());
+		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+		builder.claim(SURVEY_ID, surveyId);
+		builder.claim(QUESTION_ID, questionId);
 		builder.expirationTime(generateExpirationDate());
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
@@ -161,6 +175,12 @@ public class JwtService {
 		surveyId = claims.getIntegerClaim(SURVEY_ID);
 		return surveyId;
 	}
+	public Integer getQuestionId(String token) throws ParseException {
+		Integer questionId = null;
+		JWTClaimsSet claims = getClaimsFromToken(token);
+		questionId = claims.getIntegerClaim(QUESTION_ID);
+		return questionId;
+	}
 	
 	public Integer getWorkplaceId(String token) throws ParseException {
 		Integer workplaceId = null;
@@ -211,6 +231,24 @@ public class JwtService {
 		}
 		Integer id = getSurveyId(token);
 		if(id == null) {
+			return false;
+		}
+		if (isTokenExpired(token)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public Boolean validateDownLoadToken(String token) throws ParseException {
+		if (token == null || token.trim().length() == 0) {
+			return false;
+		}
+		Integer surveyId = getSurveyId(token);
+		if(surveyId == null) {
+			return false;
+		}
+		Integer questionId = getQuestionId(token);
+		if(questionId == null) {
 			return false;
 		}
 		if (isTokenExpired(token)) {

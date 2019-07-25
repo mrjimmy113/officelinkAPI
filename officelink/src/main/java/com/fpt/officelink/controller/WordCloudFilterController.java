@@ -157,4 +157,23 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Boolean>(res,status);
 	}
 	
+	@GetMapping("/all")
+	public ResponseEntity<List<WordCloudFilterDTO>> getAll() {
+		HttpStatus status = null;
+		List<WordCloudFilterDTO> res = new ArrayList<WordCloudFilterDTO>();
+		try {
+			List<WordCloudFilter>result = service.getAll();
+			result.forEach(element -> {
+				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
+				BeanUtils.copyProperties(element, tmp);
+				res.add(tmp);
+			});
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<List<WordCloudFilterDTO>>(res, status);
+	}
+	
 }

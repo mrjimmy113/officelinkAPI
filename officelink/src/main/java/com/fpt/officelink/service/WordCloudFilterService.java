@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
+import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.Word;
 import com.fpt.officelink.entity.WordCloud;
@@ -25,4 +26,8 @@ public interface WordCloudFilterService {
 	boolean isExisted(String name, String language);
 
 	Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity);
+
+	List<WordCloudFilter> getAll();
+
+	List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId);
 }

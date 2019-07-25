@@ -14,7 +14,7 @@ import com.fpt.officelink.entity.Team;
 @Repository
 public interface SurveySendTargetRepository extends JpaRepository<SurveySendTarget, Integer>{
 
-	@Query("SELECT s FROM SurveySendTarget s WHERE s.survey.id = :id")
+	@Query("SELECT s FROM SurveySendTarget s WHERE s.survey.id = :id s.isNeed = true")
 	List<SurveySendTarget> findAllBySurveyId(@Param("id") Integer surveyId);
 	
 	@Modifying
