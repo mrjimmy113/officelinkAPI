@@ -8,4 +8,10 @@ INSERT INTO `filter_word` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8)
 
 INSERT INTO `word_cloud_filter` VALUES (1,NULL,NULL,_binary '\0','ENG','DEFAULT',NULL);
 
-INSERT INTO role VALUES (1, "employer"), (2, "employee") , (3, "manager");
+INSERT INTO role VALUES (1, "employer"), (2, "employee") , (3, "manager") , (4, "system_admin");
+
+INSERT INTO workplace VALUES (1,NULL,NULL,'\0',"Office Link System Dummie");
+
+INSERT INTO account VALUES (1,NULL,NULL,NULL,"officelink@gmail.com","Office Link System Dummie",'\0',"","$2b$10$ZCJvGsNIkO0/RVp4GNz/r.mPtvnionj9Negy4FfGLcLi6kE.wv9yC",NULL,4,1);
+
+INSERT INTO configuration VALUES (1,NULL,NULL,0, b'1','\0',"0 5 0 * * *",NULL,1);
