@@ -29,10 +29,15 @@ import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.SurveySendTarget;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.TypeQuestion;
+import com.fpt.officelink.service.ConfigurationService;
 import com.fpt.officelink.service.SurveyService;
 
 @Controller
@@ -41,6 +46,9 @@ public class SurveyController {
 
 	@Autowired
 	SurveyService ser;
+	
+	@Autowired
+	ConfigurationService configService;
 
 	Logger log = Logger.getLogger(SurveyController.class.getName());
 	
@@ -260,7 +268,32 @@ public class SurveyController {
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			ser.sendOutSurvey(target,getUserContext().getWorkplaceId());
+			List<SurveySendTarget> targets = new ArrayList<SurveySendTarget>();
+			target.getTargetList().forEach(e -> {
+				SurveySendTarget targetEntity = new SurveySendTarget();
+
+				if (e.getLocationId() != 0) {
+					Location location = new Location();
+					location.setId(e.getLocationId());
+					targetEntity.setLocation(location);
+				}
+
+				if (e.getDepartmentId() != 0) {
+					Department department = new Department();
+					department.setId(e.getDepartmentId());
+					targetEntity.setDepartment(department);
+				}
+
+				if (e.getTeamId() != 0) {
+					Team team = new Team();
+					team.setId(e.getTeamId());
+					targetEntity.setTeam(team);
+				}
+				targets.add(targetEntity);
+
+			});
+			ser.sendOutSurvey(target.getSurveyId(),configService.filterDuplicate(targets),target.getDuration(),getUserContext().getWorkplaceId());
+			
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();

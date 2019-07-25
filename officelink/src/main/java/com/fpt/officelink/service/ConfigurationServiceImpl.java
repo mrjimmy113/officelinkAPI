@@ -107,7 +107,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		return true;
 	}
 
-	private List<SurveySendTarget> filterDuplicate(List<SurveySendTarget> targets) {
+	@Override
+	public List<SurveySendTarget> filterDuplicate(List<SurveySendTarget> targets) {
+		System.out.println(targets);
 		List<SurveySendTarget> locations = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> deps = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> locationDeps = new ArrayList<SurveySendTarget>();
@@ -121,6 +123,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			if (location == null && dep == null && team == null) {
 				isAll = true;
 				target.setNeed(true);
+				filtered.add(target);
 				break;
 			}
 
