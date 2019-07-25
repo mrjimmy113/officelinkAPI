@@ -1,6 +1,9 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -28,8 +31,8 @@ public class TeamQuestionReport implements Serializable{
 	@JoinColumn(name = "surveyQuestion_id", nullable = false)
 	private SurveyQuestion surveyQuestion;
 	
-	@OneToMany(mappedBy = "teamQuestionReport", cascade = CascadeType.PERSIST)
-	private Set<AnswerReport> answerReports;
+	@OneToMany(mappedBy = "teamQuestionReport", cascade = CascadeType.ALL)
+	private List<AnswerReport> answerReports;
 
 	@ManyToOne
 	@JoinColumn(name = "team_id", nullable = false)
@@ -52,12 +55,8 @@ public class TeamQuestionReport implements Serializable{
 		this.surveyQuestion = surveyQuestion;
 	}
 
-	public Set<AnswerReport> getAnswerReports() {
+	public List<AnswerReport> getAnswerReports() {
 		return answerReports;
-	}
-
-	public void setAnswerReports(Set<AnswerReport> answers) {
-		this.answerReports = answers;
 	}
 	
 	public Team getTeam() {
@@ -68,4 +67,14 @@ public class TeamQuestionReport implements Serializable{
 		this.team = team;
 	}
 	
+	public void addAnswerReport(List<AnswerReport> list) {
+		if (this.answerReports == null) {
+			this.answerReports = new ArrayList<AnswerReport>();
+		}
+		this.answerReports.addAll(list);
+		
+		for (AnswerReport answerReport : list) {
+			answerReport.setTeamQuestionReport(this);
+		}
+	}
 }

@@ -4,6 +4,7 @@ package com.fpt.officelink.entity;
 import java.io.Serializable;
 
 import javax.persistence.Id;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +30,7 @@ public class AnswerReport implements Serializable{
 	@Column
 	private Integer weight;
 	
-	@ManyToOne
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "teamQuestionReport_id")
 	private TeamQuestionReport teamQuestionReport;
 	
@@ -61,10 +62,10 @@ public class AnswerReport implements Serializable{
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
-	public TeamQuestionReport getQuestionReport() {
+	public TeamQuestionReport getTeamQuestionReport() {
 		return teamQuestionReport;
 	}
-	public void setQuestionReport(TeamQuestionReport questionReport) {
+	public void setTeamQuestionReport(TeamQuestionReport questionReport) {
 		this.teamQuestionReport = questionReport;
 	}
 

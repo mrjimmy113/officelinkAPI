@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 	 */
 	@Async
 	@Override
+	@Transactional
 	public void generateTeamQuestionReport(int surveyId) {
 		// get all the team the survey was sent to
 		Set<Team> teams = this.getTeamsSent(surveyId);
@@ -89,7 +92,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 				}
 				
 				// Save report
-				questionReport.setAnswerReports(new HashSet<AnswerReport>(arList));
+				questionReport.addAnswerReport(arList);
 				teamQuestionReportRep.save(questionReport);
 			}
 		}
