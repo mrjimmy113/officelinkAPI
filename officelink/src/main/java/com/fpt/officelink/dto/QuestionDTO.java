@@ -17,6 +17,8 @@ public class QuestionDTO {
 	private Integer questionIdentity;
 	
 	private Integer questionIndex;
+	
+	private boolean required;
 
 	public Integer getId() {
 		return id;
@@ -73,5 +75,19 @@ public class QuestionDTO {
 	public void setQuestionIndex(Integer questionIndex) {
 		this.questionIndex = questionIndex;
 	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	
+	
+	
+	
+	
 	
 }

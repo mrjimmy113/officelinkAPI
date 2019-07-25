@@ -140,6 +140,7 @@ public class SurveyController {
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
 				tmpSQ.setQuestion(tmpQ);
+				tmpSQ.setRequired(q.isRequired());
 				sqList.add(tmpSQ);
 			});
 			ser.newSurvey(survey, sqList);
@@ -178,6 +179,8 @@ public class SurveyController {
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
 				tmpSQ.setQuestion(tmpQ);
+				
+				tmpSQ.setRequired(q.isRequired());
 				sqList.add(tmpSQ);
 			});
 			ser.updateSurvey(survey, sqList);
