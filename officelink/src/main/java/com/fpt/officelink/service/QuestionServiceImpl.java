@@ -66,7 +66,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Page<Question> searchWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return quesRep.findAllByQuestionContainingAndIsDeleted(term, false, pageRequest);
+		return quesRep.findAllByQuestionContainingAndWorkplaceIdAndIsDeleted(term,getUserContext().getWorkplaceId(), false, pageRequest);
 	}
 
 	@Override
