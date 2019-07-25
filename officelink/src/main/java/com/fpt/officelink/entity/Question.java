@@ -44,6 +44,10 @@ public class Question implements Serializable {
 
 	@Column
 	private boolean isDeleted;
+	
+	@ManyToOne()
+	@JoinColumn(name = "workplace_id")
+	private Workplace workplace;
 
 	public Integer getId() {
 		return id;
@@ -92,5 +96,15 @@ public class Question implements Serializable {
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
+	
+	
 
 }
