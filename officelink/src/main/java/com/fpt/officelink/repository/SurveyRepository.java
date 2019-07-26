@@ -2,6 +2,7 @@ package com.fpt.officelink.repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	@Query("SELECT s FROM Survey s WHERE s.workplace.id = :id AND s.dateSendOut != null ORDER BY s.dateSendOut DESC")
 	Page<Survey> findTop5LastestSendOutSurvey(@Param("id") Integer workplaceId, Pageable pageable);
 	
+	@Query("SELECT s FROM Survey s WHERE LOWER(s.name) = LOWER(:name) AND s.workplace.id = :id")
+	Optional<Survey> findByNameAndWorkplaceId(@Param("name") String name, @Param("id") Integer workplaceId);
 }

@@ -44,7 +44,7 @@ public class AnswerOption implements Serializable{
 	}
 
 	public void setAnswerText(String answerText) {
-		this.answerText = answerText;
+		this.answerText = answerText.trim();
 	}
 
 	public Question getQuestion() {

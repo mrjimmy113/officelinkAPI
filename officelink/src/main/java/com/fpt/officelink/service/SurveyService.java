@@ -22,7 +22,7 @@ public interface SurveyService {
 
 	void delete(Integer id);
 
-	void updateSurvey(Survey survey, List<SurveyQuestion> sqList);
+	boolean updateSurvey(Survey survey, List<SurveyQuestion> sqList);
 
 	List<SurveyQuestion> getDetail(Integer id);
 
@@ -30,7 +30,7 @@ public interface SurveyService {
 
 	List<Survey> getWorkplaceSurvey(int workplaceId);
 
-	void newSurvey(Survey survey, List<SurveyQuestion> sqList);
+	boolean newSurvey(Survey survey, List<SurveyQuestion> sqList);
 
 	SurveyReportDTO getReport(Integer id);
 

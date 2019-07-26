@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -100,7 +99,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public void newSurvey(Survey survey, List<SurveyQuestion> sqList) {
+	public boolean newSurvey(Survey survey, List<SurveyQuestion> sqList) {
+		Optional<Survey> opSur = surveyRep.findByNameAndWorkplaceId(survey.getName(), getUserContext().getWorkplaceId());
+		if(opSur.isPresent()) return false;
 		survey.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 		Workplace workplace = new Workplace();
 		workplace.setId(getUserContext().getWorkplaceId());
@@ -123,12 +124,22 @@ public class SurveyServiceImpl implements SurveyService {
 			sq.setSurvey(survey);
 			surQuestRep.save(sq);
 		});
+		return true;
 
 	}
 
 	@Transactional(rollbackOn = Exception.class)
 	@Override
-	public void updateSurvey(Survey survey, List<SurveyQuestion> sqList) {
+	public boolean updateSurvey(Survey survey, List<SurveyQuestion> sqList) {
+		Optional<Survey> opSur = surveyRep.findByNameAndWorkplaceId(survey.getName(), getUserContext().getWorkplaceId());
+		if(opSur.isPresent()) {
+			Optional<Survey> tmp = surveyRep.findById(survey.getId());
+			if(tmp.isPresent()) {
+				if(!tmp.get().getName().equalsIgnoreCase(survey.getName())) {
+					return false;
+				}
+			}
+		}
 		survey.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		surveyRep.save(survey);
 		surQuestRep.deleteBySurveyId(survey.getId());
@@ -149,6 +160,7 @@ public class SurveyServiceImpl implements SurveyService {
 			sq.setSurvey(survey);
 			surQuestRep.save(sq);
 		});
+		return true;
 
 	}
 
