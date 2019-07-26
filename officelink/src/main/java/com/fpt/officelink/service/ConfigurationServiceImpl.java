@@ -3,6 +3,7 @@ package com.fpt.officelink.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -16,9 +17,11 @@ import org.springframework.stereotype.Service;
 import com.fpt.officelink.entity.Configuration;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.ConfigurationRepository;
+import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.utils.Constants;
 
@@ -33,6 +36,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Autowired
 	SurveySendTargetRepository targetRep;
+	
+	@Autowired
+	SurveyRepository surRep;
 
 	private List<Configuration> configurationList;
 
@@ -64,6 +70,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public boolean addNewConfig(Configuration config, List<SurveySendTarget> targets) {
+		Optional<Survey> opSur = surRep.findById(config.getSurvey().getId());
+		if(opSur.isPresent()) {
+			Survey tmp = opSur.get();
+			tmp.setSent(true);
+			surRep.save(tmp);
+		}
 		targets = filterDuplicate(targets);
 		targetRep.saveAll(targets);
 

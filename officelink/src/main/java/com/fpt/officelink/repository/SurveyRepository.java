@@ -20,7 +20,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	@Query("SELECT s FROM Survey s WHERE s.isDeleted = :isDeleted AND s.workplace.id = :workplaceId")
 	List<Survey> findAllByWorkplaceAndIsDeleted(int workplaceId, boolean isDeleted);
 
-	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
+	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSent(String name, int workplaceId,
 			boolean isDeleted, boolean isActive, Pageable pageable);
 	
 	@Query("SELECT s FROM Survey s WHERE s.dateStop < :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")

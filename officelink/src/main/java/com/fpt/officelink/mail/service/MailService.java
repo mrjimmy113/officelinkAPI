@@ -7,6 +7,7 @@ import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
@@ -25,6 +26,7 @@ public class MailService {
         @Autowired
         private Configuration config;
 
+        @Async
         public void sendMail(String[] to,String temp , Map<String , Object> model){
 
                 MimeMessage message = sender.createMimeMessage();

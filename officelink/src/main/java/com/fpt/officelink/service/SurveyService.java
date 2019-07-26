@@ -56,6 +56,6 @@ public interface SurveyService {
 
 	boolean checkIfUserTakeSurvey(Integer surveyId);
 
-	void sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
+	boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
 			throws JOSEException;
 }
