@@ -10,6 +10,8 @@ public class WordCloudFilterDTO {
 	private String name;
 
 	private String language;
+	
+	private boolean isExclude;
 
 	private List<WordDTO> wordList = new ArrayList<WordDTO>();
 
@@ -44,5 +46,15 @@ public class WordCloudFilterDTO {
 	public void setWordList(List<WordDTO> wordList) {
 		this.wordList = wordList;
 	}
+
+	public boolean isExclude() {
+		return isExclude;
+	}
+
+	public void setExclude(boolean isExclude) {
+		this.isExclude = isExclude;
+	}
+	
+	
 
 }

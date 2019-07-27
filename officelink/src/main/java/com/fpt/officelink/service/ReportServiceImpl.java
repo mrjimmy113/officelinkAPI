@@ -87,7 +87,7 @@ public class ReportServiceImpl implements ReportService {
 		SurveySendDetailDTO result = new SurveySendDetailDTO();
 		Survey survey = surRep.findById(surveyId).get();
 		List<SurveySendTarget> targets = null;
-		if (survey.getTemplateId() != 0) {
+		if (survey.getTemplateId() != null) {
 			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
 		} else {
 			targets = targetRep.findAllBySurveyId(surveyId);

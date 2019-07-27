@@ -126,6 +126,7 @@ public class WordCloudFilterController {
 			service.modifyFilter(entity,wordList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);

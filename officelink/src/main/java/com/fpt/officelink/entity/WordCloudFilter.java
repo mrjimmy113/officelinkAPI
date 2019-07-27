@@ -51,6 +51,9 @@ public class WordCloudFilter implements Serializable {
 	@JoinColumn(name = "workplace_id")
 	private Workplace workplace;
 
+	@Column
+	private boolean isExclude;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -114,5 +117,15 @@ public class WordCloudFilter implements Serializable {
 	public void setWorkplace(Workplace workplace) {
 		this.workplace = workplace;
 	}
+
+	public boolean isExclude() {
+		return isExclude;
+	}
+
+	public void setExclude(boolean isExclude) {
+		this.isExclude = isExclude;
+	}
+	
+	
 	
 }

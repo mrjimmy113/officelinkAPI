@@ -17,6 +17,9 @@ import com.fpt.officelink.entity.Survey;
 public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
 
+	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:name% AND s.workplace.id = :id AND s.isDeleted = :isDeleted")
+	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeleted(@Param("name") String name, @Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable pageable);
+	
 	@Query("SELECT s FROM Survey s WHERE s.isDeleted = :isDeleted AND s.workplace.id = :workplaceId")
 	List<Survey> findAllByWorkplaceAndIsDeleted(int workplaceId, boolean isDeleted);
 

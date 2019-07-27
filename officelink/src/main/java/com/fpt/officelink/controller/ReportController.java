@@ -61,6 +61,7 @@ public class ReportController {
 			res = reportSer.getSendDetail(surveyId);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 

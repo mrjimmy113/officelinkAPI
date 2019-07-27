@@ -142,8 +142,11 @@ public class SurveyServiceImpl implements SurveyService {
 				}
 			}
 		}
-		survey.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
-		surveyRep.save(survey);
+		Optional<Survey> opCurSur = surveyRep.findById(survey.getId());
+		Survey curSur = opCurSur.get();
+		curSur.setName(survey.getName());
+		curSur.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+		surveyRep.save(curSur);
 		surQuestRep.deleteBySurveyId(survey.getId());
 		sqList.forEach(sq -> {
 			Question q = sq.getQuestion();
@@ -159,7 +162,7 @@ public class SurveyServiceImpl implements SurveyService {
 				}
 			}
 			sq.setQuestion(q);
-			sq.setSurvey(survey);
+			sq.setSurvey(curSur);
 			surQuestRep.save(sq);
 		});
 		return true;
@@ -169,7 +172,7 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public Page<Survey> searchWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return surveyRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeleted(term, getUserContext().getWorkplaceId(), false, pageRequest);
 	}
 
 	@Override
