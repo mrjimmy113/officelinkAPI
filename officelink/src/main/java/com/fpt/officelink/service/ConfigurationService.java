@@ -21,4 +21,6 @@ public interface ConfigurationService {
 	boolean addNewConfig(Configuration config, List<SurveySendTarget> targets);
 
 	boolean modifyConfig(Configuration config, List<SurveySendTarget> targets);
+
+	List<SurveySendTarget> filterDuplicate(List<SurveySendTarget> targets);
 }

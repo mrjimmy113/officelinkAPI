@@ -71,6 +71,9 @@ public class Survey implements Serializable {
 	
 	@Column
 	private Integer templateId;
+	
+	@Column
+	private boolean isSent;
 
 	public Integer getId() {
 		return id;
@@ -85,7 +88,7 @@ public class Survey implements Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = name.trim();
 	}
 
 	public boolean isActive() {
@@ -199,5 +202,14 @@ public class Survey implements Serializable {
 	public void setTemplateId(Integer templateId) {
 		this.templateId = templateId;
 	}
+
+	public boolean isSent() {
+		return isSent;
+	}
+
+	public void setSent(boolean isSent) {
+		this.isSent = isSent;
+	}
+	
 	
 }

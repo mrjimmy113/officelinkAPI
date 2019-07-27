@@ -6,8 +6,6 @@ public class WordDTO {
 
 	private String name;
 
-	private boolean isExclude;
-
 	public Integer getId() {
 		return id;
 	}
@@ -23,15 +21,5 @@ public class WordDTO {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public boolean isExclude() {
-		return isExclude;
-	}
-
-	public void setExclude(boolean isExclude) {
-		this.isExclude = isExclude;
-	}
-
-	
 
 }

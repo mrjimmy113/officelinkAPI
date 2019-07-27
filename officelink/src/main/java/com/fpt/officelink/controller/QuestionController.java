@@ -33,13 +33,13 @@ public class QuestionController {
 	
 	//Question
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<QuestionDTO>> search(@RequestParam("term") String term){
+	public ResponseEntity<PageSearchDTO<QuestionDTO>> search(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<QuestionDTO> res = new PageSearchDTO<QuestionDTO>();
 		
 		try {
 			
-			Page<Question> result = qSer.searchWithPagination(term, 0);
+			Page<Question> result = qSer.searchWithPagination(term, page);
 			//Convert to DTO
 			List<QuestionDTO> dtoList = new ArrayList<QuestionDTO>();
 			result.getContent().forEach(e ->  {
@@ -69,13 +69,13 @@ public class QuestionController {
 	}
 	
 	@GetMapping("/search")
-	public ResponseEntity<PageSearchDTO<QuestionDTO>> searchWithType(@RequestParam("term") String term,@RequestParam("type") Integer type){
+	public ResponseEntity<PageSearchDTO<QuestionDTO>> searchWithType(@RequestParam("term") String term,@RequestParam("type") Integer type,@RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<QuestionDTO> res = new PageSearchDTO<QuestionDTO>();
 		
 		try {
 			
-			Page<Question> result = qSer.searchWithTermAndType(term, type, 0);
+			Page<Question> result = qSer.searchWithTermAndType(term, type, page);
 			//Convert to DTO
 			List<QuestionDTO> dtoList = new ArrayList<QuestionDTO>();
 			result.getContent().forEach(e ->  {
@@ -102,72 +102,6 @@ public class QuestionController {
 		}
 		
 		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
-	}
-	
-	@GetMapping(value = "/getPage")
-	public ResponseEntity<List<QuestionDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
-		HttpStatus status = null;
-		List<QuestionDTO> res = new ArrayList<QuestionDTO>();
-		
-		try {
-			
-			Page<Question> result = qSer.searchWithPagination(term, page);
-			//Convert to DTO
-			result.getContent().forEach(e ->  {
-				QuestionDTO dto = new QuestionDTO();
-				BeanUtils.copyProperties(e, dto,"type","options");
-				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-				e.getOptions().forEach(op -> {
-					AnswerOptionDTO opDto = new AnswerOptionDTO();
-					BeanUtils.copyProperties(op, opDto);
-					opList.add(opDto);
-				});
-				dto.setOptions(opList);
-				TypeQuestionDTO typeDto = new TypeQuestionDTO();
-				BeanUtils.copyProperties(e.getType(), typeDto);
-				dto.setType(typeDto);
-				res.add(dto);
-			});
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<List<QuestionDTO>>(res, status);
-	}
-	
-	@GetMapping(value = "/search/getPage")
-	public ResponseEntity<List<QuestionDTO>> getPageWithType(@RequestParam("term") String term,@RequestParam("type") Integer type, @RequestParam("page") int page){
-		HttpStatus status = null;
-		List<QuestionDTO> res = new ArrayList<QuestionDTO>();
-		
-		try {
-			
-			Page<Question> result = qSer.searchWithTermAndType(term, type, page);
-			//Convert to DTO
-			result.getContent().forEach(e ->  {
-				QuestionDTO dto = new QuestionDTO();
-				BeanUtils.copyProperties(e, dto,"type","options");
-				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-				e.getOptions().forEach(op -> {
-					AnswerOptionDTO opDto = new AnswerOptionDTO();
-					BeanUtils.copyProperties(op, opDto);
-					opList.add(opDto);
-				});
-				dto.setOptions(opList);
-				TypeQuestionDTO typeDto = new TypeQuestionDTO();
-				BeanUtils.copyProperties(e.getType(), typeDto);
-				dto.setType(typeDto);
-				res.add(dto);
-			});
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<List<QuestionDTO>>(res, status);
 	}
 	
 	

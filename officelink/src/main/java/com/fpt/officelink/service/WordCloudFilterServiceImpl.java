@@ -14,12 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.entity.Answer;
+import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Word;
 import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.entity.WordCloudFilter;
+import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.WordCloudFilterRepository;
 import com.fpt.officelink.repository.WordListRepository;
 
@@ -34,23 +38,31 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	@Autowired
 	WordListRepository wlRep;
 
+	private CustomUser getUserContext() {
+		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
+
 	@Override
 	public Page<WordCloudFilter> searchWithPagination(String term, int pageNum) {
 		Pageable pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return filterRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return filterRep.findAllByNameContainAndWorkplaceIdAndIsDeleted(term, getUserContext().getWorkplaceId(), false,
+				pageRequest);
 	}
 
 	@Override
 	public void modifyFilter(WordCloudFilter filter, List<Word> wordList) {
 		Optional<WordCloudFilter> opFilter = filterRep.findById(filter.getId());
 		if (opFilter.isPresent()) {
+			WordCloudFilter curFilter = opFilter.get();
 			Set<Word> old = new HashSet<Word>();
-			opFilter.get().getWordList().forEach(e -> {
+			curFilter.getWordList().forEach(e -> {
 				old.add(e);
 			});
 			Date today = new Date(Calendar.getInstance().getTimeInMillis());
-			filter.setDateModified(today);
-			this.filterSave(filter, wordList);
+			curFilter.setName(filter.getName());
+			curFilter.setLanguage(filter.getLanguage());
+			curFilter.setDateModified(today);
+			this.filterSave(curFilter, wordList);
 			old.forEach(e -> {
 				Optional<Word> opWord = wlRep.findByName(e.getName());
 				if (opWord.isPresent()) {
@@ -70,8 +82,11 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	@Transactional
 	@Override
 	public void addNewFilter(WordCloudFilter filter, List<Word> wordList) {
+		Workplace workplace = new Workplace();
+		workplace.setId(getUserContext().getWorkplaceId());
 		Date today = new Date(Calendar.getInstance().getTimeInMillis());
 		filter.setDateCreated(today);
+		filter.setWorkplace(workplace);
 		this.filterSave(filter, wordList);
 	}
 
@@ -104,39 +119,39 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 			return true;
 		return false;
 	}
-	
+
 	@Override
 	public Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity) {
 		Set<WordCloud> details = new HashSet<WordCloud>();
 		Optional<WordCloudFilter> opFilter = filterRep.findById(id);
-		rawText = rawText.replaceAll("\\W^\\s", ""); 
+		rawText = rawText.replaceAll("\\W^\\s", "");
 		rawText = rawText.toLowerCase();
 		String[] words = rawText.trim().split(" ");
-		if(opFilter.isPresent()) {
+		if (opFilter.isPresent()) {
 			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());
 			boolean isFound;
-			for(int i = 0; i< words.length; i++) {
-				
-				if(words[i].trim() == "") {
+			for (int i = 0; i < words.length; i++) {
+
+				if (words[i].trim() == "") {
 					continue;
 				}
 				isFound = false;
 				for (WordCloud d : details) {
-					if(d.getWord().equalsIgnoreCase(words[i])) {
+					if (d.getWord().equalsIgnoreCase(words[i])) {
 						d.setTimes(d.getTimes() + 1);
 						isFound = true;
 						break;
 					}
 				}
-				if(!isFound) {
+				if (!isFound) {
 					boolean isIncludeInFilter = false;
 					for (Word word : filterWordList) {
-						if(word.getName().equalsIgnoreCase(words[i])) {
+						if (word.getName().equalsIgnoreCase(words[i])) {
 							isIncludeInFilter = true;
 							break;
 						}
 					}
-					if(!isIncludeInFilter) {
+					if (!isIncludeInFilter) {
 						WordCloud tmp = new WordCloud();
 						tmp.setWord(words[i].toLowerCase());
 						tmp.setTimes(1);
@@ -146,12 +161,39 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 				}
 			}
 		}
-		
+
 		return details;
-		
+
 	}
-	
-	
-	
-	
+
+	@Override
+	public List<WordCloudFilter> getAll() {
+		return filterRep.finAllByWorkplaceIdAndIsDeleted(getUserContext().getWorkplaceId(), false);
+	}
+
+	@Override
+	public List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId) {
+		List<AnswerReportDTO> filtered = new ArrayList<AnswerReportDTO>();
+		Optional<WordCloudFilter> opWcf = filterRep.findById(filterId);
+		if (opWcf.isPresent()) {
+			List<Word> words = new ArrayList<Word>(opWcf.get().getWordList());
+			boolean isExclude = true;
+			for (AnswerReportDTO answer : answers) {
+				boolean isFound = false;
+				for (Word word : words) {
+					if (answer.getTerm().equals(word.getName())) {
+						isFound = true;
+						break;
+					}
+				}
+				if ((!isFound && isExclude) || (isFound && !isExclude))
+					filtered.add(answer);
+
+			}
+			return filtered;
+		}
+
+		return filtered;
+	}
+
 }

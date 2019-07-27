@@ -2,6 +2,7 @@ package com.fpt.officelink.repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +17,13 @@ import com.fpt.officelink.entity.Survey;
 public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
 
+	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:name% AND s.workplace.id = :id AND s.isDeleted = :isDeleted")
+	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeleted(@Param("name") String name, @Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable pageable);
+	
 	@Query("SELECT s FROM Survey s WHERE s.isDeleted = :isDeleted AND s.workplace.id = :workplaceId")
 	List<Survey> findAllByWorkplaceAndIsDeleted(int workplaceId, boolean isDeleted);
 
-	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsActive(String name, int workplaceId,
+	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSent(String name, int workplaceId,
 			boolean isDeleted, boolean isActive, Pageable pageable);
 	
 	@Query("SELECT s FROM Survey s WHERE s.dateStop < :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")
@@ -31,4 +35,6 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	@Query("SELECT s FROM Survey s WHERE s.workplace.id = :id AND s.dateSendOut != null ORDER BY s.dateSendOut DESC")
 	Page<Survey> findTop5LastestSendOutSurvey(@Param("id") Integer workplaceId, Pageable pageable);
 	
+	@Query("SELECT s FROM Survey s WHERE LOWER(s.name) = LOWER(:name) AND s.workplace.id = :id")
+	Optional<Survey> findByNameAndWorkplaceId(@Param("name") String name, @Param("id") Integer workplaceId);
 }

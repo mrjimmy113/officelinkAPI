@@ -8,12 +8,12 @@ import org.springframework.data.domain.Page;
 
 import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
-import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.SurveySendTarget;
 import com.nimbusds.jose.JOSEException;
 
 public interface SurveyService {
@@ -22,7 +22,7 @@ public interface SurveyService {
 
 	void delete(Integer id);
 
-	void updateSurvey(Survey survey, List<SurveyQuestion> sqList);
+	boolean updateSurvey(Survey survey, List<SurveyQuestion> sqList);
 
 	List<SurveyQuestion> getDetail(Integer id);
 
@@ -30,7 +30,7 @@ public interface SurveyService {
 
 	List<Survey> getWorkplaceSurvey(int workplaceId);
 
-	void newSurvey(Survey survey, List<SurveyQuestion> sqList);
+	boolean newSurvey(Survey survey, List<SurveyQuestion> sqList);
 
 	SurveyReportDTO getReport(Integer id);
 
@@ -40,8 +40,6 @@ public interface SurveyService {
 	Page<Survey> searchReportWithPagination(String term, int pageNum);
 
 	void saveAnswer(SurveyAnswerInforDTO dto);
-
-	void sendOutSurvey(SendSurveyDTO sendInfor, int workplaceId) throws JOSEException;
 
 	void sendRoutineSurvey(int surveyId, int duration) throws JOSEException;
 
@@ -57,4 +55,7 @@ public interface SurveyService {
 	List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId, int teamId);
 
 	boolean checkIfUserTakeSurvey(Integer surveyId);
+
+	boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
+			throws JOSEException;
 }

@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.validation.constraints.Positive;
 
-import com.fpt.officelink.entity.Question;
-
 public class SurveyDTO {
 	@Positive
 	private Integer id;
@@ -18,6 +16,8 @@ public class SurveyDTO {
 	private boolean isShared;
 	
 	private boolean isActive;
+	
+	private boolean isSent;
 	
 	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
 
@@ -69,7 +69,11 @@ public class SurveyDTO {
 		this.questions = questions;
 	}
 
-	
-	
-	
+	public boolean isSent() {
+		return isSent;
+	}
+
+	public void setSent(boolean isSent) {
+		this.isSent = isSent;
+	}
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,15 +32,18 @@ import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.News;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.NewsRepository;
+import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamRepository;
+import com.nimbusds.jose.JOSEException;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -67,6 +71,12 @@ public class ReportServiceImpl implements ReportService {
 	
 	@Autowired
     ServletContext context;
+	
+	@Autowired
+	SurveyQuestionRepository surQuestRep;
+	
+	@Autowired
+	JwtService jwtSer;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -77,7 +87,7 @@ public class ReportServiceImpl implements ReportService {
 		SurveySendDetailDTO result = new SurveySendDetailDTO();
 		Survey survey = surRep.findById(surveyId).get();
 		List<SurveySendTarget> targets = null;
-		if (survey.getTemplateId() != 0) {
+		if (survey.getTemplateId() != null) {
 			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
 		} else {
 			targets = targetRep.findAllBySurveyId(surveyId);
@@ -250,4 +260,20 @@ public class ReportServiceImpl implements ReportService {
      
 		return result;
 	}
+
+	@Override
+	public Optional<SurveyQuestion> getDownloadDetail(String token) throws ParseException {
+		if(jwtSer.validateDownLoadToken(token)) {
+			Integer surveyId = jwtSer.getSurveyId(token);
+			Integer questionId = jwtSer.getQuestionId(token);
+			return surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId);
+		}
+		return null;
+	}
+	
+	@Override
+	public String getDownLoadToken(Integer surveyId, Integer questionId) throws JOSEException {
+		return jwtSer.createDownloadToken(surveyId, questionId);
+	}
+
 }
