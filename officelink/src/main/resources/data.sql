@@ -12,6 +12,6 @@ INSERT INTO role VALUES (1, "employer"), (2, "employee") , (3, "manager") , (4, 
 
 INSERT INTO workplace VALUES (1,NULL,NULL,'\0',"Office Link System Dummie");
 
-INSERT INTO account VALUES (1,NULL,NULL,NULL,"officelink@gmail.com","Office Link System Dummie",'\0',"","$2b$10$ZCJvGsNIkO0/RVp4GNz/r.mPtvnionj9Negy4FfGLcLi6kE.wv9yC",NULL,4,1);
+INSERT INTO account VALUES (1,NULL,NULL,NULL,"officelink@gmail.com","Office Link System Dummie",'\0',"","$2a$10$tiD920g0y5mgxnG1/QPvaO/63Ct1HotA/4Lq1dzIxi1zXR5y4yzfu",NULL,4,1);
 
 INSERT INTO configuration VALUES (1,NULL,NULL,0, b'1','\0',"0 5 0 * * *",NULL,1);
