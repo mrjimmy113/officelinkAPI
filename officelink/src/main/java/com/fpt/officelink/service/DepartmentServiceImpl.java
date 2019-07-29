@@ -76,6 +76,10 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (dep == null) {
 			return false;
 		}
+		int count = depRep.countTeamsInDep(id);
+		if (count > 0) {
+			return false;
+		}
 		
 		dep.setDateModified(new Date());
 		dep.setDeleted(true);

@@ -144,8 +144,13 @@ public class DepartmentController {
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;
 		try {
-			depService.removeDepartment(id);
-			status = HttpStatus.OK;
+			boolean success = depService.removeDepartment(id);
+			
+			if (success) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
