@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.fpt.officelink.entity.Answer;
+import java.util.Set;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 
@@ -35,5 +36,10 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 	
 	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.surveyQuestion.question.id = :questionId")
 	List<Answer> findAllBySurveyIdAndQuestionId(@Param("surveyId") Integer surveyId, @Param("questionId") Integer questionId);
+        
+        Set<Answer> findAllByAccountId(int id);
+        
+        @Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.account.id = :accountId")
+        List<Answer> findAllByAccountIdAndSurveyId(@Param("surveyId") Integer surveyId, @Param("accountId") Integer accountId);
 
 }
