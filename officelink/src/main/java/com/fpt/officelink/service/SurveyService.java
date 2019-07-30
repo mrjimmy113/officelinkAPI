@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import com.fpt.officelink.dto.AnswerDTO;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.fpt.officelink.dto.AnswerReportDTO;
+import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
@@ -58,4 +60,12 @@ public interface SurveyService {
 
 	boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
 			throws JOSEException;
+        
+        Page<Survey> getHistorySurveyWithPagination(String term, int pageNum);
+        
+        Date getDateTakenSurvey(int surveyId);
+        
+        List<QuestionDTO> getTakeSurveyHistory(int id);
+        
+        List<AnswerDTO> getAnswerBySurveyId(int surveyId);
 }

@@ -1,5 +1,6 @@
 package com.fpt.officelink.repository;
 
+import com.fpt.officelink.entity.Answer;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -12,29 +13,38 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.fpt.officelink.entity.Survey;
+import java.util.Set;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<Survey, Integer> {
-	Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
 
-	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:name% AND s.workplace.id = :id AND s.isDeleted = :isDeleted")
-	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeleted(@Param("name") String name, @Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable pageable);
-	
-	@Query("SELECT s FROM Survey s WHERE s.isDeleted = :isDeleted AND s.workplace.id = :workplaceId")
-	List<Survey> findAllByWorkplaceAndIsDeleted(int workplaceId, boolean isDeleted);
+    Page<Survey> findAllByNameContainingAndIsDeleted(String name, boolean isDeleted, Pageable pageable);
 
-	Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSent(String name, int workplaceId,
-			boolean isDeleted, boolean isActive, Pageable pageable);
-	
-	@Query("SELECT s FROM Survey s WHERE s.dateStop < :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")
-	List<Survey> findAllByDateStopAndIsActiveAndIsDeleted(Date date, boolean isActive, boolean isDeleted);
+    @Query("SELECT s FROM Survey s WHERE s.name LIKE %:name% AND s.workplace.id = :id AND s.isDeleted = :isDeleted")
+    Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeleted(@Param("name") String name, @Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted, Pageable pageable);
 
-	@Query("SELECT s FROM Survey s JOIN s.surveyQuestions q WHERE q.question.id = :id AND s.id NOT IN (:notId) AND s.isActive = true")
-	List<Survey> findAllByQuestionId(@Param("id") Integer id,@Param("notId") List<Integer> notId);
-	
-	@Query("SELECT s FROM Survey s WHERE s.workplace.id = :id AND s.dateSendOut != null ORDER BY s.dateSendOut DESC")
-	Page<Survey> findTop5LastestSendOutSurvey(@Param("id") Integer workplaceId, Pageable pageable);
-	
-	@Query("SELECT s FROM Survey s WHERE LOWER(s.name) = LOWER(:name) AND s.workplace.id = :id")
-	Optional<Survey> findByNameAndWorkplaceId(@Param("name") String name, @Param("id") Integer workplaceId);
+    @Query("SELECT s FROM Survey s WHERE s.isDeleted = :isDeleted AND s.workplace.id = :workplaceId")
+    List<Survey> findAllByWorkplaceAndIsDeleted(int workplaceId, boolean isDeleted);
+
+    Page<Survey> findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSent(String name, int workplaceId,
+            boolean isDeleted, boolean isActive, Pageable pageable);
+
+    @Query("SELECT s FROM Survey s WHERE s.dateStop < :date AND s.isActive = :isActive AND s.isDeleted = :isDeleted")
+    List<Survey> findAllByDateStopAndIsActiveAndIsDeleted(Date date, boolean isActive, boolean isDeleted);
+
+    @Query("SELECT s FROM Survey s JOIN s.surveyQuestions q WHERE q.question.id = :id AND s.id NOT IN (:notId) AND s.isActive = true")
+    List<Survey> findAllByQuestionId(@Param("id") Integer id, @Param("notId") List<Integer> notId);
+
+    @Query("SELECT s FROM Survey s WHERE s.workplace.id = :id AND s.dateSendOut != null ORDER BY s.dateSendOut DESC")
+    Page<Survey> findTop5LastestSendOutSurvey(@Param("id") Integer workplaceId, Pageable pageable);
+
+    @Query("SELECT s FROM Survey s WHERE LOWER(s.name) = LOWER(:name) AND s.workplace.id = :id")
+    Optional<Survey> findByNameAndWorkplaceId(@Param("name") String name, @Param("id") Integer workplaceId);
+
+    @Query("SELECT DISTINCT s FROM Survey s JOIN s.surveyQuestions q JOIN q.answers a WHERE s.isDeleted = :isDeleted AND s.name like %:name% AND a in :answers")
+    Page<Survey> findAllByAnswersAndIsDeleted(
+            @Param("isDeleted") boolean isDeleted,
+            @Param("name") String name,
+            @Param("answers") Set<Answer> answers,
+            Pageable pageable);
 }
