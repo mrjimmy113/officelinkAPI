@@ -15,12 +15,16 @@ import com.fpt.officelink.entity.Question;
 public interface QuestionRepository extends JpaRepository<Question, Integer>{
 	Page<Question> findAllByQuestionContainingAndWorkplaceIdAndIsDeleted(String term,Integer workplaceId,boolean isDeleted, Pageable pageable);
 	
-	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :id AND q.isDeleted = false")
-	Page<Question> findByQuestionAndType(@Param("term") String term,@Param("id") Integer id, Pageable pageable);
+	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :id AND q.workplace.id = :id1 OR q.workplace.id =:id2 AND q.isDeleted = :isDeleted")
+	Page<Question> findByQuestionAndType(@Param("term") String term,@Param("id") Integer id, @Param("id1") Integer id1,@Param("id2") Integer id2,@Param("isDeleted") boolean isDeleted, Pageable pageable);
 	
 	@Query("SELECT q from Question q "
 			+ "JOIN SurveyQuestion s "
 			+ "ON q.id = s.question.id "
 			+ "WHERE s.survey.id = :id")
 	List<Question> findAllBySurveyId(@Param("id") Integer id);
+	
+	@Query("SELECT q FROM Question q WHERE q.question LIKE %:term% AND q.workplace.id = :id1 OR q.workplace.id =:id2 AND q.isDeleted = :isDeleted")
+	Page<Question> findAllByTwoWorkplaceIdAndIsDeleted(@Param("term") String term, @Param("id1") Integer id1,
+			@Param("id2") Integer id2,@Param("isDeleted") boolean isDeleted, Pageable pageable);
 }
