@@ -104,6 +104,42 @@ public class QuestionController {
 		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
 	}
 	
+	@GetMapping("/chooseList")
+	public ResponseEntity<PageSearchDTO<QuestionDTO>> getChooseQuestionList(@RequestParam("term") String term, @RequestParam("page") int page){
+		HttpStatus status = null;
+		PageSearchDTO<QuestionDTO> res = new PageSearchDTO<QuestionDTO>();
+		
+		try {
+			
+			Page<Question> result = qSer.searchWithPaginationSystemWorkplace(term, page);
+			//Convert to DTO
+			List<QuestionDTO> dtoList = new ArrayList<QuestionDTO>();
+			result.getContent().forEach(e ->  {
+				QuestionDTO dto = new QuestionDTO();
+				BeanUtils.copyProperties(e, dto,"type","options");
+				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
+				e.getOptions().forEach(op -> {
+					AnswerOptionDTO opDto = new AnswerOptionDTO();
+					BeanUtils.copyProperties(op, opDto);
+					opList.add(opDto);
+				});
+				dto.setOptions(opList);
+				TypeQuestionDTO typeDto = new TypeQuestionDTO();
+				BeanUtils.copyProperties(e.getType(), typeDto);
+				dto.setType(typeDto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
+	}
+	
 	
 	@PostMapping
 	public ResponseEntity<Integer> createQuestion(@RequestBody QuestionDTO dto) {

@@ -19,4 +19,6 @@ public interface QuestionService {
 
 	Page<Question> searchWithTermAndType(String term, Integer type, int pageNum);
 
+	Page<Question> searchWithPaginationSystemWorkplace(String term, int pageNum);
+
 }

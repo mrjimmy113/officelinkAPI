@@ -27,26 +27,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	UserDetailsService detailSer;
-	
-	@Resource(name="authService")
+
+	@Resource(name = "authService")
 	private UserDetailsService userDetailsService;
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-	    auth.userDetailsService(userDetailsService);
+		auth.userDetailsService(userDetailsService);
 	}
-	
+
 	@Override
 	@Bean
 	public AuthenticationManager authenticationManagerBean() throws Exception {
-	    return super.authenticationManagerBean();
+		return super.authenticationManagerBean();
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-		.exceptionHandling()
-		.authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDined);
+		http.csrf().disable().exceptionHandling().authenticationEntryPoint(entryPoint).accessDeniedHandler(accessDined)
+//				.and().authorizeRequests()
+//				.antMatchers("/account/confirm", "/account/sendMail", "/account/sendMailReset", "/account/invitationInfor",
+//						"/account/acceptInvite", "/account/resetPassword","login")
+//				.anonymous()
+//				.antMatchers("/account/profile","/account/")
+
+		;
 
 	}
 
