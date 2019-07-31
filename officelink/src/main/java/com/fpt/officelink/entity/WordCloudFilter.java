@@ -54,6 +54,9 @@ public class WordCloudFilter implements Serializable {
 	@Column
 	private boolean isExclude;
 	
+	@Column
+	private boolean isTemplate;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -124,6 +127,14 @@ public class WordCloudFilter implements Serializable {
 
 	public void setExclude(boolean isExclude) {
 		this.isExclude = isExclude;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
 	}
 	
 	

@@ -358,4 +358,27 @@ public class SurveyController {
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
+	
+	@GetMapping("/template")
+	public ResponseEntity<PageSearchDTO<SurveyDTO>> searchTemplate(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
+		try {
+			Page<Survey> result = ser.loadTemplateSurvey(term, page);
+			List<SurveyDTO> dtoList = new ArrayList<SurveyDTO>();
+			result.getContent().forEach(s -> {
+				SurveyDTO dto = new SurveyDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
+	}
 }

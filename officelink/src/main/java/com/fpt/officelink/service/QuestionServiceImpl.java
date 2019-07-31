@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,9 @@ public class QuestionServiceImpl implements QuestionService {
 	public void addNewQuestion(Question q, Integer typeId) {
 		Optional<TypeQuestion> tmp = typeRep.findById(typeId);
 		if (tmp.isPresent()) {
+			if(getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_system_admin"))) {
+				q.setTemplate(true);
+			}
 			Workplace workplace = new Workplace();
 			workplace.setId(getUserContext().getWorkplaceId());
 			q.setWorkplace(workplace);
@@ -72,7 +76,13 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Page<Question> searchWithTermAndType(String term, Integer id, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return quesRep.findByQuestionAndType(term, id, pageRequest);
+		return quesRep.findAllTemplateWithType(term, id, getUserContext().getWorkplaceId(), pageRequest);
+	}
+
+	@Override
+	public Page<Question> searchWithPaginationSystemWorkplace(String term, int pageNum) {
+		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+		return quesRep.findAllTemplate(term, getUserContext().getWorkplaceId(), pageRequest);
 	}
 
 }
