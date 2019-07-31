@@ -111,7 +111,7 @@ public class WorkplaceController {
 	
 	@Secured({"ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> update(	@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();
