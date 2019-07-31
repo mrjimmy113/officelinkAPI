@@ -123,7 +123,7 @@ public class TeamController {
 
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
-	public ResponseEntity<Integer> create(@Valid @RequestBody TeamDTO dto) {
+	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 
@@ -153,7 +153,7 @@ public class TeamController {
 
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody TeamDTO dto) {
+	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 
