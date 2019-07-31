@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -107,15 +108,23 @@ public class SurveyServiceImpl implements SurveyService {
 	public boolean newSurvey(Survey survey, List<SurveyQuestion> sqList) {
 		Optional<Survey> opSur = surveyRep.findByNameAndWorkplaceId(survey.getName(),
 				getUserContext().getWorkplaceId());
+		boolean isAdmin = false;
 		if (opSur.isPresent())
 			return false;
 		survey.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+		
+		if(getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_system_admin"))) {
+			isAdmin = true;
+		}
+		if(isAdmin) survey.setTemplate(true);
 		Workplace workplace = new Workplace();
 		workplace.setId(getUserContext().getWorkplaceId());
 		survey.setWorkplace(workplace);
 		surveyRep.save(survey);
-		sqList.forEach(sq -> {
+		for (SurveyQuestion sq : sqList) {
 			Question q = sq.getQuestion();
+			q.setWorkplace(workplace);
+			if(isAdmin) q.setTemplate(true);
 			if (q.getId() == null) {
 				for (AnswerOption op : q.getOptions()) {
 					op.setQuestion(q);
@@ -130,7 +139,7 @@ public class SurveyServiceImpl implements SurveyService {
 			sq.setQuestion(q);
 			sq.setSurvey(survey);
 			surQuestRep.save(sq);
-		});
+		}
 		return true;
 
 	}
@@ -720,5 +729,12 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 
 		return result;
+	}
+	
+	@Override
+	public Page<Survey> loadTemplateSurvey(String term, int pageNum) {
+		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+		return surveyRep.findAllTemplateSurvey(term, getUserContext().getWorkplaceId(),pageRequest);
+		
 	}
 }

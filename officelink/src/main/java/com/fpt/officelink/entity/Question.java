@@ -48,6 +48,9 @@ public class Question implements Serializable {
 	@ManyToOne()
 	@JoinColumn(name = "workplace_id")
 	private Workplace workplace;
+	
+	@Column
+	private boolean isTemplate;
 
 	public Integer getId() {
 		return id;
@@ -103,6 +106,14 @@ public class Question implements Serializable {
 
 	public void setWorkplace(Workplace workplace) {
 		this.workplace = workplace;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
 	}
 	
 	

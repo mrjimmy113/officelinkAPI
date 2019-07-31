@@ -58,4 +58,6 @@ public interface SurveyService {
 
 	boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
 			throws JOSEException;
+
+	Page<Survey> loadTemplateSurvey(String term, int pageNum);
 }

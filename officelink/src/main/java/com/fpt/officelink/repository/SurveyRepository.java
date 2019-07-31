@@ -37,4 +37,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	
 	@Query("SELECT s FROM Survey s WHERE LOWER(s.name) = LOWER(:name) AND s.workplace.id = :id")
 	Optional<Survey> findByNameAndWorkplaceId(@Param("name") String name, @Param("id") Integer workplaceId);
+	
+	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:term% AND s.workplace.id = :id OR s.isTemplate = true AND s.isDeleted = false")
+	Page<Survey> findAllTemplateSurvey(@Param("term") String term, @Param("id") Integer workplaceId, Pageable pageable);
 }
