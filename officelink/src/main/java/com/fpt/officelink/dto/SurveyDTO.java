@@ -1,5 +1,6 @@
 package com.fpt.officelink.dto;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class SurveyDTO {
 	private boolean isActive;
 	
 	private boolean isSent;
+	
+	private Date dateTaken;
 	
 	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
 
@@ -76,4 +79,14 @@ public class SurveyDTO {
 	public void setSent(boolean isSent) {
 		this.isSent = isSent;
 	}
+
+	public Date getDateTaken() {
+		return dateTaken;
+	}
+
+	public void setDateTaken(Date dateTaken) {
+		this.dateTaken = dateTaken;
+	}
+	
+	
 }

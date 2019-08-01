@@ -30,7 +30,7 @@ public class Answer implements Serializable {
 	@Column(name = "date_created")
 	private Date dateCreated;
 	
-	@Column
+	@Column(length = 500)
 	private String content;
 	
 	@ManyToOne

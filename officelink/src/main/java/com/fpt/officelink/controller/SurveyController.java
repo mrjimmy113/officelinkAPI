@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
@@ -259,7 +260,7 @@ public class SurveyController {
 
 				status = HttpStatus.OK;
 			} else {
-				status = HttpStatus.ACCEPTED;
+				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -311,10 +312,14 @@ public class SurveyController {
 	@PostMapping("/answer")
 	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
-		System.out.println("answer");
 		try {
-			ser.saveAnswer(dto);
-			status = HttpStatus.OK;
+			if(ser.checkIfUserTakeSurvey(dto.getSurveyId())) {
+				status = HttpStatus.CONFLICT;
+			}else {
+				ser.saveAnswer(dto);
+				status = HttpStatus.OK;
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
@@ -381,4 +386,44 @@ public class SurveyController {
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
+	
+	@GetMapping(value = "/history")
+    public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term, @RequestParam("page") int page) {
+        HttpStatus status = null;
+        PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
+        try {
+            //Call Service
+            Page<Survey> result = ser.getHistorySurveyWithPagination(term, page);
+            //Convert to DTO
+            List<SurveyDTO> resultList = new ArrayList<SurveyDTO>();
+            result.getContent().forEach(element -> {
+                SurveyDTO dto = new SurveyDTO();
+                BeanUtils.copyProperties(element, dto);
+                dto.setDateTaken(ser.getDateTakenSurvey(dto.getId()));
+                dto.setQuestions(ser.getTakeSurveyHistory(dto.getId()));
+                resultList.add(dto);
+            });
+            res.setMaxPage(result.getTotalPages());
+            res.setObjList(resultList);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
+    }
+
+    @GetMapping("/history/answer")
+    public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
+        HttpStatus status = null;
+        List<AnswerDTO> dto = new ArrayList<>();
+        try {
+            dto = ser.getAnswerBySurveyId(id);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<List<AnswerDTO>>(dto, status);
+    }
 }

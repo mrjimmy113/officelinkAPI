@@ -27,7 +27,7 @@ public class JwtService {
 	public static final String ROLE = "role";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
 	public static final String WORKPLACE_ID = "workplaceId";
-	public static final int EXPIRE_TIME = 86400000;
+	public static final int EXPIRE_TIME = 24 * 3600 * 1000;
 
 	public String generateTokenLogin(String email, String role) throws JOSEException {
 		String token = null;
@@ -35,7 +35,7 @@ public class JwtService {
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(EMAIL, email);
 		builder.claim(ROLE, role);
-		builder.expirationTime(generateExpirationDate());
+		builder.expirationTime(generateExpirationDate(1));
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 		signedJWT.sign(signer);
@@ -43,12 +43,13 @@ public class JwtService {
 		return token;
 	}
 
-	public String createSurveyToken(Integer surveyId) throws JOSEException {
+	public String createSurveyToken(String email,Integer surveyId, int duration) throws JOSEException {
 		String token = null;
 		JWSSigner signer = new MACSigner(generateShareSecret());
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(SURVEY_ID, surveyId);
-		builder.expirationTime(generateExpirationDate());
+		builder.claim(EMAIL, email);
+		builder.expirationTime(generateExpirationDate(duration));
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 		signedJWT.sign(signer);
@@ -62,7 +63,7 @@ public class JwtService {
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(EMAIL, email);
 		builder.claim(WORKPLACE_ID, workplaceId);
-		builder.expirationTime(generateExpirationDate());
+		builder.expirationTime(generateExpirationDate(1));
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 		signedJWT.sign(signer);
@@ -76,7 +77,7 @@ public class JwtService {
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(SURVEY_ID, surveyId);
 		builder.claim(QUESTION_ID, questionId);
-		builder.expirationTime(generateExpirationDate());
+		builder.expirationTime(generateExpirationDate(1));
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 		signedJWT.sign(signer);
@@ -92,7 +93,7 @@ public class JwtService {
 			JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 			builder.claim(EMAIL, email);
 
-			builder.expirationTime(generateExpirationDate());
+			builder.expirationTime(generateExpirationDate(1));
 			JWTClaimsSet claimsSet = builder.build();
 			SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 			signedJWT.sign(signer);
@@ -110,7 +111,7 @@ public class JwtService {
 			JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 			builder.claim(DTO, dto);
 
-			builder.expirationTime(generateExpirationDate());
+			builder.expirationTime(generateExpirationDate(1));
 			JWTClaimsSet claimsSet = builder.build();
 			SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 			signedJWT.sign(signer);
@@ -158,8 +159,8 @@ public class JwtService {
 
 
 
-	private Date generateExpirationDate() {
-		return new Date(System.currentTimeMillis() + EXPIRE_TIME);
+	private Date generateExpirationDate(int duration) {
+		return new Date(System.currentTimeMillis() + EXPIRE_TIME * duration);
 	}
 
 	private Date getExpirationDateFromToken(String token) {
