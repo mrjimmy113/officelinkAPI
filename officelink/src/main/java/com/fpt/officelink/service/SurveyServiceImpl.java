@@ -28,7 +28,6 @@ import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
-import com.fpt.officelink.dto.SendSurveyDTO;
 import com.fpt.officelink.dto.SendTargetDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
@@ -41,6 +40,7 @@ import com.fpt.officelink.entity.AnswerReport;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.MultipleAnswer;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
@@ -49,6 +49,7 @@ import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.TeamQuestionReport;
 import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.entity.Workplace;
+import com.fpt.officelink.enumaration.TypeEnum;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
@@ -59,6 +60,7 @@ import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
 import com.fpt.officelink.repository.TeamQuestionReportRepository;
+import com.fpt.officelink.repository.WordCloudRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -101,6 +103,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Autowired
 	TeamQuestionReportRepository teamQuestReportRep;
+	
+	@Autowired
+	WordCloudRepository a;
 
 	@Value("${angular.path}")
 	private String angularPath;
@@ -233,7 +238,7 @@ public class SurveyServiceImpl implements SurveyService {
 		if (jwtSer.validateTakeSurveyToken(token)) {
 			Integer id = jwtSer.getSurveyId(token);
 			String email = jwtSer.getEmailFromToken(token);
-			if(email.equals(getUserContext().getUsername())) return null;
+			if(!email.equals(getUserContext().getUsername())) return null;
 			Optional<Survey> survey = surveyRep.findById(id);
 			if (survey.isPresent()) {
 				if (checkIfUserTakeSurvey(id))
@@ -417,13 +422,25 @@ public class SurveyServiceImpl implements SurveyService {
 			surveyRep.save(sur);
 			dto.getAnswers().forEach(a -> {
 				Answer entity = new Answer();
-				Account acc = (accRep.findByEmail(getUserContext().getUsername())).get();
+				Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
 				entity.setAccount(acc);
 				entity.setContent(a.getContent());
-				entity.setSurveyQuestion(surQuestRep.findById(a.getQuestionIdentity()).get());
+				SurveyQuestion sq = new SurveyQuestion();
+				sq.setId(a.getQuestionIdentity());
+				entity.setSurveyQuestion(sq);
 				entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
-				if (a.getContent().matches(".*[a-zA-Z]+.*")) {
+				if (a.getQuestionType().equals(TypeEnum.TEXT.toString())) {
 					entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), 1, entity));
+				}else if(a.getQuestionType().equals(TypeEnum.MULTIPLE.toString())) {
+					String[] options = a.getContent().split(",");
+					List<MultipleAnswer> multipleAnswers = new ArrayList<MultipleAnswer>();
+					for (int i = 0; i < options.length; i++) {
+						MultipleAnswer multipleAnswer = new MultipleAnswer();
+						multipleAnswer.setAnswerOption(options[i]);
+						multipleAnswer.setAnswer(entity);
+						multipleAnswers.add(multipleAnswer);
+					}
+					entity.setMultiple(multipleAnswers);
 				}
 				savedAnswer.add(entity);
 			});
@@ -451,7 +468,7 @@ public class SurveyServiceImpl implements SurveyService {
 				if(tmpLocation != null) dto.setLocationName(tmpLocation.getName());
 				else dto.setLocationName("");
 				
-				if(tmpTeam != null) dto.setTeamName(tmpLocation.getName());
+				if(tmpTeam != null) dto.setTeamName(tmpTeam.getName());
 				else dto.setTeamName("");
 				
 				sendSurveyDTOs.add(dto);

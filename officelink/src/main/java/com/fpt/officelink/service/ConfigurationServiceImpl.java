@@ -121,24 +121,22 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public List<SurveySendTarget> filterDuplicate(List<SurveySendTarget> targets) {
-		System.out.println(targets);
 		List<SurveySendTarget> locations = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> deps = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> locationDeps = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> teams = new ArrayList<SurveySendTarget>();
 		List<SurveySendTarget> filtered = new ArrayList<SurveySendTarget>();
 		boolean isAll = false;
-		for (SurveySendTarget target : targets) {
-			Location location = target.getLocation();
-			Department dep = target.getDepartment();
-			Team team = target.getTeam();
+		for (int i = 0; i < targets.size(); i++) {
+			Location location = targets.get(i).getLocation();
+			Department dep = targets.get(i).getDepartment();
+			Team team = targets.get(i).getTeam();
 			if (location == null && dep == null && team == null) {
 				isAll = true;
-				target.setNeed(true);
-				filtered.add(target);
+				filtered.addAll(targets);
+				filtered.get(i).setNeed(true);
 				break;
 			}
-
 		}
 		if (!isAll) {
 			for (SurveySendTarget target : targets) {

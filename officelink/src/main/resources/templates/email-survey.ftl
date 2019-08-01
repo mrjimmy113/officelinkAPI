@@ -16,7 +16,7 @@
 <h2 style="align-content: center; color: darkturquoise">OFFICE LINK</h2><br/>
 
 <span>Hello!</span><br/>
-<span>Congratulations, your account has successfully activated, please select the button below:</span><br/>
+<span>You have received a request to take a survey, please click the button to process</span><br/>
 <a  rel="link" style="background-color: #4CAF50;
   border: none;
   color: white;

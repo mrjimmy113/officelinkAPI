@@ -121,18 +121,19 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	}
 
 	@Override
-	public Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity) {
-		Set<WordCloud> details = new HashSet<WordCloud>();
+	public List<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity) {
+		List<WordCloud> details = new ArrayList<WordCloud>();
 		Optional<WordCloudFilter> opFilter = filterRep.findById(id);
-		rawText = rawText.replaceAll("\\W^\\s", "");
+		rawText = rawText.replaceAll("[^A-Za-z0-9_\\-\\s]", "");
+		rawText = rawText.replaceAll("\n", " ");
 		rawText = rawText.toLowerCase();
+		System.out.println(rawText);
 		String[] words = rawText.trim().split(" ");
 		if (opFilter.isPresent()) {
 			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());
 			boolean isFound;
 			for (int i = 0; i < words.length; i++) {
-
-				if (words[i].trim() == "") {
+				if(words[i].trim().isEmpty()) {
 					continue;
 				}
 				isFound = false;
