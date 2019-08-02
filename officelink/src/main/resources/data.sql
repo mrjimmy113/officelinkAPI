@@ -1,6 +1,6 @@
-insert into type_question (type) value("SINGLE");
-insert into type_question (type) value("MULTIPLE");
-insert into type_question (type) value("TEXT");
+insert into type_question value(1,"SINGLE");
+insert into type_question value(2,"MULTIPLE");
+insert into type_question value(3,"TEXT");
 
 INSERT INTO role VALUES (1, "employer"), (2, "employee") , (3, "manager") , (4, "system_admin");
 

@@ -22,11 +22,11 @@ public interface WordCloudFilterService {
 
 	void delete(Integer id);
 
-	boolean isExisted(String name, String language);
-
 	List<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity);
 
 	List<WordCloudFilter> getAll();
 
 	List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId);
+
+	boolean isExisted(String name);
 }

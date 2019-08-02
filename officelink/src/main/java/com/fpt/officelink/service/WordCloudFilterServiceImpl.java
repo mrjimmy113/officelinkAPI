@@ -60,7 +60,6 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 			});
 			Date today = new Date(Calendar.getInstance().getTimeInMillis());
 			curFilter.setName(filter.getName());
-			curFilter.setLanguage(filter.getLanguage());
 			curFilter.setDateModified(today);
 			this.filterSave(curFilter, wordList);
 			old.forEach(e -> {
@@ -113,8 +112,8 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 	}
 
 	@Override
-	public boolean isExisted(String name, String language) {
-		Optional<WordCloudFilter> opWCF = filterRep.findByNameInIgnoreCaseAndLanguageInIgnoreCase(name, language);
+	public boolean isExisted(String name) {
+		Optional<WordCloudFilter> opWCF = filterRep.findByNameInIgnoreCase(name);
 		if (opWCF.isPresent())
 			return true;
 		return false;
@@ -178,7 +177,7 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		Optional<WordCloudFilter> opWcf = filterRep.findById(filterId);
 		if (opWcf.isPresent()) {
 			List<Word> words = new ArrayList<Word>(opWcf.get().getWordList());
-			boolean isExclude = true;
+			boolean isExclude = opWcf.get().isExclude();
 			for (AnswerReportDTO answer : answers) {
 				boolean isFound = false;
 				for (Word word : words) {

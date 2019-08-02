@@ -319,6 +319,7 @@ public class SurveyServiceImpl implements SurveyService {
 				surveyRep.save(survey);
 				targetRep.saveAll(targets);
 				for (Account account : sendList) {
+					if(account.getLocation() == null || account.getTeams() == null) continue;
 					Map<String, Object> model = new HashMap<String, Object>();
 					model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(account.getEmail(), surveyId, duration));
 					String[] tmp = new String[1];
@@ -388,6 +389,7 @@ public class SurveyServiceImpl implements SurveyService {
 			});
 			surQuestRep.saveAll(newSurQuests);
 			for (Account account : sendList) {
+				if(account.getLocation() == null || account.getTeams() == null) continue;
 				Map<String, Object> model = new HashMap<String, Object>();
 				model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(account.getEmail(), surveyId, duration));
 				String[] tmp = new String[1];

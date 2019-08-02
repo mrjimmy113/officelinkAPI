@@ -8,8 +8,6 @@ public class WordCloudFilterDTO {
 	private Integer id;
 
 	private String name;
-
-	private String language;
 	
 	private boolean isExclude;
 
@@ -29,14 +27,6 @@ public class WordCloudFilterDTO {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 	public List<WordDTO> getWordList() {
