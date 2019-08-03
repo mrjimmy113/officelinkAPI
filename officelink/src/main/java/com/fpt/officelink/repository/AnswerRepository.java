@@ -1,11 +1,13 @@
 package com.fpt.officelink.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.entity.Answer;
 
 public interface AnswerRepository extends JpaRepository<Answer, Integer> {
@@ -20,7 +22,8 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 	List<Answer> findAllByIndentityAndLocationId(@Param("id") Integer id, @Param("locationId") Integer locationId);
 
 	@Query("SELECT a FROM Answer a JOIN a.account.teams t WHERE a.surveyQuestion.id = :id AND t.department.id = :departmentId")
-	List<Answer> findAllByIndentityAndDepartmentId(@Param("id") Integer id, @Param("departmentId") Integer departmentId);
+	List<Answer> findAllByIndentityAndDepartmentId(@Param("id") Integer id,
+			@Param("departmentId") Integer departmentId);
 
 	@Query("SELECT a FROM Answer a JOIN a.account.teams t WHERE a.surveyQuestion.id = :id AND t.id = :teamId")
 	List<Answer> findAllByIndentityAndTeamId(@Param("id") Integer id, @Param("teamId") Integer teamId);
@@ -28,12 +31,21 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
 	@Query("SELECT a FROM Answer a JOIN a.account.teams t WHERE a.surveyQuestion.id = :id AND a.account.location.id = :locationId AND t.department.id = :departmentId")
 	List<Answer> findAllByIndentityAndLocationIdAndDepartmentId(@Param("id") Integer id,
 			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
-	
+
 	@Query("SELECT a FROM Answer a JOIN a.account.teams t WHERE a.surveyQuestion.id = :id OR a.account.location.id = :locationId AND t.department.id = :departmentId")
 	List<Answer> findAllByIndentityAndLocationIdOrDepartmentId(@Param("id") Integer id,
 			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
-	
-	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.surveyQuestion.question.id = :questionId")
-	List<Answer> findAllBySurveyIdAndQuestionId(@Param("surveyId") Integer surveyId, @Param("questionId") Integer questionId);
 
+	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.surveyQuestion.question.id = :questionId")
+	List<Answer> findAllBySurveyIdAndQuestionId(@Param("surveyId") Integer surveyId,
+			@Param("questionId") Integer questionId);
+
+	@Query("SELECT NEW com.fpt.officelink.dto.AnswerReportDTO(a.content,COUNT(a)) FROM Answer a GROUP BY a.content")
+	List<AnswerReportDTO> testReport();
+
+	Set<Answer> findAllByAccountId(int id);
+
+	@Query("SELECT a FROM Answer a WHERE a.surveyQuestion.survey.id = :surveyId AND a.account.id = :accountId")
+	List<Answer> findAllByAccountIdAndSurveyId(@Param("surveyId") Integer surveyId,
+			@Param("accountId") Integer accountId);
 }

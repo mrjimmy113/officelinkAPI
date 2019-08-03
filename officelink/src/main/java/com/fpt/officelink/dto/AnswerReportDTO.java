@@ -3,16 +3,19 @@ package com.fpt.officelink.dto;
 public class AnswerReportDTO {
 	private String term;
 	
-	private Integer weight;
+	private int weight;
 
 	public AnswerReportDTO() {
 		super();
 	}
-
-	public AnswerReportDTO(String term, Integer weight) {
-		super();
+	public AnswerReportDTO(String term, int weight) {
 		this.term = term;
 		this.weight = weight;
+	}
+	
+	public AnswerReportDTO(String term, long weight) {
+		this.term = term;
+		this.weight = (int)weight;
 	}
 
 	public String getTerm() {
@@ -22,14 +25,14 @@ public class AnswerReportDTO {
 	public void setTerm(String term) {
 		this.term = term;
 	}
-
-	public Integer getWeight() {
+	public int getWeight() {
 		return weight;
 	}
-
-	public void setWeight(Integer weight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
+	
+
 
 	
 	

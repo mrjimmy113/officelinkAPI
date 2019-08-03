@@ -25,6 +25,7 @@ import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
+import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
@@ -76,9 +77,10 @@ public class ReportController {
 		List<QuestionReportDTO> res = new ArrayList<QuestionReportDTO>();
 		HttpStatus status = null;
 		try {
-			res = surSer.getFilteredReport(surveyId, locationId, departmentId, teamId);
+			res = reportSer.getFilteredReport(surveyId, locationId, departmentId, teamId);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -114,7 +116,7 @@ public class ReportController {
 		List<AnswerReportDTO> res = new ArrayList<AnswerReportDTO>();
 		HttpStatus status = null;
 		try {
-			res = surSer.getAnswerReport(surveyId, questionId, locationId, departmentId, teamId);
+//			res = surSer.getAnswerReport(surveyId, questionId, locationId, departmentId, teamId);
 
 			status = HttpStatus.OK;
 		} catch (Exception e) {
@@ -188,6 +190,20 @@ public class ReportController {
 		}
 		
 		return new ResponseEntity<List<AnswerReportDTO>>(res,status);
+	}
+	
+	@GetMapping("/detail")
+	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
+		HttpStatus status = null;
+		SurveyReportDTO res = null;
+		try {
+			res = reportSer.getReport(id);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<SurveyReportDTO>(res, status);
 	}
 	
 }

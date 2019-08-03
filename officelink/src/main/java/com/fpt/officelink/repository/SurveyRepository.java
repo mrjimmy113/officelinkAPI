@@ -3,6 +3,7 @@ package com.fpt.officelink.repository;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.Survey;
 
 @Repository
@@ -40,4 +42,14 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	
 	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:term% AND s.workplace.id = :id OR s.isTemplate = true AND s.isDeleted = false")
 	Page<Survey> findAllTemplateSurvey(@Param("term") String term, @Param("id") Integer workplaceId, Pageable pageable);
+	
+	@Query("SELECT sq.survey FROM SurveyQuestion sq LEFT JOIN sq.answers a WHERE sq.survey.name LIKE %:term% AND a.account.email = :email AND sq.survey.workplace.id = :workplaceId AND sq.survey.isSent = true GROUP BY sq.survey.id")
+	Page<Survey> findReportableSurvey(@Param("term") String term,@Param("workplaceId") Integer workplaceId,@Param("email") String email,Pageable pageable);
+	
+	@Query("SELECT DISTINCT s FROM Survey s JOIN s.surveyQuestions q JOIN q.answers a WHERE s.isDeleted = :isDeleted AND s.name like %:name% AND a in :answers")
+    Page<Survey> findAllByAnswersAndIsDeleted(
+            @Param("isDeleted") boolean isDeleted,
+            @Param("name") String name,
+            @Param("answers") Set<Answer> answers,
+            Pageable pageable);
 }

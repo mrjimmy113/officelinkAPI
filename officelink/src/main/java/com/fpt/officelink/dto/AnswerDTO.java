@@ -5,6 +5,7 @@ public class AnswerDTO {
 	private String content;
 	private Integer accountId;
 	private Integer questionIdentity;
+	private String questionType;
 	public Integer getId() {
 		return id;
 	}
@@ -29,5 +30,12 @@ public class AnswerDTO {
 	public void setQuestionIdentity(Integer questionIdentity) {
 		this.questionIdentity = questionIdentity;
 	}
+	public String getQuestionType() {
+		return questionType;
+	}
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
+	}
+	
 	
 }

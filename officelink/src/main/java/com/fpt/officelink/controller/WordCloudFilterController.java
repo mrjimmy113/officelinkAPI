@@ -146,11 +146,11 @@ public class WordCloudFilterController {
 	}
 	
 	@GetMapping("/existed")
-	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name, @RequestParam("language") String language) {
+	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name) {
 		HttpStatus status = null;
 		Boolean res = null;
 		try {
-			res = service.isExisted(name, language);
+			res = service.isExisted(name);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;

@@ -18,9 +18,8 @@ public interface WordCloudFilterRepository extends JpaRepository<WordCloudFilter
 
 	Optional<WordCloudFilter> findByNameInIgnoreCase(String name);
 
-	Optional<WordCloudFilter> findByNameInIgnoreCaseAndLanguageInIgnoreCase(String name, String language);
 
-	@Query("SELECT w FROM WordCloudFilter w WHERE w.workplace.id = :id AND w.isDeleted = :isDeleted")
+	@Query("SELECT w FROM WordCloudFilter w WHERE w.workplace.id = :id OR w.isTemplate = true AND w.isDeleted = :isDeleted")
 	List<WordCloudFilter> finAllByWorkplaceIdAndIsDeleted(@Param("id") Integer id,
 			@Param("isDeleted") boolean isDeleted);
 

@@ -29,9 +29,6 @@ public class WordCloudFilter implements Serializable {
 
 	@Column
 	private String name;
-
-	@Column
-	private String language;
 	
 	@Column
 	private boolean isDeleted;
@@ -71,14 +68,6 @@ public class WordCloudFilter implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 	public Set<Word> getWordList() {

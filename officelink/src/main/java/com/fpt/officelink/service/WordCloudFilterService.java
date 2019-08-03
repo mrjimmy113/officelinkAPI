@@ -1,7 +1,6 @@
 package com.fpt.officelink.service;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
@@ -23,11 +22,11 @@ public interface WordCloudFilterService {
 
 	void delete(Integer id);
 
-	boolean isExisted(String name, String language);
-
-	Set<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity);
+	List<WordCloud> rawTextToWordCloud(String rawText, Integer id, Answer entity);
 
 	List<WordCloudFilter> getAll();
 
 	List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId);
+
+	boolean isExisted(String name);
 }
