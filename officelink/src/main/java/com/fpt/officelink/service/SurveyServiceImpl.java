@@ -320,6 +320,7 @@ public class SurveyServiceImpl implements SurveyService {
 				targetRep.saveAll(targets);
 				for (Account account : sendList) {
 					if(account.getLocation() == null || account.getTeams() == null) continue;
+					if(account.getRole().getRole().equals("employer")) continue;
 					Map<String, Object> model = new HashMap<String, Object>();
 					model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(account.getEmail(), surveyId, duration));
 					String[] tmp = new String[1];

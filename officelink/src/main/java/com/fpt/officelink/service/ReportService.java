@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.Optional;
 
 import com.fpt.officelink.dto.DashBoardDTO;
+import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.nimbusds.jose.JOSEException;
@@ -18,5 +19,7 @@ public interface ReportService {
 	String getDownLoadToken(Integer surveyId, Integer questionId) throws JOSEException;
 
 	Optional<SurveyQuestion> getDownloadDetail(String token) throws ParseException;
+
+	SurveyReportDTO getReport(Integer id);
 
 }

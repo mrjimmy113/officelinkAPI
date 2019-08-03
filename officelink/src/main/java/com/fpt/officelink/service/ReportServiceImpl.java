@@ -28,6 +28,7 @@ import com.fpt.officelink.dto.ImageNewsDTO;
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
+import com.fpt.officelink.dto.SendTargetDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
 import com.fpt.officelink.dto.TeamDTO;
@@ -302,6 +303,36 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public String getDownLoadToken(Integer surveyId, Integer questionId) throws JOSEException {
 		return jwtSer.createDownloadToken(surveyId, questionId);
+	}
+	
+	@Override
+	public SurveyReportDTO getReport(Integer id) {
+		SurveyReportDTO result = new SurveyReportDTO();
+		Optional<Survey> survey = surveyRep.findById(id);
+		if (survey.isPresent()) {
+			BeanUtils.copyProperties(survey.get(), result);
+			List<SendTargetDTO> sendSurveyDTOs = new ArrayList<SendTargetDTO>();
+			for (SurveySendTarget target : survey.get().getTargets()) {
+				SendTargetDTO dto = new SendTargetDTO();
+				Department tmpDep = target.getDepartment();
+				Location tmpLocation = target.getLocation();
+				Team tmpTeam = target.getTeam();
+				
+				if(tmpDep != null) dto.setDepartmentName(tmpDep.getName());
+				else dto.setDepartmentName("");
+				
+				if(tmpLocation != null) dto.setLocationName(tmpLocation.getName());
+				else dto.setLocationName("");
+				
+				if(tmpTeam != null) dto.setTeamName(tmpTeam.getName());
+				else dto.setTeamName("");
+				
+				sendSurveyDTOs.add(dto);
+			}
+			result.setSendTargets(sendSurveyDTOs);
+		}
+
+		return result;
 	}
 	
 	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
