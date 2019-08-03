@@ -66,6 +66,7 @@ public class AccountController {
     LocationService locationService;
 
 
+    //search with term
     @GetMapping
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchWithTerm(@RequestParam("term") String term){
         this.user = getUserContext();
@@ -106,6 +107,8 @@ public class AccountController {
         return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
     }
 
+
+    //confirm-register, get info of employer
     @GetMapping(value = "/confirm")
     public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken){
 
@@ -125,6 +128,7 @@ public class AccountController {
 
     }
 
+    //get profile
     @GetMapping(value = "/profile")
     public ResponseEntity<AccountDTO> getProfile(){
         CustomUser user = getUserContext();
@@ -149,13 +153,13 @@ public class AccountController {
     }
 
 
+
+    //get account assigned
     @GetMapping(value = "/getAccountAssign")
     public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id){
         CustomUser user = getUserContext();
         HttpStatus httpStatus = null;
         AccountDTO dto = new AccountDTO();
-
-
 
         Account account = null;
         try{
@@ -170,7 +174,6 @@ public class AccountController {
             });
 
 
-
             BeanUtils.copyProperties(account.getLocation(), locationDTO);
             BeanUtils.copyProperties(account, dto);
 
@@ -179,12 +182,13 @@ public class AccountController {
 
             httpStatus = HttpStatus.OK;
 
-
         }catch (Exception ex){
             httpStatus = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<AccountDTO>(dto, httpStatus);
     }
+
+
 
 
     @GetMapping(value = "/getAccountByEmail")
@@ -209,6 +213,8 @@ public class AccountController {
     }
 
 
+
+    //search get page
     @GetMapping(value = "/getAccount")
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
         this.user = getUserContext();
@@ -246,8 +252,7 @@ public class AccountController {
 
 
 
-
-    @PostMapping
+    @PostMapping(value = "/createAccount")
     public ResponseEntity<Number> create(@RequestBody AccountDTO dto) {
         HttpStatus status = null;
 
@@ -255,9 +260,9 @@ public class AccountController {
         try {
             Account entity = new Account();
 
-
             BeanUtils.copyProperties(dto, entity);
             boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
+
             if(res){
 
                 status = HttpStatus.OK;
@@ -276,12 +281,11 @@ public class AccountController {
 
 
 
-    @PostMapping(value = "/sendMail")
-    public ResponseEntity<Number> sendMail(@RequestBody AccountDTO dto){
+    //send Mail to Register
+    @PostMapping(value = "/sendMailRegister")
+    public ResponseEntity<Number> sendMailRegister(@RequestBody AccountDTO dto){
         HttpStatus status = null;
         Map<String, Object> model = new HashMap<>();
-
-
 
         try {
 
@@ -313,6 +317,7 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
+    //send mail to reset password
     @PostMapping(value = "/sendMailReset")
     public ResponseEntity<Number> sendMailResetPassword(@RequestBody String email){
         HttpStatus status = null;
@@ -337,7 +342,9 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
-    @PostMapping(value = "/confirm")
+
+    //update isActived after click confirm
+    @PutMapping(value = "/confirm")
     public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken ){
         HttpStatus status = null;
         try{
@@ -345,8 +352,7 @@ public class AccountController {
 
             Account entity = new Account();
             BeanUtils.copyProperties(accountDTO,entity);
-            boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkplace().getName());
-
+            boolean res = service.updateIsActive(entity);
 
             if(res){
 
@@ -366,6 +372,37 @@ public class AccountController {
     }
 
 
+    // update info when employee join
+    @PutMapping(value = "/updateEmployee")
+    public ResponseEntity<Number> updateEmployee(@RequestBody AccountDTO dto ){
+        HttpStatus status = null;
+        try{
+
+
+            Account entity = new Account();
+            BeanUtils.copyProperties(dto,entity);
+            boolean res = service.updateIsActive(entity);
+
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
+
+
+    //update account
     @PutMapping
     public ResponseEntity<Integer> update(@RequestBody AccountDTO dto) {
         HttpStatus status = null;
@@ -394,6 +431,7 @@ public class AccountController {
 
 
 
+    //send invite to employee
     @PostMapping(value = "/sendInvite")
     public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo ){
         HttpStatus status = null;
@@ -411,6 +449,8 @@ public class AccountController {
 
     }
 
+
+    //delete account
     @DeleteMapping
     public ResponseEntity<Integer> delete(@RequestParam("id") int id){
         HttpStatus status = null;
@@ -424,6 +464,10 @@ public class AccountController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+
+
+
+    //get info of email invite
     @GetMapping("/invitationInfor")
     public ResponseEntity<AccountDTO> getInvitationInfor(@RequestParam("token") String token) {
     	AccountDTO res = new AccountDTO();
@@ -440,21 +484,21 @@ public class AccountController {
 
 
 
+    //register when invite to employee
     @PostMapping("/acceptInvite")
-    public ResponseEntity<Number> acceptInvite(@RequestBody AccountDTO acc) {
+    public ResponseEntity<Number> acceptInvite(@RequestBody String[] emailTo) {
+        CustomUser user = getUserContext();
     	HttpStatus status = null;
     	try {
-    	    boolean res = service.checkAccountExisted(acc.getEmail());
-    	    if(res){
-                Account entity = new Account();
-                BeanUtils.copyProperties(acc, entity);
-                service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
-                status = HttpStatus.OK;
-            }else{
-                status = HttpStatus.CONFLICT;
+    	    for(int i = 0 ; i < emailTo.length ; i++){
+                boolean res = service.checkAccountExisted(emailTo[i]);
+                if(res){
+                    service.acceptInvite(emailTo[i], 2 , user.getWorkplaceId());
+                    status = HttpStatus.OK;
+                }else{
+                    status = HttpStatus.CONFLICT;
+                }
             }
-
-
 
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
@@ -463,6 +507,31 @@ public class AccountController {
     	return new ResponseEntity<Number>(status.value(),status);
     }
 
+    @PostMapping("/checkEmailExisted")
+    public ResponseEntity<Number> checkEmailExisted(@RequestBody String email) {
+        CustomUser user = getUserContext();
+        HttpStatus status = null;
+        try {
+
+                boolean res = service.checkAccountExisted(email);
+                if(res){
+
+                    status = HttpStatus.OK;
+                }else{
+                    status = HttpStatus.CONFLICT;
+                }
+
+
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<Number>(status.value(),status);
+    }
+
+
+
+    //add assign
     @PutMapping("/assign")
     public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
     	HttpStatus status = null;
@@ -477,6 +546,8 @@ public class AccountController {
     	return new ResponseEntity<Number>(status.value(),status);
     }
 
+
+    //reset password, change new password of forget password
     @PutMapping(value = "/resetPassword")
     public ResponseEntity<Number> ResetPassword(@RequestBody ResetAccountDTO resetAccountDTO) {
         HttpStatus status = null;
@@ -493,6 +564,8 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(),status);
     }
 
+
+    //change profile
     @PutMapping("/changeProfile")
     public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto){
         HttpStatus status = null;
@@ -511,6 +584,7 @@ public class AccountController {
     }
 
 
+    //change password
     @PutMapping("/changePassword")
     public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto){
         HttpStatus status = null;

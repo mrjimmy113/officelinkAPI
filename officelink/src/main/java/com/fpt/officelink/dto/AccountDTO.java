@@ -11,7 +11,8 @@ public class AccountDTO implements Serializable {
     private String email;
     private String firstname;
     private String lastname;
-    private String address;
+    private boolean isActivated;
+    //private String address;
     private boolean isDeleted ;
     private Integer role_id;
 //    private String workspacename;
@@ -19,9 +20,16 @@ public class AccountDTO implements Serializable {
     private WorkplaceDTO workplace;
     private Date dateCreated;
     private Date dateModified;
-    private Integer roleId;
+    //private Integer roleId;
     private List<TeamDTO> teams;
 
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
 
     public List<TeamDTO> getTeams() {
         return teams;
@@ -101,13 +109,13 @@ public class AccountDTO implements Serializable {
         this.lastname = lastname;
     }
 
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
-        this.roleId = roleId;
-    }
+//    public Integer getRoleId() {
+//        return roleId;
+//    }
+//
+//    public void setRoleId(Integer roleId) {
+//        this.roleId = roleId;
+//    }
 
 //    public boolean isIsDeleted() {
 //        return isDeleted;
@@ -146,12 +154,6 @@ public class AccountDTO implements Serializable {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
 
 

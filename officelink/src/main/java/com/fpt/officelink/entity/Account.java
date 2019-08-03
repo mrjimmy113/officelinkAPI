@@ -18,16 +18,16 @@ public class Account implements Serializable {
     @Column
     private boolean isDeleted;
 
-    @Column
-    private String address;
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+//    @Column
+//    private String address;
+//
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
 
     @ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
@@ -55,6 +55,9 @@ public class Account implements Serializable {
     @Column
     private String lastname;
 
+    @Column
+    private boolean isActivated;
+
     public Role getRole() {
         return role;
     }
@@ -76,7 +79,13 @@ public class Account implements Serializable {
         return isDeleted;
     }
 
+    public boolean isActivated() {
+        return isActivated;
+    }
 
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
