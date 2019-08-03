@@ -19,6 +19,8 @@ public interface AccountService {
     Page<Account> searchWithPagination(String term, Integer workplaceId , Integer roleId , int pageNum);
     boolean addNewAccount(Account account, Integer roleId ,  String workplaceName);
     boolean modifyAccount(Account account , Integer roleId , Location address , Workplace workplace);
+    boolean updateIsActive(Account account);
+
     void removeAccount(int id);
     boolean checkAccountExisted(String email);
     Optional<Account> getAccountByEmail(String email);
@@ -27,7 +29,7 @@ public interface AccountService {
 	List<Account> findAccountByWorkplaceId(Integer id);
 	void sendInvitation(String[] listEmail) throws JOSEException, ParseException;
 	AccountDTO getInvitationInfor(String token) throws ParseException;
-	void acceptInvite(Account entity, Integer roleId, Integer workplaceId);
+	void acceptInvite(String email, Integer roleId, Integer workplaceId);
 	void assignMember(int locationId, int[] teamIdList, int accountId);
 
 
@@ -41,6 +43,8 @@ public interface AccountService {
 	void sendMailResetPassword(List<String> listEmail , String accountToken);
 
 	void resetPassword(String email ,String newPassword);
+
+
 
 
 

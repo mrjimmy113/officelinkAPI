@@ -1,10 +1,17 @@
 package com.fpt.officelink.controller;
 
+
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.validation.Valid;
+
+import com.fpt.officelink.dto.*;
+import com.fpt.officelink.service.LocationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,14 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.officelink.dto.AccountDTO;
-import com.fpt.officelink.dto.AssignInforDTO;
-import com.fpt.officelink.dto.LocationDTO;
-import com.fpt.officelink.dto.PageSearchDTO;
-import com.fpt.officelink.dto.PasswordInfoDTO;
-import com.fpt.officelink.dto.ResetAccountDTO;
-import com.fpt.officelink.dto.TeamDTO;
-import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
@@ -36,458 +35,575 @@ import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.service.AccountService;
 import com.fpt.officelink.service.JwtService;
-import com.fpt.officelink.service.LocationService;
 
 @RestController
 @RequestMapping("/account")
 public class AccountController {
 
-	private CustomUser user;
+    private CustomUser user;
+    
+    
+    @Value("${angular.path}")
+    private String angularPath;
 
-	@Value("${angular.path}")
-	private String angularPath;
+    private CustomUser getUserContext() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
-	private CustomUser getUserContext() {
-		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	}
+    @Autowired
+    AccountService service;
 
-	@Autowired
-	AccountService service;
 
-	@Autowired
-	MailService mailService;
 
-	@Autowired
-	JwtService jwt;
+    @Autowired
+    MailService mailService;
 
-	@Autowired
-	LocationService locationService;
 
-	@GetMapping
-	public ResponseEntity<PageSearchDTO<AccountDTO>> searchWithTerm(@RequestParam("term") String term) {
-		this.user = getUserContext();
-		HttpStatus status = null;
+    @Autowired
+    JwtService jwt;
 
-		PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
+    @Autowired
+    LocationService locationService;
 
-		try {
-			Page<Account> pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 2, 0);
 
-			List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
+    //search with term
+    @GetMapping
+    public ResponseEntity<PageSearchDTO<AccountDTO>> searchWithTerm(@RequestParam("term") String term){
+        this.user = getUserContext();
+        HttpStatus status = null;
 
-			pageAccount.getContent().forEach(element -> {
-				AccountDTO accountDTO = new AccountDTO();
-				WorkplaceDTO workplaceDTO = new WorkplaceDTO();
-				LocationDTO locationDTO = new LocationDTO();
+        PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
-				BeanUtils.copyProperties(element.getWorkplace(), workplaceDTO);
-				BeanUtils.copyProperties(element, accountDTO);
+        try{
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(),2, 0);
 
-				accountDTO.setLocation(locationDTO);
-				accountDTO.setWorkplace(workplaceDTO);
+            List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
 
-				listAccount.add(accountDTO);
 
-			});
-			pageSearchDTO.setMaxPage(pageAccount.getTotalPages());
-			pageSearchDTO.setObjList(listAccount);
-			status = HttpStatus.OK;
+            pageAccount.getContent().forEach(element -> {
+                AccountDTO accountDTO = new AccountDTO();
+                WorkplaceDTO workplaceDTO = new WorkplaceDTO();
+                LocationDTO locationDTO = new LocationDTO();
 
-		} catch (Exception ex) {
+                BeanUtils.copyProperties(element.getWorkplace(), workplaceDTO);
+                BeanUtils.copyProperties(element,accountDTO);
 
-			status = HttpStatus.BAD_REQUEST;
-			ex.printStackTrace();
-		}
+                accountDTO.setLocation(locationDTO);
+                accountDTO.setWorkplace(workplaceDTO);
 
-		return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO, status);
-	}
+                listAccount.add(accountDTO);
 
-	@GetMapping(value = "/confirm")
-	public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken) {
+            });
+            pageSearchDTO.setMaxPage(pageAccount.getTotalPages());
+            pageSearchDTO.setObjList(listAccount);
+            status = HttpStatus.OK;
 
-		HttpStatus status = null;
-		AccountDTO accountDTO = new AccountDTO();
-		try {
-			accountDTO = jwt.getAccountByToken(accountToken);
-			status = HttpStatus.OK;
+        }catch (Exception ex){
 
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-			ex.printStackTrace();
-		}
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
 
-		return new ResponseEntity<AccountDTO>(accountDTO, status);
+        return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
+    }
 
-	}
 
-	@GetMapping(value = "/profile")
-	public ResponseEntity<AccountDTO> getProfile() {
-		CustomUser user = getUserContext();
-		HttpStatus httpStatus = null;
-		AccountDTO accountDTO = new AccountDTO();
+    //confirm-register, get info of employer
+    @GetMapping(value = "/confirm")
+    public ResponseEntity<AccountDTO> getAccountByToken(@RequestParam("accountToken") String accountToken){
 
-		Account entity = null;
-		try {
+        HttpStatus status = null;
+        AccountDTO accountDTO = new AccountDTO();
+        try{
+            accountDTO = jwt.getAccountByToken(accountToken);
+            status = HttpStatus.OK;
 
-			entity = service.getProfile(user.getUsername());
-			BeanUtils.copyProperties(entity, accountDTO);
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
 
-			httpStatus = HttpStatus.OK;
 
-		} catch (Exception ex) {
-			httpStatus = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<AccountDTO>(accountDTO, httpStatus);
-	}
+        return new ResponseEntity<AccountDTO>(accountDTO, status);
 
-	@GetMapping(value = "/getAccountAssign")
-	public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id) {
-		HttpStatus httpStatus = null;
-		AccountDTO dto = new AccountDTO();
-		Account account = null;
-		try {
+    }
 
-			account = service.getAccountAssign(id);
-			LocationDTO locationDTO = new LocationDTO();
-			List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
-			account.getTeams().forEach(element -> {
-				TeamDTO teamDTO = new TeamDTO();
-				BeanUtils.copyProperties(element, teamDTO);
-				teamDTOS.add(teamDTO);
-			});
+    //get profile
+    @GetMapping(value = "/profile")
+    public ResponseEntity<AccountDTO> getProfile(){
+        CustomUser user = getUserContext();
+        HttpStatus httpStatus = null;
+        AccountDTO accountDTO = new AccountDTO();
 
-			if (account.getLocation() != null)
-				BeanUtils.copyProperties(account.getLocation(), locationDTO);
 
-			BeanUtils.copyProperties(account, dto);
 
-			dto.setLocation(locationDTO);
-			dto.setTeams(teamDTOS);
+        Account entity = null;
+        try{
 
-			httpStatus = HttpStatus.OK;
+             entity = service.getProfile(user.getUsername());
+             BeanUtils.copyProperties(entity, accountDTO);
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			httpStatus = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<AccountDTO>(dto, httpStatus);
-	}
+            httpStatus = HttpStatus.OK;
 
-	@GetMapping(value = "/getAccountByEmail")
-	public ResponseEntity<AccountDTO> getAccountByEmail(@RequestParam("emailToken") String emailToken) {
-		HttpStatus status = null;
-		Account account = null;
-		AccountDTO accountDTO = new AccountDTO();
 
-		try {
-			String email = jwt.getEmailFromToken(emailToken);
+        }catch (Exception ex){
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<AccountDTO>(accountDTO, httpStatus);
+    }
 
-			account = service.getAccountByEmail(email).get();
-			BeanUtils.copyProperties(account, accountDTO);
-			status = HttpStatus.OK;
 
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
 
-		}
+    //get account assigned
+    @GetMapping(value = "/getAccountAssign")
+    public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id){
+        CustomUser user = getUserContext();
+        HttpStatus httpStatus = null;
+        AccountDTO dto = new AccountDTO();
 
-		return new ResponseEntity<AccountDTO>(accountDTO, status);
-	}
+        Account account = null;
+        try{
 
-	@GetMapping(value = "/getAccount")
-	public ResponseEntity<PageSearchDTO<AccountDTO>> searchGetPage(@RequestParam("term") String term,
-			@RequestParam("page") int page) {
-		this.user = getUserContext();
-		HttpStatus status = null;
+            account = service.getAccountAssign(id);
+            LocationDTO locationDTO = new LocationDTO();
+            List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
+            account.getTeams().forEach(element -> {
+                TeamDTO teamDTO = new TeamDTO();
+                BeanUtils.copyProperties(element, teamDTO);
+                teamDTOS.add(teamDTO);
+            });
 
-		PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
 
-		try {
-			Page<Account> pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 2, page);
+            BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            BeanUtils.copyProperties(account, dto);
 
-			List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
+            dto.setLocation(locationDTO);
+            dto.setTeams(teamDTOS);
 
-			pageAccount.getContent().forEach(element -> {
-				AccountDTO accountDTO = new AccountDTO();
+            httpStatus = HttpStatus.OK;
 
-				BeanUtils.copyProperties(element, accountDTO);
+        }catch (Exception ex){
+            httpStatus = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<AccountDTO>(dto, httpStatus);
+    }
 
-				listAccount.add(accountDTO);
 
-			});
-			pageSearchDTO.setMaxPage(pageAccount.getTotalPages());
-			pageSearchDTO.setObjList(listAccount);
-			status = HttpStatus.OK;
 
-		} catch (Exception ex) {
 
-			status = HttpStatus.BAD_REQUEST;
+    @GetMapping(value = "/getAccountByEmail")
+    public ResponseEntity<AccountDTO> getAccountByEmail(@RequestParam("emailToken") String emailToken){
+        HttpStatus status = null;
+        Account account = null;
+        AccountDTO accountDTO = new AccountDTO();
 
-		}
+        try{
+            String email = jwt.getEmailFromToken(emailToken);
 
-		return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO, status);
-	}
+            account = service.getAccountByEmail(email).get();
+            BeanUtils.copyProperties(account, accountDTO);
+            status = HttpStatus.OK;
 
-	@PostMapping
-	public ResponseEntity<Number> create(@RequestBody AccountDTO dto) {
-		HttpStatus status = null;
-
-		try {
-			Account entity = new Account();
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
 
-			BeanUtils.copyProperties(dto, entity);
-			boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
-			if (res) {
+        }
 
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.CONFLICT;
-			}
-
-		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
-			e.printStackTrace();
-
-		}
-		return new ResponseEntity<Number>(status.value(), status);
-	}
-
-	@PostMapping(value = "/sendMail")
-	public ResponseEntity<Number> sendMail(@RequestBody AccountDTO dto) {
-		HttpStatus status = null;
-		Map<String, Object> model = new HashMap<>();
-
-		try {
+        return new ResponseEntity<AccountDTO>(accountDTO, status);
+    }
 
-			boolean res = service.checkAccountExisted(dto.getEmail());
-			if (res) {
 
-				String token = null;
-				List<String> listEmail = new ArrayList<>();
-
-				String emailTo = dto.getEmail();
-
-				listEmail.add(emailTo);
-				Integer role_id = dto.getRole_id();
-
-				token = jwt.createTokenWithAccount(dto);
-				model.put("link", angularPath + "/confirm/" + token);
-
-				mailService.sendMail(listEmail.toArray(new String[listEmail.size()]), "email-temp.ftl", model);
 
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.CONFLICT;
-			}
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return new ResponseEntity<Number>(status.value(), status);
-	}
-
-	@PostMapping(value = "/sendMailReset")
-	public ResponseEntity<Number> sendMailResetPassword(@RequestBody String email) {
-		HttpStatus status = null;
-		AccountDTO dto = new AccountDTO();
-		String token = null;
-		Map<String, Object> model = new HashMap<>();
-		List<String> listEmail = new ArrayList<>();
-		try {
-			boolean res = service.checkAccountExisted(email);
-			if (res == false) {
-				listEmail.add(email);
-				token = jwt.createTokenWithEmail(email);
-				service.sendMailResetPassword(listEmail, token);
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.CONFLICT;
-			}
-
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<Number>(status.value(), status);
-	}
-
-	@PostMapping(value = "/confirm")
-	public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken) {
-		HttpStatus status = null;
-		try {
-			AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
-
-			Account entity = new Account();
-			BeanUtils.copyProperties(accountDTO, entity);
-			boolean res = service.addNewAccount(entity, accountDTO.getRole_id(), accountDTO.getWorkplace().getName());
-
-			if (res) {
-
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.CONFLICT;
-			}
-
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-			ex.printStackTrace();
-		}
-
-		return new ResponseEntity<Number>(status.value(), status);
-
-	}
-
-	@PutMapping
-	public ResponseEntity<Integer> update(@RequestBody AccountDTO dto) {
-		HttpStatus status = null;
-		try {
-			Account entity = new Account();
-			Location location = new Location();
-			Workplace workplace = new Workplace();
-			BeanUtils.copyProperties(dto.getWorkplace(), workplace);
-			BeanUtils.copyProperties(dto, entity);
-
-			boolean res = service.modifyAccount(entity, dto.getRole_id(), location, workplace);
-
-			if (res) {
-				status = HttpStatus.CREATED;
-			}
-
-		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
-			e.printStackTrace();
-		}
-
-		return new ResponseEntity<Integer>(status.value(), status);
-	}
-
-	@PostMapping(value = "/sendInvite")
-	public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo) {
-		HttpStatus status = null;
-		try {
-			service.sendInvitation(emailTo);
-			status = HttpStatus.OK;
-
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-			ex.printStackTrace();
-		}
-
-		return new ResponseEntity<Number>(status.value(), status);
-
-	}
-
-	@DeleteMapping
-	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
-		HttpStatus status = null;
-		try {
-			service.removeAccount(id);
-			status = HttpStatus.OK;
-
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<Integer>(status.value(), status);
-	}
-
-	@GetMapping("/invitationInfor")
-	public ResponseEntity<AccountDTO> getInvitationInfor(@RequestParam("token") String token) {
-		AccountDTO res = new AccountDTO();
-		HttpStatus status = null;
-		try {
+    //search get page
+    @GetMapping(value = "/getAccount")
+    public ResponseEntity<PageSearchDTO<AccountDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
+        this.user = getUserContext();
+        HttpStatus status = null;
+
+        PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
+
+        try{
+            Page<Account>  pageAccount = service.searchWithPagination(term, user.getWorkplaceId(), 2,  page);
+
+            List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
+
+
+            pageAccount.getContent().forEach(element -> {
+                AccountDTO accountDTO = new AccountDTO();
+
+                BeanUtils.copyProperties(element,accountDTO);
+
+                listAccount.add(accountDTO);
+
+            });
+            pageSearchDTO.setMaxPage(pageAccount.getTotalPages());
+            pageSearchDTO.setObjList(listAccount);
+            status = HttpStatus.OK;
+
+        }catch (Exception ex){
+
+            status = HttpStatus.BAD_REQUEST;
+
+        }
+
+        return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
+    }
+
+
+
+
+    @PostMapping(value = "/createAccount")
+    public ResponseEntity<Number> create(@RequestBody AccountDTO dto) {
+        HttpStatus status = null;
+
+
+        try {
+            Account entity = new Account();
+
+            BeanUtils.copyProperties(dto, entity);
+            boolean res = service.addNewAccount(entity, dto.getRole_id(), dto.getWorkplace().getName());
+
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+            e.printStackTrace();
+
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+
+
+
+    //send Mail to Register
+    @PostMapping(value = "/sendMailRegister")
+    public ResponseEntity<Number> sendMailRegister(@RequestBody AccountDTO dto){
+        HttpStatus status = null;
+        Map<String, Object> model = new HashMap<>();
+
+        try {
+
+            boolean res = service.checkAccountExisted(dto.getEmail());
+            if(res) {
+
+                String token = null;
+                List<String> listEmail = new ArrayList<>();
+
+                String emailTo = dto.getEmail();
+
+                listEmail.add(emailTo);
+                Integer role_id = dto.getRole_id();
+
+                token = jwt.createTokenWithAccount(dto);
+                model.put("link", angularPath+"/confirm/" + token);
+
+                mailService.sendMail(listEmail.toArray(new String[listEmail.size()]),"email-temp.ftl", model);
+
+                status = HttpStatus.OK;
+            } else{
+                status = HttpStatus.CONFLICT;
+            }
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+    //send mail to reset password
+    @PostMapping(value = "/sendMailReset")
+    public ResponseEntity<Number> sendMailResetPassword(@RequestBody String email){
+        HttpStatus status = null;
+        AccountDTO dto = new AccountDTO();
+        String token = null;
+        Map<String, Object> model = new HashMap<>();
+        List<String> listEmail = new ArrayList<>();
+        try{
+            boolean res = service.checkAccountExisted(email);
+            if(res == false){
+                listEmail.add(email);
+                token =  jwt.createTokenWithEmail(email);
+                service.sendMailResetPassword(listEmail, token);
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+
+    //update isActived after click confirm
+    @PutMapping(value = "/confirm")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String accountToken ){
+        HttpStatus status = null;
+        try{
+            AccountDTO accountDTO = jwt.getAccountByToken(accountToken);
+
+            Account entity = new Account();
+            BeanUtils.copyProperties(accountDTO,entity);
+            boolean res = service.updateIsActive(entity);
+
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
+
+    // update info when employee join
+    @PutMapping(value = "/updateEmployee")
+    public ResponseEntity<Number> updateEmployee(@RequestBody AccountDTO dto ){
+        HttpStatus status = null;
+        try{
+
+
+            Account entity = new Account();
+            BeanUtils.copyProperties(dto,entity);
+            boolean res = service.updateIsActive(entity);
+
+            if(res){
+
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.CONFLICT;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
+
+
+    //update account
+    @PutMapping
+    public ResponseEntity<Integer> update(@RequestBody AccountDTO dto) {
+        HttpStatus status = null;
+        try {
+            Account entity = new Account();
+            Location location = new Location();
+            Workplace workplace = new Workplace();
+            BeanUtils.copyProperties(dto.getWorkplace(), workplace);
+            BeanUtils.copyProperties(dto,entity);
+
+
+            boolean res = service.modifyAccount(entity, dto.getRole_id(), location , workplace );
+
+
+            if(res){
+                status = HttpStatus.CREATED;
+            }
+
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<Integer>(status.value(), status);
+    }
+
+
+
+    //send invite to employee
+    @PostMapping(value = "/sendInvite")
+    public ResponseEntity<Number> createAccountByToken(@RequestBody String[] emailTo ){
+        HttpStatus status = null;
+            try{
+                service.sendInvitation(emailTo);
+                status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
+        }
+
+
+        return new ResponseEntity<Number>(status.value(), status);
+
+    }
+
+
+    //delete account
+    @DeleteMapping
+    public ResponseEntity<Integer> delete(@RequestParam("id") int id){
+        HttpStatus status = null;
+        try{
+            service.removeAccount(id);
+            status = HttpStatus.OK;
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Integer>(status.value(), status);
+    }
+
+
+
+
+    //get info of email invite
+    @GetMapping("/invitationInfor")
+    public ResponseEntity<AccountDTO> getInvitationInfor(@RequestParam("token") String token) {
+    	AccountDTO res = new AccountDTO();
+    	HttpStatus status = null;
+    	try {
 			res = service.getInvitationInfor(token);
-			status = HttpStatus.OK;
+    		status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return new ResponseEntity<AccountDTO>(res, status);
-	}
+    	return new ResponseEntity<AccountDTO>(res,status);
+    }
 
-	@PostMapping("/acceptInvite")
-	public ResponseEntity<Number> acceptInvite(@RequestBody AccountDTO acc) {
-		HttpStatus status = null;
-		try {
-			boolean res = service.checkAccountExisted(acc.getEmail());
-			if (res) {
-				Account entity = new Account();
-				BeanUtils.copyProperties(acc, entity);
-				service.acceptInvite(entity, acc.getRole_id(), acc.getWorkplace().getId());
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.CONFLICT;
-			}
+
+
+    //register when invite to employee
+    @PostMapping("/acceptInvite")
+    public ResponseEntity<Number> acceptInvite(@RequestBody String[] emailTo) {
+        CustomUser user = getUserContext();
+    	HttpStatus status = null;
+    	try {
+    	    for(int i = 0 ; i < emailTo.length ; i++){
+                boolean res = service.checkAccountExisted(emailTo[i]);
+                if(res){
+                    service.acceptInvite(emailTo[i], 2 , user.getWorkplaceId());
+                    status = HttpStatus.OK;
+                }else{
+                    status = HttpStatus.CONFLICT;
+                }
+            }
 
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return new ResponseEntity<Number>(status.value(), status);
-	}
+    	return new ResponseEntity<Number>(status.value(),status);
+    }
 
-	@PutMapping("/assign")
-	public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
-		HttpStatus status = null;
-		try {
+    @PostMapping("/checkEmailExisted")
+    public ResponseEntity<Number> checkEmailExisted(@RequestBody String email) {
+        CustomUser user = getUserContext();
+        HttpStatus status = null;
+        try {
+
+                boolean res = service.checkAccountExisted(email);
+                if(res){
+
+                    status = HttpStatus.OK;
+                }else{
+                    status = HttpStatus.CONFLICT;
+                }
+
+
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<Number>(status.value(),status);
+    }
+
+
+
+    //add assign
+    @PutMapping("/assign")
+    public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
+    	HttpStatus status = null;
+    	try {
 			service.assignMember(dto.getLocationId(), dto.getTeamIdList(), dto.getAccountId());
-			status = HttpStatus.OK;
+    		status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return new ResponseEntity<Number>(status.value(), status);
-	}
+    	return new ResponseEntity<Number>(status.value(),status);
+    }
 
-	@PutMapping(value = "/resetPassword")
-	public ResponseEntity<Number> ResetPassword(@RequestBody ResetAccountDTO resetAccountDTO) {
-		HttpStatus status = null;
-		String email = null;
-		try {
-			email = jwt.getEmailFromToken(resetAccountDTO.getEmailToken());
-			service.resetPassword(email, resetAccountDTO.getNewPassword());
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
 
-		return new ResponseEntity<Number>(status.value(), status);
-	}
+    //reset password, change new password of forget password
+    @PutMapping(value = "/resetPassword")
+    public ResponseEntity<Number> ResetPassword(@RequestBody ResetAccountDTO resetAccountDTO) {
+        HttpStatus status = null;
+        String email = null;
+        try {
+            email = jwt.getEmailFromToken(resetAccountDTO.getEmailToken());
+            service.resetPassword(email, resetAccountDTO.getNewPassword());
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            status = HttpStatus.BAD_REQUEST;
+        }
 
-	@PutMapping("/changeProfile")
-	public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto) {
-		HttpStatus status = null;
-		Account account = new Account();
-		try {
-			BeanUtils.copyProperties(dto, account);
-			boolean res = service.changeProfile(account);
-			if (res) {
-				status = HttpStatus.OK;
-			}
+        return new ResponseEntity<Number>(status.value(),status);
+    }
 
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<Number>(status.value(), status);
-	}
 
-	@PutMapping("/changePassword")
-	public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto) {
-		HttpStatus status = null;
+    //change profile
+    @PutMapping("/changeProfile")
+    public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto){
+        HttpStatus status = null;
+        Account account = new Account();
+        try{
+            BeanUtils.copyProperties(dto, account);
+            boolean res = service.changeProfile(account);
+            if(res){
+                status = HttpStatus.OK;
+            }
 
-		try {
+        }catch (Exception ex){
+                status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
 
-			boolean res = service.changePassword(dto.getEmail(), dto.getCurrentPassword(), dto.getNewPassword());
-			if (res) {
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.BAD_REQUEST;
-			}
 
-		} catch (Exception ex) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<Number>(status.value(), status);
-	}
+    //change password
+    @PutMapping("/changePassword")
+    public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto){
+        HttpStatus status = null;
+
+        try{
+
+            boolean res = service.changePassword(dto.getEmail(), dto.getCurrentPassword(), dto.getNewPassword() );
+            if(res){
+                status = HttpStatus.OK;
+            }else {
+                status = HttpStatus.BAD_REQUEST;
+            }
+
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
+
+
 
 }

@@ -16,6 +16,7 @@ import com.fpt.officelink.entity.Role;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.RoleRepository;
+import com.fpt.officelink.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -81,9 +82,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Page<Account> searchWithPagination(String term, Integer workplaceId, Integer roleId ,  int pageNum) {
-        Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
-        //return accountRespository.find(term, workplaceId, false , pageable);
-        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
+        //Pageable pageable = PageRequest.of(pageNum, PAGEMAXSIZE);
+        if (pageNum > 0) {
+            pageNum = pageNum - 1;
+        }
+        PageRequest pageable = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , true , pageable);
     }
 
     @Transactional
@@ -133,6 +137,7 @@ public class AccountServiceImpl implements AccountService {
             workplace.setName(workplace.getName());
             workplaceRepository.save(workplace);
 
+            account.setActivated(true);
             account.setRole(optionalRole.get());
             account.setDateModified(new Date());
             account.setWorkplace(workplace);
@@ -144,6 +149,24 @@ public class AccountServiceImpl implements AccountService {
         return false;
 
     }
+
+    @Override
+    public boolean updateIsActive(Account account) {
+
+        Optional<Account> optionalAccount = accountRespository.findAccountByEmail(account.getEmail());
+
+        if(optionalAccount.isPresent()){
+            optionalAccount.get().setFirstname(account.getFirstname());
+            optionalAccount.get().setLastname(account.getLastname());
+            optionalAccount.get().setPassword(passwordEncoder().encode(account.getPassword()));
+            optionalAccount.get().setActivated(true);
+            optionalAccount.get().setDateCreated(new Date());
+            accountRespository.save(optionalAccount.get());
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public void removeAccount(int id) {
@@ -236,16 +259,26 @@ public class AccountServiceImpl implements AccountService {
     }
     
     @Override
-    public void acceptInvite(Account entity, Integer roleId, Integer workplaceId) {
-    	Role role = new Role();
-    	role.setId(roleId);
-    	Workplace workplace = new Workplace();
-    	workplace.setId(workplaceId);
-    	entity.setWorkplace(workplace);
-    	entity.setRole(role);
-    	entity.setPassword(passwordEncoder().encode(entity.getPassword()));
-    	accountRespository.save(entity);
-    	
+    public void acceptInvite(String email, Integer roleId, Integer workplaceId) {
+
+
+            Role role = new Role();
+            role.setId(roleId);
+            Workplace workplace = new Workplace();
+            workplace.setId(workplaceId);
+            Account account = new Account();
+
+            account.setWorkplace(workplace);
+            account.setRole(role);
+            account.setDeleted(false);
+            account.setDateCreated(new Date());
+            account.setEmail(email);
+
+            //account.setPassword(passwordEncoder().encode(entity.getPassword()));
+            accountRespository.save(account);
+
+
+
     }
     
     @Override
@@ -290,7 +323,7 @@ public class AccountServiceImpl implements AccountService {
         if(optionalAccount.isPresent()){
             optionalAccount.get().setFirstname(account.getFirstname());
             optionalAccount.get().setLastname(account.getLastname());
-            optionalAccount.get().setAddress(account.getAddress());
+
             accountRespository.save(optionalAccount.get());
             return true;
         }
