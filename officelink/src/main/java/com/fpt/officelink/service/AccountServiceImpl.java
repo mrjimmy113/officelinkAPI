@@ -18,6 +18,7 @@ import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.RoleRepository;
 import com.fpt.officelink.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,10 +39,12 @@ import com.fpt.officelink.repository.WorkplaceRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
-            public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService {
 
     private static final int PAGEMAXSIZE = 9;
-
+    
+    @Value("${angular.path}")
+	private String angularPath;
 
     @Autowired
     AccountRespository accountRespository;
@@ -219,7 +222,7 @@ import com.nimbusds.jose.JOSEException;
 			tokenList.add(jwtSer.createInviteToken(listEmail[i], getUserContext().getWorkplaceId()));
 		}
     	for (String token : tokenList) {
-    		model.put("link", "http://192.168.137.1:3000/join/" + token);
+    		model.put("link", angularPath + "/join/" + token);
     		String[] mail = new String[1];
     		mail[0] = jwtSer.getEmailFromToken(token);
     		System.out.println(jwtSer.getWorkplaceId(token));

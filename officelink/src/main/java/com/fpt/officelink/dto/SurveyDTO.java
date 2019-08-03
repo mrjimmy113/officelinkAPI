@@ -1,11 +1,10 @@
 package com.fpt.officelink.dto;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.Positive;
-
-import com.fpt.officelink.entity.Question;
 
 public class SurveyDTO {
 	@Positive
@@ -18,6 +17,10 @@ public class SurveyDTO {
 	private boolean isShared;
 	
 	private boolean isActive;
+	
+	private boolean isSent;
+	
+	private Date dateTaken;
 	
 	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
 
@@ -69,7 +72,21 @@ public class SurveyDTO {
 		this.questions = questions;
 	}
 
-	
+	public boolean isSent() {
+		return isSent;
+	}
+
+	public void setSent(boolean isSent) {
+		this.isSent = isSent;
+	}
+
+	public Date getDateTaken() {
+		return dateTaken;
+	}
+
+	public void setDateTaken(Date dateTaken) {
+		this.dateTaken = dateTaken;
+	}
 	
 	
 }

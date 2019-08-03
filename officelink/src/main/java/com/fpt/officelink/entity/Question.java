@@ -44,6 +44,13 @@ public class Question implements Serializable {
 
 	@Column
 	private boolean isDeleted;
+	
+	@ManyToOne()
+	@JoinColumn(name = "workplace_id")
+	private Workplace workplace;
+	
+	@Column
+	private boolean isTemplate;
 
 	public Integer getId() {
 		return id;
@@ -58,7 +65,7 @@ public class Question implements Serializable {
 	}
 
 	public void setQuestion(String question) {
-		this.question = question;
+		this.question = question.trim();
 	}
 
 	public TypeQuestion getType() {
@@ -92,5 +99,23 @@ public class Question implements Serializable {
 	public void setDeleted(boolean isDeleted) {
 		this.isDeleted = isDeleted;
 	}
+
+	public Workplace getWorkplace() {
+		return workplace;
+	}
+
+	public void setWorkplace(Workplace workplace) {
+		this.workplace = workplace;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
+	}
+	
+	
 
 }

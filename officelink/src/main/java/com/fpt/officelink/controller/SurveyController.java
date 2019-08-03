@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
@@ -29,10 +30,15 @@ import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
+import com.fpt.officelink.entity.SurveySendTarget;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.TypeQuestion;
+import com.fpt.officelink.service.ConfigurationService;
 import com.fpt.officelink.service.SurveyService;
 
 @Controller
@@ -42,14 +48,17 @@ public class SurveyController {
 	@Autowired
 	SurveyService ser;
 
+	@Autowired
+	ConfigurationService configService;
+
 	Logger log = Logger.getLogger(SurveyController.class.getName());
-	
+
 	private CustomUser user;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
-	
+
 	@GetMapping("/getWorkplaceSurveys")
 	public ResponseEntity<List<SurveyDTO>> getWorkplaceSurveys() {
 		this.user = getUserContext();
@@ -57,22 +66,23 @@ public class SurveyController {
 		List<SurveyDTO> res = new ArrayList<SurveyDTO>();
 		try {
 			List<Survey> result = ser.getWorkplaceSurvey(user.getWorkplaceId());
-			
+
 			result.forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
 				BeanUtils.copyProperties(s, dto);
 				res.add(dto);
 			});
-			
-			status =HttpStatus.OK;
+
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<List<SurveyDTO>>(res,status);
+		return new ResponseEntity<List<SurveyDTO>>(res, status);
 	}
 
 	@GetMapping
-	public ResponseEntity<PageSearchDTO<SurveyDTO>> search(@RequestParam("term") String term,@RequestParam("page") int page) {
+	public ResponseEntity<PageSearchDTO<SurveyDTO>> search(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
 		HttpStatus status = null;
 		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
 		try {
@@ -85,16 +95,17 @@ public class SurveyController {
 			});
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(dtoList);
-			status =HttpStatus.OK;
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res,status);
+		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
-	
+
 	@GetMapping("/searchReport")
-	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> searchReport(@RequestParam("term") String term,@RequestParam("page") int page) {
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> searchReport(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
 		HttpStatus status = null;
 		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
 		try {
@@ -107,14 +118,14 @@ public class SurveyController {
 			});
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(dtoList);
-			status =HttpStatus.OK;
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -140,19 +151,21 @@ public class SurveyController {
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
 				tmpSQ.setQuestion(tmpQ);
+				tmpSQ.setRequired(q.isRequired());
 				sqList.add(tmpSQ);
 			});
-			ser.newSurvey(survey, sqList);
-			status = HttpStatus.CREATED;
+			boolean success = ser.newSurvey(survey, sqList);
+			if (success) status = HttpStatus.OK;
+			else status = HttpStatus.CONFLICT;
+
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.info(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -178,19 +191,21 @@ public class SurveyController {
 				BeanUtils.copyProperties(q.getType(), tmpType);
 				tmpQ.setType(tmpType);
 				tmpSQ.setQuestion(tmpQ);
+				tmpSQ.setRequired(q.isRequired());
 				sqList.add(tmpSQ);
 			});
-			ser.updateSurvey(survey, sqList);
+			boolean success = ser.updateSurvey(survey, sqList);
+			if (success) status = HttpStatus.OK;
+			else status = HttpStatus.CONFLICT;
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.info(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -200,21 +215,21 @@ public class SurveyController {
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return new ResponseEntity<Integer>(status.value(),status);
+
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@GetMapping("/detail")
 	public ResponseEntity<List<QuestionDTO>> getDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
 		List<QuestionDTO> res = new ArrayList<QuestionDTO>();
 		try {
 			List<SurveyQuestion> result = ser.getDetail(id);
-			result.forEach(r ->  {
+			result.forEach(r -> {
 				Question e = r.getQuestion();
 				QuestionDTO dto = new QuestionDTO();
 				dto.setQuestionIdentity(r.getQuestionIndex());
-				BeanUtils.copyProperties(e, dto,"type","options");
+				BeanUtils.copyProperties(e, dto, "type", "options");
 				List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
 				e.getOptions().forEach(op -> {
 					AnswerOptionDTO opDto = new AnswerOptionDTO();
@@ -225,78 +240,96 @@ public class SurveyController {
 				TypeQuestionDTO typeDto = new TypeQuestionDTO();
 				BeanUtils.copyProperties(e.getType(), typeDto);
 				dto.setType(typeDto);
+				dto.setRequired(r.isRequired());
 				res.add(dto);
 			});
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<List<QuestionDTO>>(res,status);
+		return new ResponseEntity<List<QuestionDTO>>(res, status);
 	}
-	
+
 	@GetMapping("/take")
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
 		SurveyDTO res = null;
 		try {
 			res = ser.getTakeSurvey(token);
-			if(res != null) {
-				
+			if (res != null) {
+
 				status = HttpStatus.OK;
-			}else {
-				status = HttpStatus.ACCEPTED;
+			} else {
+				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<SurveyDTO>(res,status);
+		return new ResponseEntity<SurveyDTO>(res, status);
 	}
-	
+
 	@PostMapping("/sendOut")
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
 		try {
-			ser.sendOutSurvey(target,getUserContext().getWorkplaceId());
+			List<SurveySendTarget> targets = new ArrayList<SurveySendTarget>();
+			target.getTargetList().forEach(e -> {
+				SurveySendTarget targetEntity = new SurveySendTarget();
+
+				if (e.getLocationId() != 0) {
+					Location location = new Location();
+					location.setId(e.getLocationId());
+					targetEntity.setLocation(location);
+				}
+
+				if (e.getDepartmentId() != 0) {
+					Department department = new Department();
+					department.setId(e.getDepartmentId());
+					targetEntity.setDepartment(department);
+				}
+
+				if (e.getTeamId() != 0) {
+					Team team = new Team();
+					team.setId(e.getTeamId());
+					targetEntity.setTeam(team);
+				}
+				targets.add(targetEntity);
+
+			});
+			ser.sendOutSurvey(target.getSurveyId(), configService.filterDuplicate(targets), target.getDuration(),
+					getUserContext().getWorkplaceId());
+
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<Number>(status.value(),status);
-		
+		return new ResponseEntity<Number>(status.value(), status);
+
 	}
-	
+
 	@PostMapping("/answer")
 	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
-		System.out.println("answer");
 		try {
-			ser.saveAnswer(dto);
-			status = HttpStatus.OK;
+			if(ser.checkIfUserTakeSurvey(dto.getSurveyId())) {
+				status = HttpStatus.CONFLICT;
+			}else {
+				ser.saveAnswer(dto);
+				status = HttpStatus.OK;
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<Number>(status.value(),status);
+		return new ResponseEntity<Number>(status.value(), status);
 	}
-	
-	@GetMapping("/report/detail")
-	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
-		HttpStatus status = null;
-		SurveyReportDTO res = null;
-		try {
-			res = ser.getReport(id);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<SurveyReportDTO>(res,status);
-	}
-	
+
 	@GetMapping("/report")
-	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,@RequestParam("page") int page) {
+	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
 		HttpStatus status = null;
 		PageSearchDTO<SurveyReportDTO> res = new PageSearchDTO<SurveyReportDTO>();
 		try {
@@ -309,11 +342,74 @@ public class SurveyController {
 			});
 			res.setMaxPage(result.getTotalPages());
 			res.setObjList(dtoList);
-			status =HttpStatus.OK;
+			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res,status);
+		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
+	
+	@GetMapping("/template")
+	public ResponseEntity<PageSearchDTO<SurveyDTO>> searchTemplate(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
+		try {
+			Page<Survey> result = ser.loadTemplateSurvey(term, page);
+			List<SurveyDTO> dtoList = new ArrayList<SurveyDTO>();
+			result.getContent().forEach(s -> {
+				SurveyDTO dto = new SurveyDTO();
+				BeanUtils.copyProperties(s, dto);
+				dtoList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(dtoList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
+	}
+	
+	@GetMapping(value = "/history")
+    public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term, @RequestParam("page") int page) {
+        HttpStatus status = null;
+        PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
+        try {
+            //Call Service
+            Page<Survey> result = ser.getHistorySurveyWithPagination(term, page);
+            //Convert to DTO
+            List<SurveyDTO> resultList = new ArrayList<SurveyDTO>();
+            result.getContent().forEach(element -> {
+                SurveyDTO dto = new SurveyDTO();
+                BeanUtils.copyProperties(element, dto);
+                dto.setDateTaken(ser.getDateTakenSurvey(dto.getId()));
+                dto.setQuestions(ser.getTakeSurveyHistory(dto.getId()));
+                resultList.add(dto);
+            });
+            res.setMaxPage(result.getTotalPages());
+            res.setObjList(resultList);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
+    }
+
+    @GetMapping("/history/answer")
+    public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
+        HttpStatus status = null;
+        List<AnswerDTO> dto = new ArrayList<>();
+        try {
+            dto = ser.getAnswerBySurveyId(id);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<List<AnswerDTO>>(dto, status);
+    }
 }

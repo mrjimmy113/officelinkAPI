@@ -29,9 +29,6 @@ public class WordCloudFilter implements Serializable {
 
 	@Column
 	private String name;
-
-	@Column
-	private String language;
 	
 	@Column
 	private boolean isDeleted;
@@ -51,6 +48,12 @@ public class WordCloudFilter implements Serializable {
 	@JoinColumn(name = "workplace_id")
 	private Workplace workplace;
 
+	@Column
+	private boolean isExclude;
+	
+	@Column
+	private boolean isTemplate;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -65,14 +68,6 @@ public class WordCloudFilter implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String language) {
-		this.language = language;
 	}
 
 	public Set<Word> getWordList() {
@@ -114,5 +109,23 @@ public class WordCloudFilter implements Serializable {
 	public void setWorkplace(Workplace workplace) {
 		this.workplace = workplace;
 	}
+
+	public boolean isExclude() {
+		return isExclude;
+	}
+
+	public void setExclude(boolean isExclude) {
+		this.isExclude = isExclude;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
+	}
+	
+	
 	
 }

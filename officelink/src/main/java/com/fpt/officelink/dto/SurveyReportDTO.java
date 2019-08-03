@@ -11,6 +11,7 @@ public class SurveyReportDTO {
 	private int receivedAnswer;
 	private int sentOut;
 	private List<QuestionReportDTO> questions;
+	private List<SendTargetDTO> sendTargets;
 
 	public String getName() {
 		return name;
@@ -71,6 +72,15 @@ public class SurveyReportDTO {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+	public List<SendTargetDTO> getSendTargets() {
+		return sendTargets;
+	}
+
+	public void setSendTargets(List<SendTargetDTO> sendTargets) {
+		this.sendTargets = sendTargets;
+	}
+	
 	
 	
 	

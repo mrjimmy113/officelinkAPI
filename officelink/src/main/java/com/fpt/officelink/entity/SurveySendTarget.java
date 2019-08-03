@@ -2,6 +2,7 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,6 +38,9 @@ public class SurveySendTarget implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "department_id")
 	private Department department;
+	
+	@Column
+	private boolean isNeed;
 
 	public Integer getId() {
 		return id;
@@ -77,6 +81,15 @@ public class SurveySendTarget implements Serializable{
 	public void setDepartment(Department department) {
 		this.department = department;
 	}
+
+	public boolean isNeed() {
+		return isNeed;
+	}
+
+	public void setNeed(boolean isNeed) {
+		this.isNeed = isNeed;
+	}
+	
 	
 	
 	

@@ -26,9 +26,6 @@ public class Word implements Serializable {
 	@Column
 	private String name;
 	
-	@Column
-	private boolean isExclude;
-	
 	@ManyToMany(mappedBy = "wordList")
 	private Set<WordCloudFilter> filters = new HashSet<WordCloudFilter>();
 
@@ -56,12 +53,4 @@ public class Word implements Serializable {
 		this.filters = filters;
 	}
 
-	public boolean isExclude() {
-		return isExclude;
-	}
-
-	public void setExclude(boolean isExclude) {
-		this.isExclude = isExclude;
-	}
-	
 }

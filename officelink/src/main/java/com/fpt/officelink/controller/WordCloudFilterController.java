@@ -126,6 +126,7 @@ public class WordCloudFilterController {
 			service.modifyFilter(entity,wordList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -145,16 +146,35 @@ public class WordCloudFilterController {
 	}
 	
 	@GetMapping("/existed")
-	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name, @RequestParam("language") String language) {
+	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name) {
 		HttpStatus status = null;
 		Boolean res = null;
 		try {
-			res = service.isExisted(name, language);
+			res = service.isExisted(name);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Boolean>(res,status);
+	}
+	
+	@GetMapping("/all")
+	public ResponseEntity<List<WordCloudFilterDTO>> getAll() {
+		HttpStatus status = null;
+		List<WordCloudFilterDTO> res = new ArrayList<WordCloudFilterDTO>();
+		try {
+			List<WordCloudFilter>result = service.getAll();
+			result.forEach(element -> {
+				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
+				BeanUtils.copyProperties(element, tmp);
+				res.add(tmp);
+			});
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<List<WordCloudFilterDTO>>(res, status);
 	}
 	
 }

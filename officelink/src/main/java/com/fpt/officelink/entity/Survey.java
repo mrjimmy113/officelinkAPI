@@ -71,6 +71,12 @@ public class Survey implements Serializable {
 	
 	@Column
 	private Integer templateId;
+	
+	@Column
+	private boolean isSent;
+	
+	@Column
+	private boolean isTemplate;
 
 	public Integer getId() {
 		return id;
@@ -85,7 +91,7 @@ public class Survey implements Serializable {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = name.trim();
 	}
 
 	public boolean isActive() {
@@ -199,5 +205,50 @@ public class Survey implements Serializable {
 	public void setTemplateId(Integer templateId) {
 		this.templateId = templateId;
 	}
+
+	public boolean isSent() {
+		return isSent;
+	}
+
+	public void setSent(boolean isSent) {
+		this.isSent = isSent;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Survey other = (Survey) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+	
+	
+	
+	
 	
 }

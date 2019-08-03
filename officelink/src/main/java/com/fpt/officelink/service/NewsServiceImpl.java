@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.officelink.dto.ImageNewsDTO;
 import com.fpt.officelink.dto.NewsDTO;
+import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.News;
 import com.fpt.officelink.entity.Workplace;
@@ -49,6 +51,9 @@ public class NewsServiceImpl implements NewsService {
 
     @Autowired
     NewsRepository newsRep;
+    
+    @Autowired
+    ServletContext context;
     
     private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -190,5 +195,29 @@ public class NewsServiceImpl implements NewsService {
             }
         });
         return listNews;
+    }
+    
+    @Override
+    public PageSearchDTO<ImageNewsDTO> getLastestNewsList(int pageNum) {
+    	PageSearchDTO<ImageNewsDTO> result = new PageSearchDTO<ImageNewsDTO>();
+    	List<ImageNewsDTO> listNews = new ArrayList<>();
+    	Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
+    	Page<News> news = newsRep.findLastestNews(getUserContext().getWorkplaceId(),pageRequest);
+    	news.getContent().forEach(element -> {
+            try {
+                ImageNewsDTO dto = new ImageNewsDTO();
+                BeanUtils.copyProperties(element, dto);
+                String tmp = context.getRealPath("") + "image\\" + dto.getImage();
+                Path byteImage = Paths.get(tmp);
+                byte[] data = Files.readAllBytes(byteImage);
+                dto.setByte_image(data);
+                listNews.add(dto);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    	result.setMaxPage(news.getTotalPages());
+    	result.setObjList(listNews);
+    	return result;
     }
 }

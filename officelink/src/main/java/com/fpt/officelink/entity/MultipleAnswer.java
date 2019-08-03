@@ -9,11 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "answer_option")
-public class AnswerOption implements Serializable{
+public class MultipleAnswer implements Serializable {
 
 	/**
 	 * 
@@ -23,13 +21,12 @@ public class AnswerOption implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column(name = "answer_text")
-	private String answerText;
+	@Column
+	private String answerOption;
 	
 	@ManyToOne
-	@JoinColumn(name = "question_id")
-	private Question question;
+	@JoinColumn(name = "answer_id")
+	private Answer answer;
 
 	public Integer getId() {
 		return id;
@@ -38,23 +35,25 @@ public class AnswerOption implements Serializable{
 	public void setId(Integer id) {
 		this.id = id;
 	}
+	
+	
 
-	public String getAnswerText() {
-		return answerText;
+	public String getAnswerOption() {
+		return answerOption;
 	}
 
-	public void setAnswerText(String answerText) {
-		this.answerText = answerText.trim();
+	public void setAnswerOption(String answerOption) {
+		this.answerOption = answerOption;
 	}
 
-	public Question getQuestion() {
-		return question;
+	public Answer getAnswer() {
+		return answer;
 	}
 
-	public void setQuestion(Question question) {
-		this.question = question;
+	public void setAnswer(Answer answer) {
+		this.answer = answer;
 	}
 	
 	
-	
+
 }

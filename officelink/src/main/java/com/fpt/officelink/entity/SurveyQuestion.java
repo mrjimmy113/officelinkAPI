@@ -40,6 +40,9 @@ public class SurveyQuestion implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "question_id")
 	private Question question;
+	
+	@Column
+	private boolean isRequired;
 
 	public Integer getId() {
 		return id;
@@ -79,6 +82,14 @@ public class SurveyQuestion implements Serializable {
 
 	public void setQuestionIndex(Integer questionIndex) {
 		this.questionIndex = questionIndex;
+	}
+
+	public boolean isRequired() {
+		return isRequired;
+	}
+
+	public void setRequired(boolean isRequired) {
+		this.isRequired = isRequired;
 	}
 	
 	

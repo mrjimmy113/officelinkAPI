@@ -2,6 +2,7 @@ package com.fpt.officelink.entity;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -30,15 +31,18 @@ public class Answer implements Serializable {
 	@Column(name = "date_created")
 	private Date dateCreated;
 	
-	@Column
+	@Column(length = 550)
 	private String content;
 	
 	@ManyToOne
 	@JoinColumn(name = "question_identity")
 	private SurveyQuestion surveyQuestion;
 	
-	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-	private Set<WordCloud> wordClouds;
+	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST)
+	private List<WordCloud> wordClouds;
+	
+	@OneToMany(mappedBy = "answer", cascade = CascadeType.PERSIST)
+	private List<MultipleAnswer> multiple;
 	
 	@ManyToOne
 	@JoinColumn(name = "account_id")
@@ -76,13 +80,7 @@ public class Answer implements Serializable {
 		this.surveyQuestion = surveyQuestion;
 	}
 
-	public Set<WordCloud> getWordClouds() {
-		return wordClouds;
-	}
 
-	public void setWordClouds(Set<WordCloud> wordClouds) {
-		this.wordClouds = wordClouds;
-	}
 
 	public Account getAccount() {
 		return account;
@@ -91,5 +89,25 @@ public class Answer implements Serializable {
 	public void setAccount(Account account) {
 		this.account = account;
 	}
+
+	public List<WordCloud> getWordClouds() {
+		return wordClouds;
+	}
+
+	public void setWordClouds(List<WordCloud> wordClouds) {
+		this.wordClouds = wordClouds;
+	}
+
+	public List<MultipleAnswer> getMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(List<MultipleAnswer> multiple) {
+		this.multiple = multiple;
+	}
+
+	
+	
+	
 
 }

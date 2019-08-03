@@ -13,14 +13,17 @@ import com.fpt.officelink.entity.Question;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Integer>{
-	Page<Question> findAllByQuestionContainingAndIsDeleted(String term,boolean isDeleted, Pageable pageable);
+	Page<Question> findAllByQuestionContainingAndWorkplaceIdAndIsDeleted(String term,Integer workplaceId,boolean isDeleted, Pageable pageable);
 	
-	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :id AND q.isDeleted = false")
-	Page<Question> findByQuestionAndType(@Param("term") String term,@Param("id") Integer id, Pageable pageable);
+	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :id AND q.workplace.id = :workplaceId OR q.isTemplate = true AND q.isDeleted = false")
+	Page<Question> findAllTemplateWithType(@Param("term") String term,@Param("id") Integer id, @Param("workplaceId") Integer workplaceId,Pageable pageable);
 	
 	@Query("SELECT q from Question q "
 			+ "JOIN SurveyQuestion s "
 			+ "ON q.id = s.question.id "
 			+ "WHERE s.survey.id = :id")
 	List<Question> findAllBySurveyId(@Param("id") Integer id);
+	
+	@Query("SELECT q FROM Question q WHERE q.question LIKE %:term% AND q.workplace.id = :id OR q.isTemplate = true AND q.isDeleted = false")
+	Page<Question> findAllTemplate(@Param("term") String term, @Param("id") Integer id, Pageable pageable);
 }

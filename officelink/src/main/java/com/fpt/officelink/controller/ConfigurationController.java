@@ -151,9 +151,8 @@ public class ConfigurationController {
 			Survey sEntity = new Survey();
 
 			BeanUtils.copyProperties(dto, entity);
-			if (dto.getSurvey() != null) {
-				BeanUtils.copyProperties(dto.getSurvey(), sEntity);
-			}
+			
+			sEntity.setId(dto.getSurvey().getId());
 
 			wEntity.setId(user.getWorkplaceId());
 			entity.setWorkplace(wEntity);
