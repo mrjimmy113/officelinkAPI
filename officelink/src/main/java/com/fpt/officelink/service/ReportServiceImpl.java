@@ -335,6 +335,7 @@ public class ReportServiceImpl implements ReportService {
 		return result;
 	}
 	
+	@Override
 	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
 		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
 		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
@@ -352,6 +353,15 @@ public class ReportServiceImpl implements ReportService {
 				}
 			}
 		}
+		return result;
+	}
+	
+	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
+			int teamId) {
+		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
+		
+
 		return result;
 	}
 	

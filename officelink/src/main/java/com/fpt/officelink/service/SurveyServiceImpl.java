@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import javax.transaction.Transactional;
 
@@ -25,29 +24,19 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
-import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
-import com.fpt.officelink.dto.QuestionReportDTO;
-import com.fpt.officelink.dto.SendTargetDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
-import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
-import com.fpt.officelink.entity.AnswerReport;
 import com.fpt.officelink.entity.CustomUser;
-import com.fpt.officelink.entity.Department;
-import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.MultipleAnswer;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.entity.TeamQuestionReport;
-import com.fpt.officelink.entity.WordCloud;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.enumaration.TypeEnum;
 import com.fpt.officelink.mail.service.MailService;
@@ -451,53 +440,6 @@ public class SurveyServiceImpl implements SurveyService {
 		}
 	}
 
-	@Override
-	public SurveyReportDTO getReport(Integer id) {
-		SurveyReportDTO result = new SurveyReportDTO();
-		Optional<Survey> survey = surveyRep.findById(id);
-		if (survey.isPresent()) {
-			BeanUtils.copyProperties(survey.get(), result);
-			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(id);
-			List<SendTargetDTO> sendSurveyDTOs = new ArrayList<SendTargetDTO>();
-			for (SurveySendTarget target : survey.get().getTargets()) {
-				SendTargetDTO dto = new SendTargetDTO();
-				Department tmpDep = target.getDepartment();
-				Location tmpLocation = target.getLocation();
-				Team tmpTeam = target.getTeam();
-				
-				if(tmpDep != null) dto.setDepartmentName(tmpDep.getName());
-				else dto.setDepartmentName("");
-				
-				if(tmpLocation != null) dto.setLocationName(tmpLocation.getName());
-				else dto.setLocationName("");
-				
-				if(tmpTeam != null) dto.setTeamName(tmpTeam.getName());
-				else dto.setTeamName("");
-				
-				sendSurveyDTOs.add(dto);
-			}
-			result.setSendTargets(sendSurveyDTOs);
-			Function<Integer, List<Answer>> method = null;
-			Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
-			switch (acc.getRole().getRole()) {
-			case "employer":
-				method = indentity -> answerRep.findAllByIndentity(indentity);
-				break;
-
-			case "manager":
-				method = indentity -> answerRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
-						acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
-				break;
-			case "employee":
-				method = indentity -> answerRep.findAllByIndentityAndDepartmentId(indentity,
-						depRep.findByAccountId(acc.getId()).get(0).getId());
-				break;
-			}
-			result.setQuestions(getQuestionReports(sqList, method));
-		}
-
-		return result;
-	}
 
 	@Override
 	public List<Survey> getWorkplaceSurvey(int workplaceId) {
@@ -506,179 +448,10 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
-		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
-		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
-		if (opSurvey.isPresent()) {
-			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
-			if (!opSurvey.get().isActive() && opSurvey.get().isSent()) {
-				Function<Integer, List<TeamQuestionReport>> method = getTeamReport(locationId, departmentId, teamId);
-				result = getTeamQuestionReport(sqList, method);
-			} else {
-				Function<Integer, List<Answer>> method = getAnswerFunction(locationId, departmentId, teamId);
-				result = getQuestionReports(sqList, method);
-			}
-		}
-		return result;
-	}
-
-	private Function<Integer, List<Answer>> getAnswerFunction(int locationId, int departmentId, int teamId) {
-		Function<Integer, List<Answer>> method = null;
-		if (locationId == 0 && departmentId == 0 && teamId == 0) {
-			method = indentity -> answerRep.findAllByIndentity(indentity);
-			System.out.println("ALL");
-		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
-			method = indentity -> answerRep.findAllByIndentityAndLocationId(indentity, locationId);
-			System.out.println("Location");
-		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
-			method = indentity -> answerRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
-			System.out.println("Department");
-		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = indentity -> answerRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
-					departmentId);
-			System.out.println("Location - Department");
-		} else if (teamId != 0) {
-			method = indentity -> answerRep.findAllByIndentityAndTeamId(indentity, teamId);
-			System.out.println("Team");
-		}
-		return method;
-	}
-
-	@Override
-	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
-			int teamId) {
-		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
-		Function<Integer, List<Answer>> method = getAnswerFunction(locationId, departmentId, teamId);
-		List<Answer> answers = method.apply(surveyQuestion.getId());
-		switch (surveyQuestion.getQuestion().getType().getType()) {
-		case MULTIPLE:
-			result = getMutipleChoiceReport(answers);
-			break;
-		case SINGLE:
-			result = getSingleChoiceReport(answers);
-			break;
-		case TEXT:
-			result = getFreeTextReport(answers);
-			break;
-		}
-
-		return result;
-	}
-
-	@Override
 	public List<Survey> getSurveyByQuestionId(int id, int notId) {
 		List<Integer> notIdList = new ArrayList<Integer>();
 		notIdList.add(notId);
 		return surveyRep.findAllByQuestionId(id, notIdList);
-	}
-
-	// Report: Output
-	private List<QuestionReportDTO> getQuestionReports(List<SurveyQuestion> sqList,
-			Function<Integer, List<Answer>> loadAnswer) {
-		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
-		sqList.forEach(sq -> {
-			QuestionReportDTO qr = new QuestionReportDTO();
-			Question e = sq.getQuestion();
-			// Change Question to Question DTO
-			QuestionDTO dto = new QuestionDTO();
-			BeanUtils.copyProperties(e, dto, "type", "options");
-			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-			e.getOptions().forEach(op -> {
-				AnswerOptionDTO opDto = new AnswerOptionDTO();
-				BeanUtils.copyProperties(op, opDto);
-				opList.add(opDto);
-			});
-			dto.setOptions(opList);
-			TypeQuestionDTO typeDto = new TypeQuestionDTO();
-			BeanUtils.copyProperties(e.getType(), typeDto);
-			dto.setType(typeDto);
-			// Set Question
-			qr.setQuestion(dto);
-			// Get each question report
-			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
-			List<Answer> answers = loadAnswer.apply(sq.getId());
-			switch (sq.getQuestion().getType().getType()) {
-			case MULTIPLE:
-				arList = getMutipleChoiceReport(answers);
-				break;
-			case SINGLE:
-				arList = getSingleChoiceReport(answers);
-				break;
-			case TEXT:
-				arList = getFreeTextReport(answers);
-				break;
-
-			}
-			qr.setAnswers(arList);
-			qrList.add(qr);
-		});
-		return qrList;
-	}
-
-	// Report: Free Text
-	private List<AnswerReportDTO> getFreeTextReport(List<Answer> answers) {
-		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		boolean isFound;
-		for (Answer a : answers) {
-			for (WordCloud w : a.getWordClouds()) {
-				isFound = false;
-				for (AnswerReportDTO r : result) {
-					if (r.getTerm().equalsIgnoreCase(w.getWord())) {
-						r.setWeight(r.getWeight() + w.getTimes());
-						isFound = true;
-						break;
-					}
-				}
-				if (!isFound) {
-					result.add(new AnswerReportDTO(w.getWord(), w.getTimes()));
-				}
-
-			}
-
-		}
-		return result;
-	}
-
-	// Report: Single choice
-	private List<AnswerReportDTO> getSingleChoiceReport(List<Answer> answers) {
-		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		boolean isFound;
-		for (Answer answer : answers) {
-			isFound = false;
-			for (AnswerReportDTO AnswerReportDTO : result) {
-				if (answer.getContent().equalsIgnoreCase(AnswerReportDTO.getTerm())) {
-					AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
-					isFound = true;
-					break;
-				}
-			}
-			if (!isFound)
-				result.add(new AnswerReportDTO(answer.getContent(), 1));
-		}
-		return result;
-	}
-
-	// Report: Mutiple Choice
-	private List<AnswerReportDTO> getMutipleChoiceReport(List<Answer> answers) {
-		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
-		boolean isFound;
-		for (Answer answer : answers) {
-			String[] options = answer.getContent().split(",");
-			for (int i = 0; i < options.length; i++) {
-				isFound = false;
-				for (AnswerReportDTO AnswerReportDTO : result) {
-					if (options[i].equalsIgnoreCase(AnswerReportDTO.getTerm())) {
-						AnswerReportDTO.setWeight(AnswerReportDTO.getWeight() + 1);
-						isFound = true;
-						break;
-					}
-				}
-				if (!isFound)
-					result.add(new AnswerReportDTO(options[i], 1));
-			}
-		}
-		return result;
 	}
 
 	// change active status of a survey to false
@@ -693,86 +466,6 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public List<Survey> getActiveSurveyByDate(Date date) {
 		List<Survey> result = surveyRep.findAllByDateStopAndIsActiveAndIsDeleted(date, true, false);
-
-		return result;
-	}
-
-	private Function<Integer, List<TeamQuestionReport>> getTeamReport(int locationId, int departmentId, int teamId) {
-		Function<Integer, List<TeamQuestionReport>> method = null;
-		if (locationId == 0 && departmentId == 0 && teamId == 0) {
-			method = indentity -> teamQuestReportRep.findAllByIdentity(indentity);
-			System.out.println("ALL");
-		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
-			method = indentity -> teamQuestReportRep.findAllByIdentityAndLocationId(indentity, locationId);
-			System.out.println("Location");
-		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
-			method = indentity -> teamQuestReportRep.findAllByIdentityAndDepartmentId(indentity, departmentId);
-			System.out.println("Department");
-		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = indentity -> teamQuestReportRep.findAllByIdentityAndLocationIdAndDepartmentId(indentity,
-					locationId, departmentId);
-			System.out.println("Location - Department");
-		} else if (teamId != 0) {
-			method = indentity -> teamQuestReportRep.findAllByIdentityAndTeamId(indentity, teamId);
-			System.out.println("Team");
-		}
-
-		return method;
-	}
-
-	// Get report by team (when survey finish)
-	private List<QuestionReportDTO> getTeamQuestionReport(List<SurveyQuestion> sqList,
-			Function<Integer, List<TeamQuestionReport>> loadAnswer) {
-		List<QuestionReportDTO> qrList = new ArrayList<QuestionReportDTO>();
-		sqList.forEach(sq -> {
-			QuestionReportDTO qr = new QuestionReportDTO();
-			Question e = sq.getQuestion();
-			// Change Question to Question DTO
-			QuestionDTO dto = new QuestionDTO();
-			BeanUtils.copyProperties(e, dto, "type", "options");
-			List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
-			e.getOptions().forEach(op -> {
-				AnswerOptionDTO opDto = new AnswerOptionDTO();
-				BeanUtils.copyProperties(op, opDto);
-				opList.add(opDto);
-			});
-			dto.setOptions(opList);
-			TypeQuestionDTO typeDto = new TypeQuestionDTO();
-			BeanUtils.copyProperties(e.getType(), typeDto);
-			dto.setType(typeDto);
-			// Set Question
-			qr.setQuestion(dto);
-			// Get each question report
-			List<AnswerReportDTO> arList = new ArrayList<AnswerReportDTO>();
-			List<AnswerReport> answerRepors = combineAnswerReport(loadAnswer.apply(sq.getId()));
-			answerRepors.forEach(answerReport -> {
-				AnswerReportDTO arDto = new AnswerReportDTO();
-				BeanUtils.copyProperties(answerReport, arDto);
-				arList.add(arDto);
-			});
-			qr.setAnswers(arList);
-			qrList.add(qr);
-		});
-		return qrList;
-	}
-
-	// Combine Result of AnswerReport in TeamQuestionReport
-	private List<AnswerReport> combineAnswerReport(List<TeamQuestionReport> reports) {
-		List<AnswerReport> result = new ArrayList<AnswerReport>();
-		if (reports.size() > 0) {
-			result.addAll(reports.get(0).getAnswerReports());
-			reports.remove(0);
-			for (TeamQuestionReport report : reports) {
-				for (AnswerReport answerReport : report.getAnswerReports()) {
-					for (AnswerReport res : result) {
-						if (answerReport.getTerm().equals(res.getTerm())) {
-							res.setWeight(res.getWeight() + answerReport.getWeight());
-
-						}
-					}
-				}
-			}
-		}
 
 		return result;
 	}
@@ -845,4 +538,7 @@ public class SurveyServiceImpl implements SurveyService {
         }
         return answerDTO;
     }
+
+
+
 }

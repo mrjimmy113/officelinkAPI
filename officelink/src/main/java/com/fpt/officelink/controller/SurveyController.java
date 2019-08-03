@@ -327,20 +327,6 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(), status);
 	}
 
-	@GetMapping("/report/detail")
-	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
-		HttpStatus status = null;
-		SurveyReportDTO res = null;
-		try {
-			res = ser.getReport(id);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<SurveyReportDTO>(res, status);
-	}
-
 	@GetMapping("/report")
 	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
