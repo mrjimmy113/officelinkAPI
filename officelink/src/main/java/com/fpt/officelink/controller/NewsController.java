@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -124,6 +125,7 @@ public class NewsController {
         return new ResponseEntity<PageSearchDTO<NewsDTO>>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PostMapping(
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Integer> addNews(@RequestParam("file") MultipartFile file, @RequestParam("dto") String stringDTO) {
@@ -150,6 +152,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping(value = "/edit")
     public ResponseEntity<Integer> editNewsNotHasFile(@RequestParam("dto") String stringDTO) {
         HttpStatus status = null;
@@ -176,6 +179,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping()
     public ResponseEntity<Integer> editNews(@RequestParam("file") MultipartFile file, @RequestParam("dto") String stringDTO) {
         HttpStatus status = null;
@@ -203,6 +207,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @DeleteMapping
     public ResponseEntity<Integer> removeNews(@RequestParam("id") int id) {
         HttpStatus status = null;

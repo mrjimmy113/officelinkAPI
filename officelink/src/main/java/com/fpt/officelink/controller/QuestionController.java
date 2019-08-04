@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class QuestionController {
 	QuestionService qSer;
 	
 	//Question
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<QuestionDTO>> search(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
@@ -68,6 +70,7 @@ public class QuestionController {
 		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/search")
 	public ResponseEntity<PageSearchDTO<QuestionDTO>> searchWithType(@RequestParam("term") String term,@RequestParam("type") Integer type,@RequestParam("page") int page){
 		HttpStatus status = null;
@@ -104,7 +107,7 @@ public class QuestionController {
 		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
 	}
 	
-	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> createQuestion(@RequestBody QuestionDTO dto) {
 		HttpStatus status = null;
@@ -126,6 +129,7 @@ public class QuestionController {
 		return new ResponseEntity<Integer>(status.value(),status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> deleteByFlag(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -138,7 +142,7 @@ public class QuestionController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
-	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	//Type API
 	@GetMapping("/type")
 	public ResponseEntity<List<TypeQuestionDTO>> getAllQuestionType() {
@@ -158,6 +162,7 @@ public class QuestionController {
 		return new ResponseEntity<List<TypeQuestionDTO>>(result,status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/chooseList")
 	public ResponseEntity<PageSearchDTO<QuestionDTO>> getChooseQuestionList(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;

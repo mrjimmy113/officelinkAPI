@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,7 @@ public class WordCloudFilterController {
 	@Autowired
 	WordCloudFilterService service;
 	
-	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<WordCloudFilterDTO>> search(@RequestParam("term") String term) {
 		HttpStatus status = null;
@@ -64,6 +65,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping(value = "/getPage")
 	public ResponseEntity<PageSearchDTO<WordCloudFilterDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
 		HttpStatus status = null;
@@ -89,7 +91,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<PageSearchDTO<WordCloudFilterDTO>>(res,status);
 	}
 
-	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody WordCloudFilterDTO dto) {
 		HttpStatus status = null;
@@ -110,6 +112,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody WordCloudFilterDTO dto) {
 		HttpStatus status = null;
@@ -132,6 +135,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -145,6 +149,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Integer>(status.value(),status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/existed")
 	public ResponseEntity<Boolean> checkIfSurveyExisted(@RequestParam("name") String name) {
 		HttpStatus status = null;
@@ -158,6 +163,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Boolean>(res,status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
 	@GetMapping("/all")
 	public ResponseEntity<List<WordCloudFilterDTO>> getAll() {
 		HttpStatus status = null;

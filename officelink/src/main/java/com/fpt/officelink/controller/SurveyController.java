@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,6 +60,7 @@ public class SurveyController {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/getWorkplaceSurveys")
 	public ResponseEntity<List<SurveyDTO>> getWorkplaceSurveys() {
 		this.user = getUserContext();
@@ -80,6 +82,7 @@ public class SurveyController {
 		return new ResponseEntity<List<SurveyDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> search(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -126,6 +129,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -166,6 +170,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -206,6 +211,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -219,6 +225,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/detail")
 	public ResponseEntity<List<QuestionDTO>> getDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -250,6 +257,7 @@ public class SurveyController {
 		return new ResponseEntity<List<QuestionDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employee","ROLE_manager"})
 	@GetMapping("/take")
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
@@ -269,6 +277,7 @@ public class SurveyController {
 		return new ResponseEntity<SurveyDTO>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping("/sendOut")
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
@@ -309,6 +318,7 @@ public class SurveyController {
 
 	}
 
+	@Secured({"ROLE_employee","ROLE_manager"})
 	@PostMapping("/answer")
 	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
@@ -327,6 +337,7 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
 	@GetMapping("/report")
 	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -350,6 +361,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/template")
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> searchTemplate(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -373,6 +385,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
 	
+	@Secured({"ROLE_employee","ROLE_manager"})
 	@GetMapping(value = "/history")
     public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term, @RequestParam("page") int page) {
         HttpStatus status = null;
@@ -399,6 +412,7 @@ public class SurveyController {
         return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
     }
 
+	@Secured({"ROLE_employee","ROLE_manager"})
     @GetMapping("/history/answer")
     public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
         HttpStatus status = null;

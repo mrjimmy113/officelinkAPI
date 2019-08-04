@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,6 +53,7 @@ public class ConfigurationController {
 	@Autowired
 	WorkplaceService workplaceService;
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping(value = "/getConfig")
 	public ResponseEntity<ConfigurationDTO> getConfig(@RequestParam("id") Integer id) {
 
@@ -77,6 +79,7 @@ public class ConfigurationController {
 	/*
 	 * 
 	 * */
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping(value = "/searchGetPage")
 	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -140,6 +143,7 @@ public class ConfigurationController {
 		return new ResponseEntity<PageSearchDTO<ConfigurationDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
 		this.user = this.getUserContext();
@@ -196,6 +200,7 @@ public class ConfigurationController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
 	public ResponseEntity<Integer> update(@Valid @RequestBody ConfigurationDTO dto) {
 		HttpStatus status = null;
@@ -247,6 +252,7 @@ public class ConfigurationController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;

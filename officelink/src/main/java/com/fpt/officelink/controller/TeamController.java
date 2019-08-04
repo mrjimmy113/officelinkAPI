@@ -1,6 +1,5 @@
 package com.fpt.officelink.controller;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +43,7 @@ public class TeamController {
 	@Autowired
 	TeamService teamService;
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -75,6 +76,7 @@ public class TeamController {
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("getByWorkplace")
 	public ResponseEntity<List<TeamDTO>> findByWorkplace() {
 		this.user = getUserContext();
@@ -95,6 +97,7 @@ public class TeamController {
 		return new ResponseEntity<List<TeamDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("dep")
 	public ResponseEntity<List<TeamDTO>> findByDepId(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -118,7 +121,7 @@ public class TeamController {
 	}
 
 
-
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> create(@Valid @RequestBody TeamDTO dto) {
 		this.user = getUserContext();
@@ -148,6 +151,7 @@ public class TeamController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
 	public ResponseEntity<Integer> update(@Valid @RequestBody TeamDTO dto) {
 		this.user = getUserContext();
@@ -173,6 +177,7 @@ public class TeamController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;
