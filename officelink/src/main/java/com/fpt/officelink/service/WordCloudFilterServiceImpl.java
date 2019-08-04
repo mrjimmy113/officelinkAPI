@@ -126,7 +126,6 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		rawText = rawText.replaceAll("[^A-Za-z0-9_\\-\\s]", "");
 		rawText = rawText.replaceAll("\n", " ");
 		rawText = rawText.toLowerCase();
-		System.out.println(rawText);
 		String[] words = rawText.trim().split(" ");
 		if (opFilter.isPresent()) {
 			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());

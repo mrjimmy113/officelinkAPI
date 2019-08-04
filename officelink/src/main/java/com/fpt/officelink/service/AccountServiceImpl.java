@@ -11,17 +11,10 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import com.fpt.officelink.entity.Location;
-import com.fpt.officelink.entity.Role;
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.repository.LocationRepository;
-import com.fpt.officelink.repository.RoleRepository;
-import com.fpt.officelink.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,10 +25,16 @@ import com.fpt.officelink.dto.AuthDTO;
 import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
+import com.fpt.officelink.entity.Location;
+import com.fpt.officelink.entity.Role;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
+import com.fpt.officelink.repository.LocationRepository;
+import com.fpt.officelink.repository.RoleRepository;
 import com.fpt.officelink.repository.WorkplaceRepository;
+import com.fpt.officelink.utils.Constants;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -188,7 +187,7 @@ public class AccountServiceImpl implements AccountService {
     	AuthDTO result = null;
     	Optional<Account> acc = accountRespository.findByEmail(email);
     	if(acc.isPresent()) {
-    		if(passwordEncoder().matches(password, acc.get().getPassword())) {
+    		if(passwordEncoder().matches(password, acc.get().getPassword()) && acc.get().isActivated()) {
     			result = new AuthDTO();
         		result.setRole(acc.get().getRole().getRole());
         		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());

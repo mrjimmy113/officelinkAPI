@@ -98,6 +98,9 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Value("${angular.path}")
 	private String angularPath;
+	
+	@Value("${filter.EN}")
+	private int defaultFilterEN;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -422,7 +425,7 @@ public class SurveyServiceImpl implements SurveyService {
 				entity.setSurveyQuestion(sq);
 				entity.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 				if (a.getQuestionType().equals(TypeEnum.TEXT.toString())) {
-					entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), 1, entity));
+					entity.setWordClouds(filterSer.rawTextToWordCloud(a.getContent(), defaultFilterEN, entity));
 				}else if(a.getQuestionType().equals(TypeEnum.MULTIPLE.toString())) {
 					String[] options = a.getContent().split(",");
 					List<MultipleAnswer> multipleAnswers = new ArrayList<MultipleAnswer>();
