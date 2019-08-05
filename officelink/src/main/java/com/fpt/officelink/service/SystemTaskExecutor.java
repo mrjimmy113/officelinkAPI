@@ -18,7 +18,7 @@ import com.fpt.officelink.entity.Survey;
 @Service
 public class SystemTaskExecutor {
 
-	private static final Logger log = Logger.getLogger(SurveyController.class.getName());
+	private static final Logger log = Logger.getLogger(SystemTaskExecutor.class.getName());
 
 	@Autowired
 	private SurveyService surveyService;
@@ -30,7 +30,7 @@ public class SystemTaskExecutor {
 	public void sentRoutineSurvey(Configuration config) {
 		try {
 
-			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
+//			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
 
 			String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
 					config.getWorkplace().getName(), config.getSurvey().getName(), new java.util.Date().toString());
@@ -54,20 +54,30 @@ public class SystemTaskExecutor {
 		// get list of active surveys with end date < today
 		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date(Calendar.getInstance().getTimeInMillis()));
 		if (surveys.isEmpty()) {
+			log.log(Level.INFO, "No survey expired");
 			return null;
 		}
 
 		List<Survey> successSurveys = new ArrayList<Survey>();
 
 		for (Survey survey : surveys) {
-			boolean isSuccess = teamReportService.generateTeamQuestionReport(survey.getId());
+			boolean isSuccess = false;
+			
+			// generate team report for survey
+			try {
+				isSuccess = teamReportService.generateTeamQuestionReport(survey.getId()).get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 
-			// update active status
+			// update active status if report is generated successfully
 			if (isSuccess) {
 				successSurveys.add(surveyService.updateStatus(survey));
 			}
 		}
 
+		log.log(Level.INFO, "Report generated");
 		return successSurveys;
 	}
 
