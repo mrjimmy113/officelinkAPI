@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.AnswerReport;
@@ -71,8 +73,8 @@ public class TeamReportServiceImpl implements TeamReportService {
 	@Async
 	@Override
 	@Transactional
-	public boolean generateTeamQuestionReport(int surveyId) {
-		boolean isSuccess = false;
+	public Future<Boolean> generateTeamQuestionReport(int surveyId) {
+		AsyncResult<Boolean> isSuccess = new AsyncResult<Boolean>(false);
 		
 		try {
 			// get all the team the survey was sent to
@@ -110,7 +112,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 				}
 			}
 			
-			isSuccess = true;
+			isSuccess = new AsyncResult<Boolean>(true);
 			return isSuccess;
 		} catch (Exception e) {
 			return isSuccess;

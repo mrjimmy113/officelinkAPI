@@ -40,7 +40,7 @@ public class WorkplaceController {
 	@Autowired
 	WorkplaceService workpService;
 
-	@Secured({"ROLE_system_admin"})
+	@Secured({"ROLE_system_admin", "ROLE_Employer"})
 	@GetMapping(value = "/getUserWorkplace")
 	public ResponseEntity<WorkplaceDTO> getUserWorkplace(){
 		user = this.getUserContext();

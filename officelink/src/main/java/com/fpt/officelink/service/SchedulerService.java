@@ -24,9 +24,9 @@ public class SchedulerService implements SchedulingConfigurer {
 	
 	private List<ScheduledFuture<?>> dailyTaskList; // daily task list
 
-	private ThreadPoolTaskScheduler configScheduler; // scheduler properties
+	private ThreadPoolTaskScheduler configScheduler; // configuration schedule
 
-	private List<ScheduledFuture<?>> configTaskList; // store scheduled schedule
+	private List<ScheduledFuture<?>> configTaskList; // configuration task list
 	
 	private List<Configuration> configList; // list of configurations
 
@@ -45,7 +45,7 @@ public class SchedulerService implements SchedulingConfigurer {
 		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
 		
 		// start daily Tasks
-		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0 * 22 * * *");
+		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0/15 * * * * *");
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class SchedulerService implements SchedulingConfigurer {
 	private ThreadPoolTaskScheduler dailyPoolScheduler() {
 		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 		scheduler.setThreadNamePrefix("DailyThreadPool");
-		scheduler.setPoolSize(5);
+		scheduler.setPoolSize(1);
 		scheduler.initialize();
 		return scheduler;
 	}
@@ -100,7 +100,7 @@ public class SchedulerService implements SchedulingConfigurer {
 	}
 
 	/**
-	 * 
+	 * Configure Configuration tasks
 	 */
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -126,7 +126,7 @@ public class SchedulerService implements SchedulingConfigurer {
 				// register to system.
 				// when configuration change, you cannot simply create a new schedule and the
 				// ignore scheduled task nor update the scheduled task
-				// insteed the scheduled tasks need to be cancel first, then replaced with the
+				// in steed the scheduled tasks need to be cancel first, then replaced with the
 				// new schedule
 				if (i >= configTaskList.size()) {
 					// add new schedule to pool
@@ -142,6 +142,7 @@ public class SchedulerService implements SchedulingConfigurer {
 	}
 	
 	/**
+	 * get a schedule task from configuration
 	 * @param config
 	 * @return
 	 */
