@@ -101,19 +101,15 @@ public class NewsController {
     }
 
     @GetMapping(value = "/getPage")
-    public ResponseEntity<PageSearchDTO<NewsDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
+    public ResponseEntity<PageSearchDTO<ImageNewsDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
         HttpStatus status = null;
-        PageSearchDTO<NewsDTO> res = new PageSearchDTO<NewsDTO>();
+        PageSearchDTO<ImageNewsDTO> res = new PageSearchDTO<ImageNewsDTO>();
         try {
             //Call Service
             Page<News> result = service.searchByTitleWithPagination(term, page);
             //Convert to DTO
-            List<NewsDTO> resultList = new ArrayList<NewsDTO>();
-            result.getContent().forEach(element -> {
-                NewsDTO dto = new NewsDTO();
-                BeanUtils.copyProperties(element, dto);
-                resultList.add(dto);
-            });
+            String path = context.getRealPath("");
+            List<ImageNewsDTO> resultList = service.getListNews(result, path);
             res.setMaxPage(result.getTotalPages());
             res.setObjList(resultList);
             status = HttpStatus.OK;
@@ -122,7 +118,7 @@ public class NewsController {
             status = HttpStatus.BAD_REQUEST;
         }
 
-        return new ResponseEntity<PageSearchDTO<NewsDTO>>(res, status);
+        return new ResponseEntity<PageSearchDTO<ImageNewsDTO>>(res, status);
     }
 
     @Secured({"ROLE_employer","ROLE_system_admin"})
