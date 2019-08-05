@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.AccountDTO;
 import com.fpt.officelink.dto.AssignInforDTO;
+import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.LocationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.PasswordInfoDTO;
@@ -176,12 +177,17 @@ public class AccountController {
             List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
             account.getTeams().forEach(element -> {
                 TeamDTO teamDTO = new TeamDTO();
+                DepartmentDTO depDTO = new DepartmentDTO();
                 BeanUtils.copyProperties(element, teamDTO);
+                BeanUtils.copyProperties(element.getDepartment(), depDTO);
+                teamDTO.setDepartment(depDTO);
                 teamDTOS.add(teamDTO);
             });
 
-
-            BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            if(account.getLocation() != null) {
+            	BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            }
+            
             BeanUtils.copyProperties(account, dto);
 
             dto.setLocation(locationDTO);
@@ -190,6 +196,7 @@ public class AccountController {
             httpStatus = HttpStatus.OK;
 
         }catch (Exception ex){
+        	ex.printStackTrace();
             httpStatus = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<AccountDTO>(dto, httpStatus);

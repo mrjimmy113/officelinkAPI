@@ -30,6 +30,7 @@ import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
 import com.fpt.officelink.entity.Answer;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.AnswerReport;
 import com.fpt.officelink.entity.ApplyFilterDTO;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Survey;
@@ -121,7 +122,13 @@ public class ReportController {
 		List<AnswerReportDTO> res = new ArrayList<AnswerReportDTO>();
 		HttpStatus status = null;
 		try {
-//			res = surSer.getAnswerReport(surveyId, questionId, locationId, departmentId, teamId);
+			List<AnswerReport> result = new ArrayList<AnswerReport>();
+			result = reportSer.getAnswerReport(surveyId, questionId, locationId, departmentId, teamId);
+			for (AnswerReport answerReport : result) {
+				AnswerReportDTO dto = new AnswerReportDTO();
+				BeanUtils.copyProperties(answerReport, dto);
+				res.add(dto);
+			}
 
 			status = HttpStatus.OK;
 		} catch (Exception e) {

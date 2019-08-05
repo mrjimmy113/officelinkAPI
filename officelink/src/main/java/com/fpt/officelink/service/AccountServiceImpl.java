@@ -215,16 +215,16 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void sendInvitation(String[] listEmail) throws JOSEException, ParseException {
     	List<String> tokenList = new ArrayList<String>();
-    	Map<String, Object> model = new HashMap<>();
+    	
     	for (int i = 0; i < listEmail.length; i++) {
     		System.out.println(getUserContext().getWorkplaceId());
 			tokenList.add(jwtSer.createInviteToken(listEmail[i], getUserContext().getWorkplaceId()));
 		}
     	for (String token : tokenList) {
+    		Map<String, Object> model = new HashMap<>();
     		model.put("link", angularPath + "/join/" + token);
     		String[] mail = new String[1];
     		mail[0] = jwtSer.getEmailFromToken(token);
-    		System.out.println(jwtSer.getWorkplaceId(token));
     		mailService.sendMail(mail,"email-invite-temp.ftl", model);
 		}
     	
