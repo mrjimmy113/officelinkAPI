@@ -22,14 +22,14 @@ public class SystemTaskExecutor {
 
 	@Autowired
 	private SurveyService surveyService;
-	
+
 	@Autowired
 	private TeamReportService teamReportService;
-	
+
 	@Async
 	public void sentRoutineSurvey(Configuration config) {
 		try {
-			
+
 			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
 
 			String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
@@ -45,28 +45,30 @@ public class SystemTaskExecutor {
 			log.log(Level.INFO, msg);
 		}
 	}
-	
 
 	/**
 	 * set surveys active status and generate report for teams
 	 */
 	@Async
 	public List<Survey> generateReportDaily() {
-		// get list of active surveys with end date is to day or before
+		// get list of active surveys with end date < today
 		List<Survey> surveys = surveyService.getActiveSurveyByDate(new Date(Calendar.getInstance().getTimeInMillis()));
 		if (surveys.isEmpty()) {
 			return null;
 		}
-		
+
 		List<Survey> successSurveys = new ArrayList<Survey>();
-		
+
 		for (Survey survey : surveys) {
-			teamReportService.generateTeamQuestionReport(survey.getId());
-			//update active status
-			successSurveys.add(surveyService.updateStatus(survey));
+			boolean isSuccess = teamReportService.generateTeamQuestionReport(survey.getId());
+
+			// update active status
+			if (isSuccess) {
+				successSurveys.add(surveyService.updateStatus(survey));
+			}
 		}
-		
+
 		return successSurveys;
 	}
-	
+
 }

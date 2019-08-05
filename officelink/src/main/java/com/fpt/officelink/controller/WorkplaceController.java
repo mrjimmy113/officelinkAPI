@@ -90,7 +90,7 @@ public class WorkplaceController {
 	
 	@Secured({"ROLE_system_admin"})
 	@PostMapping
-	public ResponseEntity<Integer> create(@Valid @RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> create(@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();
@@ -111,7 +111,7 @@ public class WorkplaceController {
 	
 	@Secured({"ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> update(	@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();

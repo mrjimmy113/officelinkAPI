@@ -71,41 +71,51 @@ public class TeamReportServiceImpl implements TeamReportService {
 	@Async
 	@Override
 	@Transactional
-	public void generateTeamQuestionReport(int surveyId) {
-		// get all the team the survey was sent to
-		Set<Team> teams = this.getTeamsSent(surveyId);
+	public boolean generateTeamQuestionReport(int surveyId) {
+		boolean isSuccess = false;
 		
-		// Get the list of survey-questions
-		List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
-		
-		for (Team team : teams) {
-			for (SurveyQuestion sQuestion : surveyQuestions) {
-				// init a team question report
-				TeamQuestionReport questionReport = new TeamQuestionReport();
-				questionReport.setTeam(team);
-				questionReport.setSurveyQuestion(sQuestion);
+		try {
+			// get all the team the survey was sent to
+			Set<Team> teams = this.getTeamsSent(surveyId);
+			
+			// Get the list of survey-questions
+			List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
+			
+			for (Team team : teams) {
+				for (SurveyQuestion sQuestion : surveyQuestions) {
+					// init a team question report
+					TeamQuestionReport questionReport = new TeamQuestionReport();
+					questionReport.setTeam(team);
+					questionReport.setSurveyQuestion(sQuestion);
 
-				List<AnswerReport> arList = new ArrayList<AnswerReport>();
-				// get team's answer of survey question
-				
-				// get team's answer report
-				switch (sQuestion.getQuestion().getType().getType()) {
-				case MULTIPLE:
-					arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
-				case SINGLE:
-					arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
-				case TEXT:
-					arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
+					List<AnswerReport> arList = new ArrayList<AnswerReport>();
+					// get team's answer of survey question
+					
+					// get team's answer report
+					switch (sQuestion.getQuestion().getType().getType()) {
+					case MULTIPLE:
+						arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					case SINGLE:
+						arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					case TEXT:
+						arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					}
+					
+					// Save report
+					questionReport.addAnswerReport(arList);
+					teamQuestionReportRep.save(questionReport);
 				}
-				
-				// Save report
-				questionReport.addAnswerReport(arList);
-				teamQuestionReportRep.save(questionReport);
 			}
+			
+			isSuccess = true;
+			return isSuccess;
+		} catch (Exception e) {
+			return isSuccess;
 		}
+		
 	}
 
 	/**
@@ -122,7 +132,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 		// Find the survey target
 		List<SurveySendTarget> targets = null;
 
-		if (survey.getTemplateId() != 0) {
+		if (survey.isTemplate()) {
 			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
 		} else {
 			targets = targetRep.findAllBySurveyId(surveyId);
