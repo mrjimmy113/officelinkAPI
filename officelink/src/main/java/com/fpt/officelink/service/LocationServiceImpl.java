@@ -66,33 +66,43 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Page<Location> searchWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return locationRep.findAllByAddressContainingAndIsDeleted(term, false, pageRequest);
+        return locationRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, getUserContext().getWorkplaceId(), pageRequest);
     }
 
 	@Override
 	public boolean addLocation(Location location) {
-		Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-		Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-		if (loc1.isPresent() || loc2.isPresent()) {
-			return false;
-		} else {
-			Workplace workplace = new Workplace();
-			workplace.setId(getUserContext().getWorkplaceId());
-			location.setWorkplace(workplace);
-			locationRep.save(location);
-			return true;
-		}
+		Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeletedAndWorkplaceId(location.getName(), Boolean.FALSE, getUserContext().getWorkplaceId());
+                Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeletedAndWorkplaceId(location.getAddress(), Boolean.FALSE, getUserContext().getWorkplaceId());
+                if (loc1.isPresent() || loc2.isPresent()) {
+                    return false;
+                } else {
+                    Workplace workplace = new Workplace();
+                    workplace.setId(getUserContext().getWorkplaceId());
+                    location.setWorkplace(workplace);
+                    locationRep.save(location);
+                    return true;
+                }
 	}
 
-
+    boolean check;
 
     @Override
     public boolean editLocation(Location location) {
-        Optional<Location> loc1 = locationRep.findByNameContainingAndIsDeleted(location.getName(), Boolean.FALSE);
-        Optional<Location> loc2 = locationRep.findByAddressContainingAndIsDeleted(location.getAddress(), Boolean.FALSE);
-        if (loc1.isPresent() || loc2.isPresent()) {
+        check = true;
+        List<Location> loc = locationRep.findAllByWorkplaceIdAndIsDeleted(getUserContext().getWorkplaceId(), false);
+        loc.forEach(element -> {
+            if (element.getId().intValue() != location.getId().intValue()) {
+                if (element.getName().contains(location.getName()) || element.getAddress().contains(location.getAddress())) {
+                    check = false;
+                }
+            }
+        });
+        if (check == false) {
             return false;
         } else {
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            location.setWorkplace(workplace);
             locationRep.save(location);
             return true;
         }
@@ -126,6 +136,6 @@ public class LocationServiceImpl implements LocationService {
 		return new ArrayList<Location>(locationRep.findAllByDepartmentId(id));
 	}
 
-
+        
 
 }
