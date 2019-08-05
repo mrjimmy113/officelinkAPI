@@ -44,8 +44,8 @@ public class SchedulerService implements SchedulingConfigurer {
 		configTaskList = new ArrayList<ScheduledFuture<?>>();
 		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
 		
-		// start daily Tasks
-		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0/15 * * * * *");
+		// start daily Tasks (at 0:5:0 every day)
+		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0 5 0 * * *");
 	}
 
 	/**
