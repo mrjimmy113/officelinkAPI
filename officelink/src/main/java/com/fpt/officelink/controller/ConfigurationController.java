@@ -53,29 +53,6 @@ public class ConfigurationController {
 	@Autowired
 	WorkplaceService workplaceService;
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
-	@GetMapping(value = "/getConfig")
-	public ResponseEntity<ConfigurationDTO> getConfig(@RequestParam("id") Integer id) {
-
-		HttpStatus status = null;
-		ConfigurationDTO res = new ConfigurationDTO();
-
-		try {
-			//
-			Configuration result = configService.getConfigById(id);
-			//
-			BeanUtils.copyProperties(result, res);
-			//
-			res.setWorkplaceId(result.getWorkplace().getId());
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return new ResponseEntity<ConfigurationDTO>(res, status);
-	}
-
 	/*
 	 * 
 	 * */
@@ -202,7 +179,7 @@ public class ConfigurationController {
 
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody ConfigurationDTO dto) {
+	public ResponseEntity<Integer> update(@RequestBody ConfigurationDTO dto) {
 		HttpStatus status = null;
 		try {
 			Configuration entity = new Configuration();
