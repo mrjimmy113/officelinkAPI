@@ -426,4 +426,17 @@ public class SurveyController {
         }
         return new ResponseEntity<List<AnswerDTO>>(dto, status);
     }
+	
+	@Secured("ROLE_employer")
+	@GetMapping("/status")
+	public ResponseEntity<Void> updateActiveStatus(@RequestParam("id") Integer id, @RequestParam("isActive") boolean isActive) {
+		HttpStatus status = null;
+		try {
+			ser.updateActiveStatus(id, isActive);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Void>(status);
+	}
 }

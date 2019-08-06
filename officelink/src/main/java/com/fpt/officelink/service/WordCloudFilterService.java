@@ -16,7 +16,7 @@ public interface WordCloudFilterService {
 	
 	void removeFilter(int id);
 
-	void addNewFilter(WordCloudFilter filter, List<Word> wordList);
+	Integer addNewFilter(WordCloudFilter filter, List<Word> wordList);
 
 	void modifyFilter(WordCloudFilter filter, List<Word> wordList);
 

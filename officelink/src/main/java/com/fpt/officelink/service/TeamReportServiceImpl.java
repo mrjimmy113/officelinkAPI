@@ -135,9 +135,9 @@ public class TeamReportServiceImpl implements TeamReportService {
 		List<SurveySendTarget> targets = null;
 
 		if (survey.isTemplate()) {
-			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
+			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(),true);
 		} else {
-			targets = targetRep.findAllBySurveyId(surveyId);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId,true);
 		}
 
 		// if the survey was sent to the whole company

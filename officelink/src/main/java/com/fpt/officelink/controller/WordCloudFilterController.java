@@ -102,6 +102,7 @@ public class WordCloudFilterController {
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody WordCloudFilterDTO dto) {
 		HttpStatus status = null;
+		Integer res = null;
 		try {
 			WordCloudFilter entity = new WordCloudFilter();
 			List<Word> wordList = new ArrayList<Word>();
@@ -111,12 +112,12 @@ public class WordCloudFilterController {
 				BeanUtils.copyProperties(element,tmp,"filter");
 				wordList.add(tmp);
 			});
-			service.addNewFilter(entity, wordList);
+			res = service.addNewFilter(entity, wordList);
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<Integer>(status.value(), status);
+		return new ResponseEntity<Integer>(res, status);
 	}
 	
 	@Secured({"ROLE_employer","ROLE_system_admin"})

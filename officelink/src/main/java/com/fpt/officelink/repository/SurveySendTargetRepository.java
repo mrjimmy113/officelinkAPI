@@ -9,13 +9,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.fpt.officelink.entity.SurveySendTarget;
-import com.fpt.officelink.entity.Team;
 
 @Repository
 public interface SurveySendTargetRepository extends JpaRepository<SurveySendTarget, Integer>{
 
-	@Query("SELECT s FROM SurveySendTarget s WHERE s.survey.id = :id AND s.isNeed = true")
-	List<SurveySendTarget> findAllBySurveyId(@Param("id") Integer surveyId);
+	@Query("SELECT s FROM SurveySendTarget s WHERE s.survey.id = :id AND s.isNeed = :isNeed")
+	List<SurveySendTarget> findAllBySurveyIdAndIsNeed(@Param("id") Integer surveyId,@Param("isNeed") boolean isNeed);
 	
 	@Modifying
 	@Query("DELETE FROM SurveySendTarget s WHERE s.survey.id = :id")

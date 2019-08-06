@@ -117,9 +117,9 @@ public class ReportServiceImpl implements ReportService {
 		Survey survey = surRep.findById(surveyId).get();
 		List<SurveySendTarget> targets = null;
 		if (survey.getTemplateId() != null) {
-			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
+			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(),true);
 		} else {
-			targets = targetRep.findAllBySurveyId(surveyId);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId,true);
 		}
 		Set<Location> locations = new HashSet<Location>();
 		Set<Department> departments = new HashSet<Department>();
@@ -253,7 +253,6 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public DashBoardDTO getDashBoard(Integer id) throws IOException {
 		DashBoardDTO result = new DashBoardDTO();
-		PageRequest top5 = PageRequest.of(0, 5);
 		PageRequest top1 = PageRequest.of(0, 1);
 		result.setAccount(accRep.countByWorkplaceId(id));
 		result.setTeam(teamRep.countByWorkplaceId(id));

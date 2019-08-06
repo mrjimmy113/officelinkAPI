@@ -7,12 +7,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.fpt.officelink.dto.AnswerDTO;
-import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.QuestionDTO;
-import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyAnswerInforDTO;
 import com.fpt.officelink.dto.SurveyDTO;
-import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.entity.SurveyQuestion;
 import com.fpt.officelink.entity.SurveySendTarget;
@@ -61,4 +58,6 @@ public interface SurveyService {
     List<QuestionDTO> getTakeSurveyHistory(int id);
     
     List<AnswerDTO> getAnswerBySurveyId(int surveyId);
+
+	void updateActiveStatus(Integer id, boolean isActive);
 }

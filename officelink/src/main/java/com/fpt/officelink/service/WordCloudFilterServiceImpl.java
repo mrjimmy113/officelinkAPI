@@ -81,7 +81,7 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 
 	@Transactional
 	@Override
-	public void addNewFilter(WordCloudFilter filter, List<Word> wordList) {
+	public Integer addNewFilter(WordCloudFilter filter, List<Word> wordList) {
 		Workplace workplace = new Workplace();
 		workplace.setId(getUserContext().getWorkplaceId());
 		Date today = new Date(Calendar.getInstance().getTimeInMillis());
@@ -90,7 +90,7 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		}
 		filter.setDateCreated(today);
 		filter.setWorkplace(workplace);
-		this.filterSave(filter, wordList);
+		return this.filterSave(filter, wordList).getId();
 	}
 
 	public WordCloudFilter filterSave(WordCloudFilter filter, List<Word> wordList) {
