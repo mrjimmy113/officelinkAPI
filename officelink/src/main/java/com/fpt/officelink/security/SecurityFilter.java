@@ -53,8 +53,6 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
 						authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
 						SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 					}
-				} else {
-					System.out.println("RIP Token");
 				}
 			} catch (UsernameNotFoundException e) {
 				// TODO Auto-generated catch block

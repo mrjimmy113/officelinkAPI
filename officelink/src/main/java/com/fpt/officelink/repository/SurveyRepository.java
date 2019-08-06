@@ -52,4 +52,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
             @Param("name") String name,
             @Param("answers") Set<Answer> answers,
             Pageable pageable);
+	
+	@Query("SELECT COUNT(s) FROM Survey s WHERE s.workplace.id = :id AND s.isSent = true")
+	int countSendOutSurvey(@Param("id") Integer id);
 }

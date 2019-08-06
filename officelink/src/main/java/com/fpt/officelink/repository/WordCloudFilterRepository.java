@@ -27,4 +27,6 @@ public interface WordCloudFilterRepository extends JpaRepository<WordCloudFilter
 	Page<WordCloudFilter> findAllByNameContainAndWorkplaceIdAndIsDeleted(@Param("name") String name,
 			@Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable page);
 
+	@Query("SELECT w FROM WordCloudFilter w WHERE w.workplace.id = :workplaceId AND w.id = :id")
+	Optional<WordCloudFilter> findOneById(@Param("id") Integer id,@Param("workplaceId") Integer workplaceId);
 }

@@ -77,7 +77,14 @@ public class WordCloudFilterController {
 			List<WordCloudFilterDTO> resultList = new ArrayList<WordCloudFilterDTO>();
 			result.getContent().forEach(element -> {
 				WordCloudFilterDTO tmp = new WordCloudFilterDTO();
+				List<WordDTO> tmpList = new ArrayList<WordDTO>();
+				element.getWordList().forEach(e -> {
+					WordDTO tmpW = new WordDTO();
+					BeanUtils.copyProperties(e, tmpW,"filter");
+					tmpList.add(tmpW);
+				});
 				BeanUtils.copyProperties(element, tmp);
+				tmp.setWordList(tmpList);
 				resultList.add(tmp);
 			});
 			res.setMaxPage(result.getTotalPages());
@@ -183,4 +190,25 @@ public class WordCloudFilterController {
 		return new ResponseEntity<List<WordCloudFilterDTO>>(res, status);
 	}
 	
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@GetMapping("/one")
+	public ResponseEntity<WordCloudFilterDTO> getOne(@RequestParam("id") Integer id) {
+		HttpStatus status = null;
+		WordCloudFilterDTO res = new WordCloudFilterDTO();
+		try {
+			WordCloudFilter result = service.getOneFilter(id);
+			BeanUtils.copyProperties(result, res);
+			List<WordDTO> tmpList = new ArrayList<WordDTO>();
+			result.getWordList().forEach(e ->{
+				WordDTO tmpW = new WordDTO();
+				BeanUtils.copyProperties(e, tmpW,"filter");
+				tmpList.add(tmpW);
+			});
+			res.setWordList(tmpList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<WordCloudFilterDTO>(res,status);
+	}
 }

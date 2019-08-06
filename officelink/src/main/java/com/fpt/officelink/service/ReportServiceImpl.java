@@ -268,7 +268,6 @@ public class ReportServiceImpl implements ReportService {
 		result.setLocation(res);
 
 		List<News> newsList = newsRep.findLastestNews(id, top1).getContent();
-		System.out.print(newsList.size());
 		if (!newsList.isEmpty()) {
 			ImageNewsDTO dto = new ImageNewsDTO();
 			BeanUtils.copyProperties(newsList.get(0), dto);
@@ -278,14 +277,10 @@ public class ReportServiceImpl implements ReportService {
 			dto.setByte_image(data);
 			result.setNews(dto);
 		}
-		List<Survey> surveys = surRep.findTop5LastestSendOutSurvey(id, top5).getContent();
-		List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
-		for (Survey sur : surveys) {
-			SurveyReportDTO dtoReport = new SurveyReportDTO();
-			BeanUtils.copyProperties(sur, dtoReport);
-			dtoList.add(dtoReport);
+		if(surRep.countSendOutSurvey(id) > 0) {
+			result.setEndTutorial(true);
 		}
-		result.setReports(dtoList);
+		
 
 		return result;
 	}

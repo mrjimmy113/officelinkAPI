@@ -192,6 +192,7 @@ public class AccountServiceImpl implements AccountService {
         		result.setRole(acc.get().getRole().getRole());
         		result.setName(acc.get().getFirstname() + " " + acc.get().getLastname());
         		result.setToken(jwtSer.createTokenWithEmail(acc.get().getEmail()));
+        		result.setWorkplaceName(acc.get().getWorkplace().getName());
     		}
     		
     	}

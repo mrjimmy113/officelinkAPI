@@ -4,6 +4,7 @@ public class AuthDTO {
 	private String name;
 	private String token;
 	private String role;
+	private String workplaceName;
 	public String getToken() {
 		return token;
 	}
@@ -21,6 +22,12 @@ public class AuthDTO {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getWorkplaceName() {
+		return workplaceName;
+	}
+	public void setWorkplaceName(String workplaceName) {
+		this.workplaceName = workplaceName;
 	}
 	
 	

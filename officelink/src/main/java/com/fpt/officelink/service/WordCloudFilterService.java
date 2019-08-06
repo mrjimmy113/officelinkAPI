@@ -29,4 +29,6 @@ public interface WordCloudFilterService {
 	List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId);
 
 	boolean isExisted(String name);
+
+	WordCloudFilter getOneFilter(Integer id);
 }

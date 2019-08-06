@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -84,6 +85,9 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		Workplace workplace = new Workplace();
 		workplace.setId(getUserContext().getWorkplaceId());
 		Date today = new Date(Calendar.getInstance().getTimeInMillis());
+		if (getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_system_admin"))) {
+			filter.setTemplate(true);
+		}
 		filter.setDateCreated(today);
 		filter.setWorkplace(workplace);
 		this.filterSave(filter, wordList);
@@ -195,4 +199,9 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		return filtered;
 	}
 
+	@Override
+	public WordCloudFilter getOneFilter(Integer id) {
+		return filterRep.findOneById(id, getUserContext().getWorkplaceId()).get();
+		
+	}
 }
