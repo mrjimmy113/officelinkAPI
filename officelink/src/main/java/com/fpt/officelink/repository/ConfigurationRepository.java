@@ -18,5 +18,5 @@ public interface ConfigurationRepository extends JpaRepository<Configuration, In
 			@Param("isDeleted") Boolean isDeleted,
 			Pageable page);
 	
-	List<Configuration> findAllByIsDeleted(boolean isDeleted);
+	List<Configuration> findAllByIsDeletedAndIsActive(boolean isDeleted, boolean isActive);
 }

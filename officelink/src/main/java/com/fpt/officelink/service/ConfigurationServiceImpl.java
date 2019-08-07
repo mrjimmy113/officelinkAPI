@@ -48,7 +48,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	 */
 	@Override
 	public List<Configuration> getConfigurations() {
-		List<Configuration> configs = configRep.findAllByIsDeleted(false);
+		List<Configuration> configs = configRep.findAllByIsDeletedAndIsActive(false, true);
 		return configs;
 	}
 
@@ -200,5 +200,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		filtered.addAll(locationDeps);
 		filtered.addAll(teams);
 		return filtered;
+	}
+
+	@Override
+	public void updateActiveStatus(int id, boolean isActive) {
+		Configuration config = configRep.findById(id).get();
+
+		config.setActive(isActive);
+		config.setDateModified(new Date());
+		configRep.save(config);
+		// update schedule
+		schedService.configureTasks(new ScheduledTaskRegistrar());
 	}
 }
