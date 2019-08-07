@@ -1,4 +1,4 @@
-package com.fpt.officelink.service;
+package com.fpt.officelink.scheduler;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.fpt.officelink.controller.SurveyController;
 import com.fpt.officelink.entity.Configuration;
 import com.fpt.officelink.entity.Survey;
+import com.fpt.officelink.service.SurveyService;
+import com.fpt.officelink.service.TeamReportService;
 
 @Service
 public class SystemTaskExecutor {

@@ -242,4 +242,17 @@ public class ConfigurationController {
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
+	
+	@Secured("ROLE_employer")
+	@GetMapping("/status")
+	public ResponseEntity<Void> updateActiveStatus(@RequestParam("id") Integer id, @RequestParam("isActive") boolean isActive) {
+		HttpStatus status = null;
+		try {
+			configService.updateActiveStatus(id, isActive);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Void>(status);
+	}
 }

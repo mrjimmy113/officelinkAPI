@@ -22,7 +22,12 @@ public class SurveyDTO {
 	
 	private Date dateTaken;
 	
+	private ConfigurationDTO configuration;
+	
+	private Date dateCreated;
+	
 	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
+	
 
 	public Integer getId() {
 		return id;
@@ -86,6 +91,22 @@ public class SurveyDTO {
 
 	public void setDateTaken(Date dateTaken) {
 		this.dateTaken = dateTaken;
+	}
+	
+	public ConfigurationDTO getConfiguration() {
+		return configuration;
+	}
+
+	public void setConfiguration(ConfigurationDTO configurationDTO) {
+		this.configuration = configurationDTO;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 	
 	

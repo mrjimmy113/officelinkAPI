@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
@@ -60,7 +61,7 @@ public class SurveyController {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("/getWorkplaceSurveys")
 	public ResponseEntity<List<SurveyDTO>> getWorkplaceSurveys() {
 		this.user = getUserContext();
@@ -72,6 +73,8 @@ public class SurveyController {
 			result.forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
 				BeanUtils.copyProperties(s, dto);
+				ConfigurationDTO configDTO = new ConfigurationDTO();
+				BeanUtils.copyProperties(s.getConfiguration(), configDTO);
 				res.add(dto);
 			});
 
@@ -82,7 +85,7 @@ public class SurveyController {
 		return new ResponseEntity<List<SurveyDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> search(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -94,6 +97,11 @@ public class SurveyController {
 			result.getContent().forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
 				BeanUtils.copyProperties(s, dto);
+				if (s.getConfiguration() != null) {
+					ConfigurationDTO configDTO = new ConfigurationDTO();
+					BeanUtils.copyProperties(s.getConfiguration(), configDTO);
+					dto.setConfiguration(configDTO);
+				}
 				dtoList.add(dto);
 			});
 			res.setMaxPage(result.getTotalPages());
@@ -129,7 +137,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -159,8 +167,10 @@ public class SurveyController {
 				sqList.add(tmpSQ);
 			});
 			boolean success = ser.newSurvey(survey, sqList);
-			if (success) status = HttpStatus.OK;
-			else status = HttpStatus.CONFLICT;
+			if (success)
+				status = HttpStatus.OK;
+			else
+				status = HttpStatus.CONFLICT;
 
 		} catch (Exception e) {
 			log.info(e.getMessage());
@@ -170,7 +180,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody SurveyDTO dto) {
 		HttpStatus status = null;
@@ -200,8 +210,10 @@ public class SurveyController {
 				sqList.add(tmpSQ);
 			});
 			boolean success = ser.updateSurvey(survey, sqList);
-			if (success) status = HttpStatus.OK;
-			else status = HttpStatus.CONFLICT;
+			if (success)
+				status = HttpStatus.OK;
+			else
+				status = HttpStatus.CONFLICT;
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			log.info(e.getMessage());
@@ -211,7 +223,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -225,7 +237,7 @@ public class SurveyController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("/detail")
 	public ResponseEntity<List<QuestionDTO>> getDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -257,7 +269,7 @@ public class SurveyController {
 		return new ResponseEntity<List<QuestionDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employee","ROLE_manager"})
+	@Secured({ "ROLE_employee", "ROLE_manager" })
 	@GetMapping("/take")
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
@@ -277,7 +289,7 @@ public class SurveyController {
 		return new ResponseEntity<SurveyDTO>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PostMapping("/sendOut")
 	public ResponseEntity<Number> sendOutSurvey(@RequestBody SendSurveyDTO target) {
 		HttpStatus status = null;
@@ -318,18 +330,18 @@ public class SurveyController {
 
 	}
 
-	@Secured({"ROLE_employee","ROLE_manager"})
+	@Secured({ "ROLE_employee", "ROLE_manager" })
 	@PostMapping("/answer")
 	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
 		try {
-			if(ser.checkIfUserTakeSurvey(dto.getSurveyId())) {
+			if (ser.checkIfUserTakeSurvey(dto.getSurveyId())) {
 				status = HttpStatus.CONFLICT;
-			}else {
+			} else {
 				ser.saveAnswer(dto);
 				status = HttpStatus.OK;
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
@@ -337,7 +349,7 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_employee", "ROLE_manager", "ROLE_system_admin" })
 	@GetMapping("/report")
 	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -360,8 +372,8 @@ public class SurveyController {
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
 	}
-	
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("/template")
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> searchTemplate(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -384,52 +396,54 @@ public class SurveyController {
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
-	
-	@Secured({"ROLE_employee","ROLE_manager"})
+
+	@Secured({ "ROLE_employee", "ROLE_manager" })
 	@GetMapping(value = "/history")
-    public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term, @RequestParam("page") int page) {
-        HttpStatus status = null;
-        PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
-        try {
-            //Call Service
-            Page<Survey> result = ser.getHistorySurveyWithPagination(term, page);
-            //Convert to DTO
-            List<SurveyDTO> resultList = new ArrayList<SurveyDTO>();
-            result.getContent().forEach(element -> {
-                SurveyDTO dto = new SurveyDTO();
-                BeanUtils.copyProperties(element, dto);
-                dto.setDateTaken(ser.getDateTakenSurvey(dto.getId()));
-                dto.setQuestions(ser.getTakeSurveyHistory(dto.getId()));
-                resultList.add(dto);
-            });
-            res.setMaxPage(result.getTotalPages());
-            res.setObjList(resultList);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            status = HttpStatus.BAD_REQUEST;
-        }
+	public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term,
+			@RequestParam("page") int page) {
+		HttpStatus status = null;
+		PageSearchDTO<SurveyDTO> res = new PageSearchDTO<SurveyDTO>();
+		try {
+			// Call Service
+			Page<Survey> result = ser.getHistorySurveyWithPagination(term, page);
+			// Convert to DTO
+			List<SurveyDTO> resultList = new ArrayList<SurveyDTO>();
+			result.getContent().forEach(element -> {
+				SurveyDTO dto = new SurveyDTO();
+				BeanUtils.copyProperties(element, dto);
+				dto.setDateTaken(ser.getDateTakenSurvey(dto.getId()));
+				dto.setQuestions(ser.getTakeSurveyHistory(dto.getId()));
+				resultList.add(dto);
+			});
+			res.setMaxPage(result.getTotalPages());
+			res.setObjList(resultList);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
 
-        return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
-    }
+		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
+	}
 
-	@Secured({"ROLE_employee","ROLE_manager"})
-    @GetMapping("/history/answer")
-    public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
-        HttpStatus status = null;
-        List<AnswerDTO> dto = new ArrayList<>();
-        try {
-            dto = ser.getAnswerBySurveyId(id);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            e.printStackTrace();
-            status = HttpStatus.BAD_REQUEST;
-        }
-        return new ResponseEntity<List<AnswerDTO>>(dto, status);
-    }
-	
+	@Secured({ "ROLE_employee", "ROLE_manager" })
+	@GetMapping("/history/answer")
+	public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
+		HttpStatus status = null;
+		List<AnswerDTO> dto = new ArrayList<>();
+		try {
+			dto = ser.getAnswerBySurveyId(id);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			e.printStackTrace();
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<AnswerDTO>>(dto, status);
+	}
+
 	@Secured("ROLE_employer")
 	@GetMapping("/status")
-	public ResponseEntity<Void> updateActiveStatus(@RequestParam("id") Integer id, @RequestParam("isActive") boolean isActive) {
+	public ResponseEntity<Void> updateActiveStatus(@RequestParam("id") Integer id,
+			@RequestParam("isActive") boolean isActive) {
 		HttpStatus status = null;
 		try {
 			ser.updateActiveStatus(id, isActive);
