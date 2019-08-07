@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -80,13 +81,16 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 
 	@Transactional
 	@Override
-	public void addNewFilter(WordCloudFilter filter, List<Word> wordList) {
+	public Integer addNewFilter(WordCloudFilter filter, List<Word> wordList) {
 		Workplace workplace = new Workplace();
 		workplace.setId(getUserContext().getWorkplaceId());
 		Date today = new Date(Calendar.getInstance().getTimeInMillis());
+		if (getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_system_admin"))) {
+			filter.setTemplate(true);
+		}
 		filter.setDateCreated(today);
 		filter.setWorkplace(workplace);
-		this.filterSave(filter, wordList);
+		return this.filterSave(filter, wordList).getId();
 	}
 
 	public WordCloudFilter filterSave(WordCloudFilter filter, List<Word> wordList) {
@@ -126,7 +130,6 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		rawText = rawText.replaceAll("[^A-Za-z0-9_\\-\\s]", "");
 		rawText = rawText.replaceAll("\n", " ");
 		rawText = rawText.toLowerCase();
-		System.out.println(rawText);
 		String[] words = rawText.trim().split(" ");
 		if (opFilter.isPresent()) {
 			List<Word> filterWordList = new ArrayList<Word>(opFilter.get().getWordList());
@@ -196,4 +199,9 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 		return filtered;
 	}
 
+	@Override
+	public WordCloudFilter getOneFilter(Integer id) {
+		return filterRep.findOneById(id, getUserContext().getWorkplaceId()).get();
+		
+	}
 }

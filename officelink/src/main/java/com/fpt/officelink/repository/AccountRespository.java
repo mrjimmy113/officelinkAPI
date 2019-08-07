@@ -2,9 +2,6 @@ package com.fpt.officelink.repository;
 
 import java.util.List;
 import java.util.Optional;
-
-import com.fpt.officelink.entity.Team;
-import com.fpt.officelink.entity.Workplace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -38,7 +35,8 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 
 	Optional<Account> findByEmailAndPassword(String email, String password);
 	
-	List<Account> findAllByWorkplaceIdAndIsDeleted(Integer workplaceId, boolean isDeleted); 
+	@Query("SELECT a FROM Account a WHERE a.workplace.id = :workId AND a.isDeleted = :isDeleted AND a.teams IS NOT EMPTY AND a.location IS NOT NULL")
+	List<Account> findAllEmail(@Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted); 
 
 	@Query("SELECT a FROM Account a WHERE a.location.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
 	List<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);

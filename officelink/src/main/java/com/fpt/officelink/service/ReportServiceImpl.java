@@ -94,19 +94,19 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired
 	SingleChoiceRepository singleRep;
-	
+
 	@Autowired
 	MultipleAnswerRepository multiRep;
-	
+
 	@Autowired
 	WordCloudRepository textRep;
-	
+
 	@Autowired
 	SurveyRepository surveyRep;
-	
+
 	@Autowired
 	AnswerReportRepository answerReportRep;
-	
+
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
@@ -117,9 +117,9 @@ public class ReportServiceImpl implements ReportService {
 		Survey survey = surRep.findById(surveyId).get();
 		List<SurveySendTarget> targets = null;
 		if (survey.getTemplateId() != null) {
-			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
+			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(),true);
 		} else {
-			targets = targetRep.findAllBySurveyId(surveyId);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId,true);
 		}
 		Set<Location> locations = new HashSet<Location>();
 		Set<Department> departments = new HashSet<Department>();
@@ -253,7 +253,6 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public DashBoardDTO getDashBoard(Integer id) throws IOException {
 		DashBoardDTO result = new DashBoardDTO();
-		PageRequest top5 = PageRequest.of(0, 5);
 		PageRequest top1 = PageRequest.of(0, 1);
 		result.setAccount(accRep.countByWorkplaceId(id));
 		result.setTeam(teamRep.countByWorkplaceId(id));
@@ -268,7 +267,6 @@ public class ReportServiceImpl implements ReportService {
 		result.setLocation(res);
 
 		List<News> newsList = newsRep.findLastestNews(id, top1).getContent();
-		System.out.print(newsList.size());
 		if (!newsList.isEmpty()) {
 			ImageNewsDTO dto = new ImageNewsDTO();
 			BeanUtils.copyProperties(newsList.get(0), dto);
@@ -278,14 +276,10 @@ public class ReportServiceImpl implements ReportService {
 			dto.setByte_image(data);
 			result.setNews(dto);
 		}
-		List<Survey> surveys = surRep.findTop5LastestSendOutSurvey(id, top5).getContent();
-		List<SurveyReportDTO> dtoList = new ArrayList<SurveyReportDTO>();
-		for (Survey sur : surveys) {
-			SurveyReportDTO dtoReport = new SurveyReportDTO();
-			BeanUtils.copyProperties(sur, dtoReport);
-			dtoList.add(dtoReport);
+		if(surRep.countSendOutSurvey(id) > 0) {
+			result.setEndTutorial(true);
 		}
-		result.setReports(dtoList);
+		
 
 		return result;
 	}
@@ -304,7 +298,7 @@ public class ReportServiceImpl implements ReportService {
 	public String getDownLoadToken(Integer surveyId, Integer questionId) throws JOSEException {
 		return jwtSer.createDownloadToken(surveyId, questionId);
 	}
-	
+
 	@Override
 	public SurveyReportDTO getReport(Integer id) {
 		SurveyReportDTO result = new SurveyReportDTO();
@@ -317,16 +311,22 @@ public class ReportServiceImpl implements ReportService {
 				Department tmpDep = target.getDepartment();
 				Location tmpLocation = target.getLocation();
 				Team tmpTeam = target.getTeam();
-				
-				if(tmpDep != null) dto.setDepartmentName(tmpDep.getName());
-				else dto.setDepartmentName("");
-				
-				if(tmpLocation != null) dto.setLocationName(tmpLocation.getName());
-				else dto.setLocationName("");
-				
-				if(tmpTeam != null) dto.setTeamName(tmpTeam.getName());
-				else dto.setTeamName("");
-				
+
+				if (tmpDep != null)
+					dto.setDepartmentName(tmpDep.getName());
+				else
+					dto.setDepartmentName("");
+
+				if (tmpLocation != null)
+					dto.setLocationName(tmpLocation.getName());
+				else
+					dto.setLocationName("");
+
+				if (tmpTeam != null)
+					dto.setTeamName(tmpTeam.getName());
+				else
+					dto.setTeamName("");
+
 				sendSurveyDTOs.add(dto);
 			}
 			result.setSendTargets(sendSurveyDTOs);
@@ -334,7 +334,7 @@ public class ReportServiceImpl implements ReportService {
 
 		return result;
 	}
-	
+
 	@Override
 	public List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId) {
 		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
@@ -343,29 +343,38 @@ public class ReportServiceImpl implements ReportService {
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
 			if (!opSurvey.get().isActive() && opSurvey.get().isSent()) {
 				for (SurveyQuestion sq : sqList) {
-					Function<Integer, List<AnswerReport>> method = getReportFunctionExpire(locationId, departmentId, teamId);
+					Function<Integer, List<AnswerReport>> method = getReportFunctionExpire(locationId, departmentId,
+							teamId);
 					result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
 				}
 			} else {
 				for (SurveyQuestion sq : sqList) {
-					Function<Integer, List<AnswerReport>> method = getReportFunction(locationId, departmentId, teamId, sq.getQuestion().getType().getType());
+					Function<Integer, List<AnswerReport>> method = getReportFunction(locationId, departmentId, teamId,
+							sq.getQuestion().getType().getType());
 					result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
 				}
 			}
 		}
 		return result;
 	}
-	
-	public List<AnswerReportDTO> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
+
+	@Override
+	public List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
 			int teamId) {
-		List<AnswerReportDTO> result = new ArrayList<AnswerReportDTO>();
+		List<AnswerReport> result = new ArrayList<AnswerReport>();
 		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
-		
+		if (!surveyQuestion.getSurvey().isActive() && surveyQuestion.getSurvey().isSent()) {
+			result = getReportFunctionExpire(locationId, departmentId, teamId).apply(surveyQuestion.getId());
+		} else {
+			result = getReportFunction(locationId, departmentId, teamId,
+					surveyQuestion.getQuestion().getType().getType()).apply(surveyQuestion.getId());
+		}
 
 		return result;
 	}
-	
-	private Function<Integer, List<AnswerReport>> getReportFunctionExpire(int locationId, int departmentId, int teamId) {
+
+	private Function<Integer, List<AnswerReport>> getReportFunctionExpire(int locationId, int departmentId,
+			int teamId) {
 		Function<Integer, List<AnswerReport>> method = null;
 		if (locationId == 0 && departmentId == 0 && teamId == 0) {
 			method = getReportAllFunctionExpire();
@@ -377,7 +386,8 @@ public class ReportServiceImpl implements ReportService {
 			method = identity -> answerReportRep.findAllByIdentityAndDepartmentId(identity, departmentId);
 			System.out.println("Department");
 		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = identity -> answerReportRep.findAllByIdentityAndLocationIdAndDepartmentId(identity, locationId, departmentId);
+			method = identity -> answerReportRep.findAllByIdentityAndLocationIdAndDepartmentId(identity, locationId,
+					departmentId);
 			System.out.println("Location - Department");
 		} else if (teamId != 0) {
 			method = identity -> answerReportRep.findAllByIdentityAndTeamId(identity, teamId);
@@ -385,7 +395,7 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return method;
 	}
-	
+
 	private Function<Integer, List<AnswerReport>> getReportAllFunctionExpire() {
 		Function<Integer, List<AnswerReport>> method = null;
 		Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
@@ -459,14 +469,15 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return method;
 	}
-	
-	private QuestionReportDTO getQuestionDTO(Integer identity,Question q, Function<Integer, List<AnswerReport>> method) {
-		QuestionReportDTO result  = new QuestionReportDTO();
+
+	private QuestionReportDTO getQuestionDTO(Integer identity, Question q,
+			Function<Integer, List<AnswerReport>> method) {
+		QuestionReportDTO result = new QuestionReportDTO();
 		List<AnswerReport> entities = method.apply(identity);
-		
-		//Change Question to DTO
+
+		// Change Question to DTO
 		QuestionDTO dto = new QuestionDTO();
-		BeanUtils.copyProperties(q, dto,"type","options");
+		BeanUtils.copyProperties(q, dto, "type", "options");
 		List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
 		q.getOptions().forEach(op -> {
 			AnswerOptionDTO opDto = new AnswerOptionDTO();
@@ -477,8 +488,8 @@ public class ReportServiceImpl implements ReportService {
 		TypeQuestionDTO typeDto = new TypeQuestionDTO();
 		BeanUtils.copyProperties(q.getType(), typeDto);
 		dto.setType(typeDto);
-		
-		//Change AnswerReport to DTO
+
+		// Change AnswerReport to DTO
 		List<AnswerReportDTO> answerReportDtos = new ArrayList<AnswerReportDTO>();
 		for (AnswerReport entity : entities) {
 			AnswerReportDTO answerReportDto = new AnswerReportDTO();
@@ -555,5 +566,4 @@ public class ReportServiceImpl implements ReportService {
 		return method;
 	}
 
-	
 }

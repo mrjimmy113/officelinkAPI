@@ -8,7 +8,7 @@ public class DashBoardDTO {
 	private int department;
 	private List<LocationDTO> location;
 	private ImageNewsDTO news;
-	private List<SurveyReportDTO> reports;
+	private boolean endTutorial;
 	public int getAccount() {
 		return account;
 	}
@@ -33,16 +33,17 @@ public class DashBoardDTO {
 	public void setLocation(List<LocationDTO> location) {
 		this.location = location;
 	}
-	public List<SurveyReportDTO> getReports() {
-		return reports;
-	}
-	public void setReports(List<SurveyReportDTO> reports) {
-		this.reports = reports;
-	}
 	public ImageNewsDTO getNews() {
 		return news;
 	}
 	public void setNews(ImageNewsDTO news) {
 		this.news = news;
 	}
+	public boolean isEndTutorial() {
+		return endTutorial;
+	}
+	public void setEndTutorial(boolean endTutorial) {
+		this.endTutorial = endTutorial;
+	}
+	
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,7 @@ public class WorkplaceController {
 	@Autowired
 	WorkplaceService workpService;
 
+	@Secured({"ROLE_system_admin", "ROLE_Employer"})
 	@GetMapping(value = "/getUserWorkplace")
 	public ResponseEntity<WorkplaceDTO> getUserWorkplace(){
 		user = this.getUserContext();
@@ -59,7 +61,7 @@ public class WorkplaceController {
 		return new ResponseEntity<WorkplaceDTO>(res, status);
 	}
 	
-	
+	@Secured({"ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<WorkplaceDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
 		HttpStatus status = null;
@@ -86,8 +88,9 @@ public class WorkplaceController {
 		return new ResponseEntity<PageSearchDTO<WorkplaceDTO>>(res, status); 
 	}
 	
+	@Secured({"ROLE_system_admin"})
 	@PostMapping
-	public ResponseEntity<Integer> create(@Valid @RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> create(@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();
@@ -106,8 +109,9 @@ public class WorkplaceController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
+	@Secured({"ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> update(	@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();
@@ -122,6 +126,7 @@ public class WorkplaceController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
+	@Secured({"ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id){
 		HttpStatus status = null;

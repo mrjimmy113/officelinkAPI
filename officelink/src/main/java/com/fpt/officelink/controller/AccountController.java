@@ -1,23 +1,18 @@
 package com.fpt.officelink.controller;
 
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import javax.validation.Valid;
-
-import com.fpt.officelink.dto.*;
-import com.fpt.officelink.service.LocationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +23,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.officelink.dto.AccountDTO;
+import com.fpt.officelink.dto.AssignInforDTO;
+import com.fpt.officelink.dto.DepartmentDTO;
+import com.fpt.officelink.dto.LocationDTO;
+import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.PasswordInfoDTO;
+import com.fpt.officelink.dto.ResetAccountDTO;
+import com.fpt.officelink.dto.TeamDTO;
+import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
@@ -35,6 +39,7 @@ import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.service.AccountService;
 import com.fpt.officelink.service.JwtService;
+import com.fpt.officelink.service.LocationService;
 
 @RestController
 @RequestMapping("/account")
@@ -67,6 +72,7 @@ public class AccountController {
 
 
     //search with term
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchWithTerm(@RequestParam("term") String term){
         this.user = getUserContext();
@@ -129,6 +135,7 @@ public class AccountController {
     }
 
     //get profile
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
     @GetMapping(value = "/profile")
     public ResponseEntity<AccountDTO> getProfile(){
         CustomUser user = getUserContext();
@@ -155,6 +162,7 @@ public class AccountController {
 
 
     //get account assigned
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getAccountAssign")
     public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id){
         CustomUser user = getUserContext();
@@ -169,12 +177,17 @@ public class AccountController {
             List<TeamDTO> teamDTOS = new ArrayList<TeamDTO>();
             account.getTeams().forEach(element -> {
                 TeamDTO teamDTO = new TeamDTO();
+                DepartmentDTO depDTO = new DepartmentDTO();
                 BeanUtils.copyProperties(element, teamDTO);
+                BeanUtils.copyProperties(element.getDepartment(), depDTO);
+                teamDTO.setDepartment(depDTO);
                 teamDTOS.add(teamDTO);
             });
 
-
-            BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            if(account.getLocation() != null) {
+            	BeanUtils.copyProperties(account.getLocation(), locationDTO);
+            }
+            
             BeanUtils.copyProperties(account, dto);
 
             dto.setLocation(locationDTO);
@@ -183,6 +196,7 @@ public class AccountController {
             httpStatus = HttpStatus.OK;
 
         }catch (Exception ex){
+        	ex.printStackTrace();
             httpStatus = HttpStatus.BAD_REQUEST;
         }
         return new ResponseEntity<AccountDTO>(dto, httpStatus);
@@ -215,6 +229,7 @@ public class AccountController {
 
 
     //search get page
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getAccount")
     public ResponseEntity<PageSearchDTO<AccountDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page){
         this.user = getUserContext();
@@ -403,6 +418,7 @@ public class AccountController {
 
 
     //update account
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping
     public ResponseEntity<Integer> update(@RequestBody AccountDTO dto) {
         HttpStatus status = null;
@@ -451,6 +467,7 @@ public class AccountController {
 
 
     //delete account
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @DeleteMapping
     public ResponseEntity<Integer> delete(@RequestParam("id") int id){
         HttpStatus status = null;
@@ -507,6 +524,7 @@ public class AccountController {
     	return new ResponseEntity<Number>(status.value(),status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PostMapping("/checkEmailExisted")
     public ResponseEntity<Number> checkEmailExisted(@RequestBody String email) {
         CustomUser user = getUserContext();
@@ -532,6 +550,7 @@ public class AccountController {
 
 
     //add assign
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping("/assign")
     public ResponseEntity<Number> assign(@RequestBody AssignInforDTO dto) {
     	HttpStatus status = null;
@@ -566,6 +585,7 @@ public class AccountController {
 
 
     //change profile
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
     @PutMapping("/changeProfile")
     public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto){
         HttpStatus status = null;
@@ -585,6 +605,7 @@ public class AccountController {
 
 
     //change password
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
     @PutMapping("/changePassword")
     public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto){
         HttpStatus status = null;

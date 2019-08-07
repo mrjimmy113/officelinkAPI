@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,7 @@ public class LocationController {
     @Autowired
     LocationService service;
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<LocationDTO>> getAll() {
         HttpStatus status = null;
@@ -67,6 +69,7 @@ public class LocationController {
         return new ResponseEntity<List<LocationDTO>>(res, status);
     }
     
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getId")
     public ResponseEntity<LocationDTO> searchById(@RequestParam("id") int id) {
         HttpStatus status = null;
@@ -81,6 +84,7 @@ public class LocationController {
         return new ResponseEntity<LocationDTO>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping("getByWorkplace")
     public ResponseEntity<List<LocationDTO>> findByWorkplace() {
         this.user = getUserContext();
@@ -101,6 +105,7 @@ public class LocationController {
         return new ResponseEntity<List<LocationDTO>>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping
     public ResponseEntity<PageSearchDTO<LocationDTO>> search(@RequestParam("term") String term) {
         HttpStatus status = null;
@@ -125,6 +130,7 @@ public class LocationController {
         return new ResponseEntity<PageSearchDTO<LocationDTO>>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getPage")
     public ResponseEntity<PageSearchDTO<LocationDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
         HttpStatus status = null;
@@ -150,6 +156,7 @@ public class LocationController {
         return new ResponseEntity<PageSearchDTO<LocationDTO>>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PostMapping
     public ResponseEntity<Integer> add(@RequestBody LocationDTO dto) {
         HttpStatus status = null;
@@ -170,6 +177,7 @@ public class LocationController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping
     public ResponseEntity<Integer> edit(@RequestBody LocationDTO dto) {
         HttpStatus status = null;
@@ -189,6 +197,7 @@ public class LocationController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @DeleteMapping
     public ResponseEntity<Integer> remove(@RequestParam("id") int id) {
         HttpStatus status = null;
@@ -206,6 +215,7 @@ public class LocationController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
     
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping("/byDepartment")
     public ResponseEntity<List<LocationDTO>> getByDepId(@Param("id") int id) {
     	HttpStatus status = null;

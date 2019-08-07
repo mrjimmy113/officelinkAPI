@@ -16,7 +16,7 @@ public interface WordCloudFilterService {
 	
 	void removeFilter(int id);
 
-	void addNewFilter(WordCloudFilter filter, List<Word> wordList);
+	Integer addNewFilter(WordCloudFilter filter, List<Word> wordList);
 
 	void modifyFilter(WordCloudFilter filter, List<Word> wordList);
 
@@ -29,4 +29,6 @@ public interface WordCloudFilterService {
 	List<AnswerReportDTO> applyFilter(List<AnswerReportDTO> answers, Integer filterId);
 
 	boolean isExisted(String name);
+
+	WordCloudFilter getOneFilter(Integer id);
 }

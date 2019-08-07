@@ -1,19 +1,16 @@
 package com.fpt.officelink.dto;
 
+import java.sql.Date;
 import java.util.List;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 public class DepartmentDTO {
 	
-
 	private Integer id;
 	
-
 	private String name;
 	
-
+	private Date dateCreated;
+	
 	private List<TeamDTO> teams;
 	
 //	private List<LocationDTO> locations;
@@ -41,6 +38,14 @@ public class DepartmentDTO {
 
 	public void setTeams(List<TeamDTO> teams) {
 		this.teams = teams;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 	
 //	public List<LocationDTO> getLocations() {

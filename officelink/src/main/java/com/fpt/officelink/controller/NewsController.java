@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,19 +101,15 @@ public class NewsController {
     }
 
     @GetMapping(value = "/getPage")
-    public ResponseEntity<PageSearchDTO<NewsDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
+    public ResponseEntity<PageSearchDTO<ImageNewsDTO>> searchGetPage(@RequestParam("term") String term, @RequestParam("page") int page) {
         HttpStatus status = null;
-        PageSearchDTO<NewsDTO> res = new PageSearchDTO<NewsDTO>();
+        PageSearchDTO<ImageNewsDTO> res = new PageSearchDTO<ImageNewsDTO>();
         try {
             //Call Service
             Page<News> result = service.searchByTitleWithPagination(term, page);
             //Convert to DTO
-            List<NewsDTO> resultList = new ArrayList<NewsDTO>();
-            result.getContent().forEach(element -> {
-                NewsDTO dto = new NewsDTO();
-                BeanUtils.copyProperties(element, dto);
-                resultList.add(dto);
-            });
+            String path = context.getRealPath("");
+            List<ImageNewsDTO> resultList = service.getListNews(result, path);
             res.setMaxPage(result.getTotalPages());
             res.setObjList(resultList);
             status = HttpStatus.OK;
@@ -121,9 +118,10 @@ public class NewsController {
             status = HttpStatus.BAD_REQUEST;
         }
 
-        return new ResponseEntity<PageSearchDTO<NewsDTO>>(res, status);
+        return new ResponseEntity<PageSearchDTO<ImageNewsDTO>>(res, status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PostMapping(
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Integer> addNews(@RequestParam("file") MultipartFile file, @RequestParam("dto") String stringDTO) {
@@ -150,6 +148,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping(value = "/edit")
     public ResponseEntity<Integer> editNewsNotHasFile(@RequestParam("dto") String stringDTO) {
         HttpStatus status = null;
@@ -176,6 +175,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @PutMapping()
     public ResponseEntity<Integer> editNews(@RequestParam("file") MultipartFile file, @RequestParam("dto") String stringDTO) {
         HttpStatus status = null;
@@ -203,6 +203,7 @@ public class NewsController {
         return new ResponseEntity<Integer>(status.value(), status);
     }
 
+    @Secured({"ROLE_employer","ROLE_system_admin"})
     @DeleteMapping
     public ResponseEntity<Integer> removeNews(@RequestParam("id") int id) {
         HttpStatus status = null;

@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.AnswerReport;
@@ -71,41 +73,52 @@ public class TeamReportServiceImpl implements TeamReportService {
 	@Async
 	@Override
 	@Transactional
-	public void generateTeamQuestionReport(int surveyId) {
-		// get all the team the survey was sent to
-		Set<Team> teams = this.getTeamsSent(surveyId);
+	public Future<Boolean> generateTeamQuestionReport(int surveyId) {
+		AsyncResult<Boolean> isSuccess = new AsyncResult<Boolean>(false);
 		
-		// Get the list of survey-questions
-		List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
-		
-		for (Team team : teams) {
-			for (SurveyQuestion sQuestion : surveyQuestions) {
-				// init a team question report
-				TeamQuestionReport questionReport = new TeamQuestionReport();
-				questionReport.setTeam(team);
-				questionReport.setSurveyQuestion(sQuestion);
+		try {
+			// get all the team the survey was sent to
+			Set<Team> teams = this.getTeamsSent(surveyId);
+			
+			// Get the list of survey-questions
+			List<SurveyQuestion> surveyQuestions = surQuestRep.findAllBySurveyId(surveyId);
+			
+			for (Team team : teams) {
+				for (SurveyQuestion sQuestion : surveyQuestions) {
+					// init a team question report
+					TeamQuestionReport questionReport = new TeamQuestionReport();
+					questionReport.setTeam(team);
+					questionReport.setSurveyQuestion(sQuestion);
 
-				List<AnswerReport> arList = new ArrayList<AnswerReport>();
-				// get team's answer of survey question
-				
-				// get team's answer report
-				switch (sQuestion.getQuestion().getType().getType()) {
-				case MULTIPLE:
-					arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
-				case SINGLE:
-					arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
-				case TEXT:
-					arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-					break;
+					List<AnswerReport> arList = new ArrayList<AnswerReport>();
+					// get team's answer of survey question
+					
+					// get team's answer report
+					switch (sQuestion.getQuestion().getType().getType()) {
+					case MULTIPLE:
+						arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					case SINGLE:
+						arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					case TEXT:
+						arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+						break;
+					}
+					
+					// Save report
+					questionReport.addAnswerReport(arList);
+					teamQuestionReportRep.save(questionReport);
 				}
-				
-				// Save report
-				questionReport.addAnswerReport(arList);
-				teamQuestionReportRep.save(questionReport);
 			}
+			
+			isSuccess = new AsyncResult<Boolean>(true);
+			return isSuccess;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return isSuccess;
 		}
+		
 	}
 
 	/**
@@ -122,10 +135,10 @@ public class TeamReportServiceImpl implements TeamReportService {
 		// Find the survey target
 		List<SurveySendTarget> targets = null;
 
-		if (survey.getTemplateId() != 0) {
-			targets = targetRep.findAllBySurveyId(survey.getTemplateId());
+		if (survey.isTemplate()) {
+			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(),true);
 		} else {
-			targets = targetRep.findAllBySurveyId(surveyId);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId,true);
 		}
 
 		// if the survey was sent to the whole company

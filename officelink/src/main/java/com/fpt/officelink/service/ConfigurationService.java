@@ -23,4 +23,6 @@ public interface ConfigurationService {
 	boolean modifyConfig(Configuration config, List<SurveySendTarget> targets);
 
 	List<SurveySendTarget> filterDuplicate(List<SurveySendTarget> targets);
+	
+	void updateActiveStatus(int id, boolean isActive);
 }

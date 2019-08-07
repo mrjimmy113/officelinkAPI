@@ -23,6 +23,7 @@ import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.ConfigurationRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
+import com.fpt.officelink.scheduler.ConfigurationScheduler;
 import com.fpt.officelink.utils.Constants;
 
 @Service
@@ -32,7 +33,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	ConfigurationRepository configRep;
 
 	@Autowired
-	SchedulerService schedService;
+	ConfigurationScheduler schedService;
 
 	@Autowired
 	SurveySendTargetRepository targetRep;
@@ -47,7 +48,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	 */
 	@Override
 	public List<Configuration> getConfigurations() {
-		List<Configuration> configs = configRep.findAllByIsDeleted(false);
+		List<Configuration> configs = configRep.findAllByIsDeletedAndIsActive(false, true);
 		return configs;
 	}
 
@@ -199,5 +200,16 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		filtered.addAll(locationDeps);
 		filtered.addAll(teams);
 		return filtered;
+	}
+
+	@Override
+	public void updateActiveStatus(int id, boolean isActive) {
+		Configuration config = configRep.findById(id).get();
+
+		config.setActive(isActive);
+		config.setDateModified(new Date());
+		configRep.save(config);
+		// update schedule
+		schedService.configureTasks(new ScheduledTaskRegistrar());
 	}
 }

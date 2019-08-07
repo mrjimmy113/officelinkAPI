@@ -43,12 +43,11 @@ public class JwtService {
 		return token;
 	}
 
-	public String createSurveyToken(String email,Integer surveyId, int duration) throws JOSEException {
+	public String createSurveyToken(Integer surveyId, int duration) throws JOSEException {
 		String token = null;
 		JWSSigner signer = new MACSigner(generateShareSecret());
 		JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 		builder.claim(SURVEY_ID, surveyId);
-		builder.claim(EMAIL, email);
 		builder.expirationTime(generateExpirationDate(duration));
 		JWTClaimsSet claimsSet = builder.build();
 		SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);

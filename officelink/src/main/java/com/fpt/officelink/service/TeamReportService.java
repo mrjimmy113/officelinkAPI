@@ -1,5 +1,7 @@
 package com.fpt.officelink.service;
 
+import java.util.concurrent.Future;
+
 public interface TeamReportService {
-	void generateTeamQuestionReport(int surveyId);
+	Future<Boolean> generateTeamQuestionReport(int surveyId);
 }

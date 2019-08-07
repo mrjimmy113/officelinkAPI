@@ -30,7 +30,7 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 			@Param("workplaceId") int workplaceId,
 			@Param("isDeleted") Boolean isDeleted);
 	
-	@Query("SELECT t FROM Team t WHERE t.department.id = :id")
+	@Query("SELECT t FROM Team t WHERE t.department.id = :id AND t.isDeleted = false")
 	List<Team> findAllByDepartmentId(@Param("id") Integer id);
 	
 	@Query("SELECT t FROM Team t WHERE t.isDeleted = :isDeleted AND t.department.workplace.id = :workplaceId")
@@ -41,14 +41,18 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 
 	List<Team> findAllByIsDeleted(Boolean isDeleted);
 
-	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :id")
+	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :id AND t.isDeleted = false")
 	List<Team> findAllByLocationId(@Param("id") Integer id);
 	
-	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :locationId AND t.department.id = :depId")
+	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :locationId AND t.department.id = :depId AND t.isDeleted = false")
 	List<Team> findAllByLocationIdAndDepartmentId(@Param("locationId") Integer locationId,@Param("depId") Integer depId);
 
 	@Query("SELECT COUNT(t) FROM Team t WHERE t.department.workplace.id = :id AND t.isDeleted = false")
 	int countByWorkplaceId(@Param("id") Integer id);
 
-
+	@Query("SELECT t FROM Team t WHERE t.department.workplace.id = :workplaceId AND t.id = :id")
+	Team findByIdAndWorkplaceId(@Param("id") Integer id, @Param("workplaceId") Integer workplaceId);
+	
+//	@Query("SELECT COUNT(id) FROM account_team a WHERE a.team.id =:id AND a.isDeleted = false")
+//	int countAccountsInTeam(@Param("id") Integer id);
 }

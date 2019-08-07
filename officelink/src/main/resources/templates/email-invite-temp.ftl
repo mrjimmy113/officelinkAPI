@@ -13,9 +13,9 @@
 </head>
 <body style="text-align: center; background-color: #dfe4ea; border-radius: 15px ">
 
-<h2 style="align-content: center; color: #5352ed">OFFICE LINK</h2><br/>
+<h2 style="align-content: center; color: #5352ed">WELCOME TO OFFICE LINK</h2><br/>
 
-<img src="http://www.kenwitsconsultancy.co.uk/wp-content/uploads/2016/03/Survey.jpg" width="120px" height="30" alt=""/>
+<img src="http://webshop.officelink.no/htdocs/images/logo.png" alt="" width="500px" height="200px"/>
 <br/>
 <span>Hello!</span><br/>
 <span>You just received an invitation to create an account at OFFICE LINK, please click the button below:</span><br/>
@@ -31,10 +31,6 @@
   border: none;
   border-radius: 15px;
   box-shadow: 0 9px #999;"  href="${link}">JOIN NOW</a> <br/>
-
-<span>or Go to ${link}</span>
-
-
 
 </body>
 </html>

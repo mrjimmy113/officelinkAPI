@@ -25,13 +25,6 @@ import com.fpt.officelink.entity.Location;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Integer> {
 
-    //get list location
-
-    Page<Location> findAllByAddressContainingAndIsDeleted(String address , Boolean isDeleted , Pageable pageable);
-    Page<Location> findAllByNameContainingAndIsDeleted(String address , Boolean isDeleted , Pageable pageable);
-
-
-
     //check address has existed and be deleted
     List<Location> findByAddressAndIsDeleted(String address, Boolean isDeleted);
     
@@ -57,4 +50,30 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     @Query("SELECT COUNT(l) FROM Location l WHERE l.workplace.id = :id")
     int countByWorkplaceId(@Param("id") Integer id);
     
+    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    Page<Location> findAllByNameContainingAndIsDeletedAndWorkplaceId(
+            @Param("name") String name,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId,
+            Pageable pageable);
+
+    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    Page<Location> findAllByAddressContainingAndIsDeletedAndWorkplaceId(
+            @Param("address") String address,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId,
+            Pageable pageable);
+
+    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    Optional<Location> findByNameContainingAndIsDeletedAndWorkplaceId(
+            @Param("name") String name,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId);
+
+    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    Optional<Location> findByAddressContainingAndIsDeletedAndWorkplaceId(
+            @Param("address") String address,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId);
+
 }

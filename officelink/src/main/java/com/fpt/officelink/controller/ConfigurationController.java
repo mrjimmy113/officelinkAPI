@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,31 +53,10 @@ public class ConfigurationController {
 	@Autowired
 	WorkplaceService workplaceService;
 
-	@GetMapping(value = "/getConfig")
-	public ResponseEntity<ConfigurationDTO> getConfig(@RequestParam("id") Integer id) {
-
-		HttpStatus status = null;
-		ConfigurationDTO res = new ConfigurationDTO();
-
-		try {
-			//
-			Configuration result = configService.getConfigById(id);
-			//
-			BeanUtils.copyProperties(result, res);
-			//
-			res.setWorkplaceId(result.getWorkplace().getId());
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			e.printStackTrace();
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return new ResponseEntity<ConfigurationDTO>(res, status);
-	}
-
 	/*
 	 * 
 	 * */
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping(value = "/searchGetPage")
 	public ResponseEntity<PageSearchDTO<ConfigurationDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -140,6 +120,7 @@ public class ConfigurationController {
 		return new ResponseEntity<PageSearchDTO<ConfigurationDTO>>(res, status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody ConfigurationDTO dto) {
 		this.user = this.getUserContext();
@@ -196,8 +177,9 @@ public class ConfigurationController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(@Valid @RequestBody ConfigurationDTO dto) {
+	public ResponseEntity<Integer> update(@RequestBody ConfigurationDTO dto) {
 		HttpStatus status = null;
 		try {
 			Configuration entity = new Configuration();
@@ -247,6 +229,7 @@ public class ConfigurationController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		HttpStatus status = null;
@@ -258,5 +241,18 @@ public class ConfigurationController {
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
+	}
+	
+	@Secured("ROLE_employer")
+	@GetMapping("/status")
+	public ResponseEntity<Void> updateActiveStatus(@RequestParam("id") Integer id, @RequestParam("isActive") boolean isActive) {
+		HttpStatus status = null;
+		try {
+			configService.updateActiveStatus(id, isActive);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Void>(status);
 	}
 }

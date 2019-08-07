@@ -15,10 +15,10 @@
 
 <h2 style="align-content: center; color: #5352ed">OFFICE LINK</h2><br/>
 
-<img src="http://www.kenwitsconsultancy.co.uk/wp-content/uploads/2016/03/Survey.jpg" width="120px" height="30" alt=""/>
+<img src="http://webshop.officelink.no/htdocs/images/logo.png" alt="" width="500px" height="200px"/>
 <br/>
 <span>Hello!</span><br/>
-<span>To reset the password at OFFICE LINK, at OFFICE LINK, please click the button below:</span><br/>
+<span>To reset the password at OFFICE LINK, please click the button below:</span><br/>
 <a  rel="link" style="display: inline-block;
   padding: 15px 25px;
   font-size: 24px;
@@ -30,11 +30,7 @@
   background-color: #4CAF50;
   border: none;
   border-radius: 15px;
-  box-shadow: 0 9px #999;"  href="${link}">CONFIRM</a> <br/>
-
-<span>or Go to ${link}</span>
-
-
+  box-shadow: 0 9px #999;"  href="${link}">RESET</a> <br/>
 
 </body>
 </html>
