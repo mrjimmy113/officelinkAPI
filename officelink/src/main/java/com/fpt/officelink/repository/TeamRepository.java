@@ -50,5 +50,9 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 	@Query("SELECT COUNT(t) FROM Team t WHERE t.department.workplace.id = :id AND t.isDeleted = false")
 	int countByWorkplaceId(@Param("id") Integer id);
 
-
+	@Query("SELECT t FROM Team t WHERE t.department.workplace.id = :workplaceId AND t.id = :id")
+	Team findByIdAndWorkplaceId(@Param("id") Integer id, @Param("workplaceId") Integer workplaceId);
+	
+//	@Query("SELECT COUNT(id) FROM account_team a WHERE a.team.id =:id AND a.isDeleted = false")
+//	int countAccountsInTeam(@Param("id") Integer id);
 }

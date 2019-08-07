@@ -1,7 +1,8 @@
 package com.fpt.officelink.service;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +39,6 @@ public class DepartmentServiceImpl implements DepartmentService{
 		return result;
 	}
 
-
-
-	
 	@Override
 	public Page<Department> searchWithPagination(String term, int workplaceId, int pageNum) {
 		if (pageNum > 0) {
@@ -57,7 +55,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (opDep.isPresent()) {
 			return false;
 		} else {
-			dep.setDateCreated(new Date());
+			dep.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 			depRep.save(dep);
 			return true;
 		}
@@ -71,8 +69,8 @@ public class DepartmentServiceImpl implements DepartmentService{
 	}
 
 	@Override
-	public boolean removeDepartment(int id) {
-		Department dep = depRep.findById(id).get();
+	public boolean removeDepartment(int id, int workplaceId) {
+		Department dep = depRep.findByIdAndWorkplaceId(id, workplaceId);
 		if (dep == null) {
 			return false;
 		}
@@ -81,7 +79,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 			return false;
 		}
 		
-		dep.setDateModified(new Date());
+		dep.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		dep.setDeleted(true);
 		depRep.save(dep);
 		

@@ -18,7 +18,7 @@ public interface TeamService {
 	
 	boolean modifyTeam(Team team);
 	
-	boolean removeTeam(int id);
+	boolean removeTeam(int id, int workplaceId);
 
 	List<Team> getTeamByDepartmentId(Integer id);
 }

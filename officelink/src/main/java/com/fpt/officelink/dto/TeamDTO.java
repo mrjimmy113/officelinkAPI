@@ -1,17 +1,15 @@
 package com.fpt.officelink.dto;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import java.sql.Date;
 
 public class TeamDTO {
 	
-	@NotNull
 	private int id;
 	
-	@NotEmpty
 	private String name;
 	
-	@NotNull
+	private Date dateCreated;
+	
 	private DepartmentDTO department; 
 
 	public int getId() {
@@ -30,6 +28,14 @@ public class TeamDTO {
 		this.name = name;
 	}
 	
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
 	public DepartmentDTO getDepartment() {
 		return department;
 	}

@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Survey implements Serializable {
@@ -59,8 +60,8 @@ public class Survey implements Serializable {
 	@Column
 	private boolean isDeleted;
 	
-	@OneToMany(mappedBy = "survey", cascade = CascadeType.PERSIST)
-	private Set<Configuration> configurations;
+	@OneToOne(mappedBy = "survey", cascade = CascadeType.PERSIST)
+	private Configuration configuration;
 	
 	@ManyToOne
 	@JoinColumn(name = "workplace_id")
@@ -150,12 +151,12 @@ public class Survey implements Serializable {
 		this.workplace = workplace;
 	}
 	
-	public Set<Configuration> getConfigurations() {
-		return configurations;
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
-	public void setConfigurations(Set<Configuration> configurations) {
-		this.configurations = configurations;
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	public Date getDateSendOut() {

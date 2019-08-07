@@ -1,7 +1,7 @@
 package com.fpt.officelink.service;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +43,7 @@ public class TeamServiceImpl implements TeamService {
 		if (opTeam.isPresent()) {
 			return false;
 		} else {
-			team.setDateCreated(new Date());
+			team.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 			teamRep.save(team);
 			return true;
 		}
@@ -51,19 +51,24 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public boolean modifyTeam(Team team) {
-		team.setDateModified(new Date());
+		team.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		teamRep.save(team);
 		return true;
 	}
 
 	@Override
-	public boolean removeTeam(int id) {
-		Team team = teamRep.findById(id).get();
-		if (team != null) {
-			team.setDeleted(true);
+	public boolean removeTeam(int id, int workplaceId) {
+		Team team = teamRep.findByIdAndWorkplaceId(id, workplaceId);
+		if (team == null) {
+			return false;
+		}
+		int count = team.getAccounts().size();
+		if (count > 0) {
+			return false;
 		}
 		
-		team.setDateModified(new Date());
+		team.setDeleted(true);
+		team.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		teamRep.save(team);
 		return true;
 	}

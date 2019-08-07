@@ -147,9 +147,10 @@ public class DepartmentController {
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
+		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
-			boolean success = depService.removeDepartment(id);
+			boolean success = depService.removeDepartment(id, this.user.getWorkplaceId());
 			
 			if (success) {
 				status = HttpStatus.OK;

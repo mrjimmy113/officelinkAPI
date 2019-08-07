@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.SendSurveyDTO;
@@ -72,6 +73,8 @@ public class SurveyController {
 			result.forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
 				BeanUtils.copyProperties(s, dto);
+				ConfigurationDTO configDTO = new ConfigurationDTO();
+				BeanUtils.copyProperties(s.getConfiguration(), configDTO);
 				res.add(dto);
 			});
 
@@ -94,6 +97,9 @@ public class SurveyController {
 			result.getContent().forEach(s -> {
 				SurveyDTO dto = new SurveyDTO();
 				BeanUtils.copyProperties(s, dto);
+				ConfigurationDTO configDTO = new ConfigurationDTO();
+				BeanUtils.copyProperties(s.getConfiguration(), configDTO);
+				dto.setConfiguration(configDTO);
 				dtoList.add(dto);
 			});
 			res.setMaxPage(result.getTotalPages());
