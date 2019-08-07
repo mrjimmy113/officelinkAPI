@@ -23,6 +23,7 @@ import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.repository.ConfigurationRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
+import com.fpt.officelink.scheduler.ConfigurationScheduler;
 import com.fpt.officelink.utils.Constants;
 
 @Service
@@ -32,7 +33,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	ConfigurationRepository configRep;
 
 	@Autowired
-	SchedulerService schedService;
+	ConfigurationScheduler schedService;
 
 	@Autowired
 	SurveySendTargetRepository targetRep;

@@ -1,4 +1,4 @@
-package com.fpt.officelink.service;
+package com.fpt.officelink.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,18 +12,15 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.entity.Configuration;
+import com.fpt.officelink.service.ConfigurationService;
 
 /**
  * @author phduo
  *
  */
 @Service
-public class SchedulerService implements SchedulingConfigurer {
+public class ConfigurationScheduler implements SchedulingConfigurer {
 	
-	private ThreadPoolTaskScheduler dailyScheduler; // daily schedule
-	
-	private List<ScheduledFuture<?>> dailyTaskList; // daily task list
-
 	private ThreadPoolTaskScheduler configScheduler; // configuration schedule
 
 	private List<ScheduledFuture<?>> configTaskList; // configuration task list
@@ -37,15 +34,10 @@ public class SchedulerService implements SchedulingConfigurer {
 	SystemTaskExecutor executor;
 	
 	// constructor
-	private SchedulerService() {
+	private ConfigurationScheduler() {
 		//init value 
-		dailyScheduler = dailyPoolScheduler();
 		configScheduler = configurationPoolScheduler();
 		configTaskList = new ArrayList<ScheduledFuture<?>>();
-		dailyTaskList = new ArrayList<ScheduledFuture<?>>();
-		
-		// start daily Tasks (at 0:5:0 every day)
-		this.configureDailyTasks(new ScheduledTaskRegistrar(), "0 5 0 * * *");
 	}
 
 	/**
@@ -59,52 +51,12 @@ public class SchedulerService implements SchedulingConfigurer {
 		scheduler.initialize();
 		return scheduler;
 	}
-	
-	/**
-	 * Thread pool for daily task scheduler
-	 * @return a ThreadPoolTaskScheduler for daily tasks
-	 */
-	private ThreadPoolTaskScheduler dailyPoolScheduler() {
-		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-		scheduler.setThreadNamePrefix("DailyThreadPool");
-		scheduler.setPoolSize(1);
-		scheduler.initialize();
-		return scheduler;
-	}
-	
-	/**
-	 * Configure daily tasks
-	 * @param taskRegistrar
-	 * @param cron
-	 */
-	public void configureDailyTasks(ScheduledTaskRegistrar taskRegistrar, String cron) {
-		if (!dailyTaskList.isEmpty()) {
-			for (ScheduledFuture<?> schedule : dailyTaskList) {
-				schedule.cancel(false);
-			}
-		}
-		
-		ScheduledFuture<?> newSchedule = dailyScheduler.schedule(new Runnable() {
-			@Override
-			public void run() {
-				// Put task here
-				executor.generateReportDaily();
-			}
-			// schedule time here
-
-		}, new CronTrigger(cron));
-		
-		dailyTaskList.add(newSchedule);
-		
-		taskRegistrar.setScheduler(dailyScheduler);
-	}
 
 	/**
 	 * Configure Configuration tasks
 	 */
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-		
 		// cancel any scheduled tasks
 		if (!configTaskList.isEmpty()) {
 			for (ScheduledFuture<?> schedule : configTaskList) {
@@ -154,7 +106,6 @@ public class SchedulerService implements SchedulingConfigurer {
 				executor.sentRoutineSurvey(config);
 			}
 			// schedule time here
-
 		}, new CronTrigger(config.getScheduleTime()));
 		
 		return newSchedule;

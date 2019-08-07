@@ -115,6 +115,7 @@ public class TeamReportServiceImpl implements TeamReportService {
 			isSuccess = new AsyncResult<Boolean>(true);
 			return isSuccess;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return isSuccess;
 		}
 		
