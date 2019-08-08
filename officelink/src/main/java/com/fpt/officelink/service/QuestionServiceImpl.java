@@ -1,5 +1,7 @@
 package com.fpt.officelink.service;
 
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
 			}
 			Workplace workplace = new Workplace();
 			workplace.setId(getUserContext().getWorkplaceId());
+			q.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 			q.setWorkplace(workplace);
 			q.setType(tmp.get());
 			q.setDeleted(false);
@@ -53,7 +56,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 	@Override
 	public void deleteByFlag(Integer id) {
-		Optional<Question> tmp = quesRep.findById(id);
+		Optional<Question> tmp = quesRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
 		if (tmp.isPresent()) {
 			Question q = tmp.get();
 			q.setDeleted(true);

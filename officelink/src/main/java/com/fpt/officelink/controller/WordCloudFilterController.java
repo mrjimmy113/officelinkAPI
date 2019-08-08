@@ -171,7 +171,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<Boolean>(res,status);
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/all")
 	public ResponseEntity<List<WordCloudFilterDTO>> getAll() {
 		HttpStatus status = null;
@@ -191,7 +191,7 @@ public class WordCloudFilterController {
 		return new ResponseEntity<List<WordCloudFilterDTO>>(res, status);
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/one")
 	public ResponseEntity<WordCloudFilterDTO> getOne(@RequestParam("id") Integer id) {
 		HttpStatus status = null;

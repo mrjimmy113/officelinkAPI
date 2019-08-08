@@ -1,6 +1,7 @@
 package com.fpt.officelink.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer>{
 			+ "WHERE s.survey.id = :id")
 	List<Question> findAllBySurveyId(@Param("id") Integer id);
 	
-	@Query("SELECT q FROM Question q WHERE q.question LIKE %:term% AND q.workplace.id = :id OR q.isTemplate = true AND q.isDeleted = false")
+	@Query("SELECT q FROM Question q WHERE q.question LIKE %:term% AND (q.workplace.id = :id OR q.isTemplate = true) AND q.isDeleted = false")
 	Page<Question> findAllTemplate(@Param("term") String term, @Param("id") Integer id, Pageable pageable);
+	
+	@Query("SELECT q FROM Question q WHERE q.id = :id AND q.workplace.id = :workplaceId")
+	Optional<Question> findByIdAndWorkplaceId(@Param("id") Integer id, @Param("workplaceId") Integer workplaceId);
 }

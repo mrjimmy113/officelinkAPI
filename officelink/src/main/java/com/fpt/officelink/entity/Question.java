@@ -1,6 +1,7 @@
 package com.fpt.officelink.entity;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,9 @@ public class Question implements Serializable {
 	
 	@Column
 	private boolean isTemplate;
+	
+	@Column
+	private Date dateCreated;
 
 	public Integer getId() {
 		return id;
@@ -114,6 +118,14 @@ public class Question implements Serializable {
 
 	public void setTemplate(boolean isTemplate) {
 		this.isTemplate = isTemplate;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 	
 	

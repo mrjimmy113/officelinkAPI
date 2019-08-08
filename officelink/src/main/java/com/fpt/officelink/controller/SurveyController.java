@@ -244,8 +244,10 @@ public class SurveyController {
 		List<QuestionDTO> res = new ArrayList<QuestionDTO>();
 		try {
 			List<SurveyQuestion> result = ser.getDetail(id);
-			result.forEach(r -> {
+			
+			for (SurveyQuestion r : result) {
 				Question e = r.getQuestion();
+				if(e.isDeleted()) continue;
 				QuestionDTO dto = new QuestionDTO();
 				dto.setQuestionIdentity(r.getQuestionIndex());
 				BeanUtils.copyProperties(e, dto, "type", "options");
@@ -261,7 +263,8 @@ public class SurveyController {
 				dto.setType(typeDto);
 				dto.setRequired(r.isRequired());
 				res.add(dto);
-			});
+			}	
+			
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
@@ -269,7 +272,7 @@ public class SurveyController {
 		return new ResponseEntity<List<QuestionDTO>>(res, status);
 	}
 
-	@Secured({ "ROLE_employee", "ROLE_manager" })
+	@Secured({ "ROLE_employee"})
 	@GetMapping("/take")
 	public ResponseEntity<SurveyDTO> getTakeSurvey(@RequestParam("token") String token) {
 		HttpStatus status = null;
@@ -330,7 +333,7 @@ public class SurveyController {
 
 	}
 
-	@Secured({ "ROLE_employee", "ROLE_manager" })
+	@Secured({ "ROLE_employee" })
 	@PostMapping("/answer")
 	public ResponseEntity<Number> answer(@RequestBody SurveyAnswerInforDTO dto) {
 		HttpStatus status = null;
@@ -349,7 +352,7 @@ public class SurveyController {
 		return new ResponseEntity<Number>(status.value(), status);
 	}
 
-	@Secured({ "ROLE_employer", "ROLE_employee", "ROLE_manager", "ROLE_system_admin" })
+	@Secured({ "ROLE_employer", "ROLE_employee", "ROLE_system_admin" })
 	@GetMapping("/report")
 	public ResponseEntity<PageSearchDTO<SurveyReportDTO>> reportList(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -397,7 +400,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
 
-	@Secured({ "ROLE_employee", "ROLE_manager" })
+	@Secured({ "ROLE_employee"})
 	@GetMapping(value = "/history")
 	public ResponseEntity<PageSearchDTO<SurveyDTO>> getHistorySurveyWithPagination(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -425,7 +428,7 @@ public class SurveyController {
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
 	}
 
-	@Secured({ "ROLE_employee", "ROLE_manager" })
+	@Secured({ "ROLE_employee"})
 	@GetMapping("/history/answer")
 	public ResponseEntity<List<AnswerDTO>> getAnswerBySurvey(@RequestParam("id") int id) {
 		HttpStatus status = null;
