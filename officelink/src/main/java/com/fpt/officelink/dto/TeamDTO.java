@@ -1,6 +1,7 @@
 package com.fpt.officelink.dto;
 
 import java.sql.Date;
+import java.util.List;
 
 public class TeamDTO {
 	
@@ -11,6 +12,8 @@ public class TeamDTO {
 	private Date dateCreated;
 	
 	private DepartmentDTO department; 
+	
+	private List<AccountDTO> accounts;
 
 	public int getId() {
 		return id;
@@ -43,4 +46,13 @@ public class TeamDTO {
 	public void setDepartment(DepartmentDTO department) {
 		this.department = department;
 	}
+
+	public List<AccountDTO> getAccounts() {
+		return accounts;
+	}
+
+	public void setAccounts(List<AccountDTO> accounts) {
+		this.accounts = accounts;
+	}
+	
 }
