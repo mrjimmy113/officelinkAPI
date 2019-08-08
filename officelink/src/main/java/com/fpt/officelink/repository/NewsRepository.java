@@ -22,14 +22,20 @@ import com.fpt.officelink.entity.News;
  * @author Thai Phu Cuong
  */
 @Repository
-public interface NewsRepository extends JpaRepository<News, Integer>{
-    Page<News> findAllByTitleContainingAndIsDeleted(String title, Boolean isDeleted, Pageable page);
-    
+public interface NewsRepository extends JpaRepository<News, Integer> {
+
+    @Query("Select n from News n where n.title like %:title% and n.isDeleted = :isDeleted and n.workplace.id = :workplaceId ORDER BY n.dateCreated DESC")
+    Page<News> findAllByTitleContainingAndIsDeleted(
+            @Param("title") String title,
+            @Param("isDeleted") Boolean isDeleted,
+            @Param("workplaceId") Integer workplaceId,
+            Pageable pageable);
+
     List<News> findByIsDeleted(boolean isDeleted);
-    
-    @Query(value= "FROM News n WHERE n.dateCreated >= ?1 AND n.dateCreated <= ?2 ORDER BY n.dateCreated DESC")
-    List<News> findNewstByDateCreated(Date startDate, Date endDate) ;
-    
+
+    @Query(value = "FROM News n WHERE n.dateCreated >= ?1 AND n.dateCreated <= ?2 AND n.workplace.id = ?3 ORDER BY n.dateCreated DESC")
+    List<News> findNewstByDateCreated(Date startDate, Date endDate, Integer workplaceId);
+
     @Query("SELECT n FROM News n WHERE n.workplace.id = :id AND n.isDeleted = false ORDER BY n.dateCreated DESC")
     Page<News> findLastestNews(@Param("id") Integer workplaceId, Pageable pageable);
 }
