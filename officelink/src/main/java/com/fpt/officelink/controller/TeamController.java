@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.officelink.dto.AccountDTO;
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.TeamDTO;
+import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Team;
@@ -59,6 +61,15 @@ public class TeamController {
 				TeamDTO teamDTO = new TeamDTO();
 				BeanUtils.copyProperties(element.getDepartment(), depDTO);
 				BeanUtils.copyProperties(element, teamDTO);
+				
+				List<AccountDTO> accounts = new ArrayList<AccountDTO>();
+				for (Account acc : element.getAccounts()) {
+					AccountDTO accDTO = new AccountDTO();
+					BeanUtils.copyProperties(acc, accDTO);
+					accounts.add(accDTO);
+				}
+				
+				teamDTO.setAccounts(accounts);
 				teamDTO.setDepartment(depDTO);
 				resultList.add(teamDTO);
 			});
@@ -166,8 +177,13 @@ public class TeamController {
 			
 			depEntity.setWorkplace(wEntity);
 			teamEntity.setDepartment(depEntity);
-			teamService.modifyTeam(teamEntity);
-			status = HttpStatus.OK;
+			
+			boolean isSucceed = teamService.modifyTeam(teamEntity);
+			if (isSucceed) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

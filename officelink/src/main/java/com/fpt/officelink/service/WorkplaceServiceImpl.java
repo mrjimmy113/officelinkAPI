@@ -1,6 +1,7 @@
 package com.fpt.officelink.service;
 
-import java.util.Date;
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 
-		return workpRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return workpRep.searchWithPaging(term, pageRequest);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 		if (opDep.isPresent()) {
 			return false;
 		} else {
-			workp.setDateCreated(new Date());
+			workp.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
 			workpRep.save(workp);
 			return true;
 		}
@@ -60,9 +61,14 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 
 	@Override
 	public boolean modifyWorkplace(Workplace workp) {
-		workp.setDateModified(new Date());
-		workpRep.save(workp);
-		return true;
+		Optional<Workplace> opDep = workpRep.findByNameAndIsDeleted(workp.getName(), false);
+		if (opDep.isPresent()) {
+			return false;
+		} else {
+			workp.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			workpRep.save(workp);
+			return true;
+		}
 	}
 
 	@Override
@@ -72,7 +78,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 			return false;
 		}
 
-		workp.setDateModified(new Date());
+		workp.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		workp.setDeleted(true);
 		workpRep.save(workp);
 		return true;

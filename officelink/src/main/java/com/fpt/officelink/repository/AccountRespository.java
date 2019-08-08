@@ -63,6 +63,7 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 	@Query("SELECT a FROM Account a WHERE a.email = :email")
 	Account findAllByEmail( @Param("email") String email);
 
-
+	@Query("SELECT a FROM Account a WHERE a.id = :id AND a.workplace.id = :workplaceId")
+	Account findByIdAndWorkplaceId(@Param("id") int id, @Param("workplaceId") int workplaceId);
 
 }
