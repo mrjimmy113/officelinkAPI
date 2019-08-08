@@ -172,30 +172,8 @@ public class ReportServiceImpl implements ReportService {
 				}
 				break;
 			}
+
 			case "employee": {
-				if (isAll) {
-					for (Team team : currentAcc.getTeams()) {
-						departments.add(team.getDepartment());
-					}
-					teams.addAll(currentAcc.getTeams());
-				} else {
-					locations = new HashSet<Location>();
-					Set<Department> tmpDeps = new HashSet<Department>();
-					Set<Team> tmpTeams = new HashSet<Team>();
-					for (Team team : currentAcc.getTeams()) {
-						if (departments.contains(team.getDepartment())) {
-							tmpDeps.add(team.getDepartment());
-						}
-						if (teams.contains(team)) {
-							tmpTeams.add(team);
-						}
-					}
-					departments = tmpDeps;
-					teams = tmpTeams;
-				}
-				break;
-			}
-			case "manager": {
 				if (isAll) {
 					locations.add(currentAcc.getLocation());
 					for (Team team : currentAcc.getTeams()) {
@@ -404,13 +382,9 @@ public class ReportServiceImpl implements ReportService {
 			method = indentity -> answerReportRep.findAllByIdentity(indentity);
 			break;
 
-		case "manager":
+		case "employee":
 			method = indentity -> answerReportRep.findAllByIdentityAndLocationIdOrDepartmentId(indentity,
 					acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
-			break;
-		case "employee":
-			method = indentity -> answerReportRep.findAllByIdentityAndDepartmentId(indentity,
-					depRep.findByAccountId(acc.getId()).get(0).getId());
 			break;
 		}
 		return method;
@@ -434,7 +408,7 @@ public class ReportServiceImpl implements ReportService {
 			}
 			break;
 
-		case "manager":
+		case "employee":
 			switch (type) {
 			case SINGLE:
 				method = indentity -> singleRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
@@ -447,22 +421,6 @@ public class ReportServiceImpl implements ReportService {
 			case TEXT:
 				method = indentity -> textRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
 						acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
-				break;
-			}
-			break;
-		case "employee":
-			switch (type) {
-			case SINGLE:
-				method = indentity -> singleRep.findAllByIndentityAndDepartmentId(indentity,
-						depRep.findByAccountId(acc.getId()).get(0).getId());
-				break;
-			case MULTIPLE:
-				method = indentity -> multiRep.findAllByIndentityAndDepartmentId(indentity,
-						depRep.findByAccountId(acc.getId()).get(0).getId());
-				break;
-			case TEXT:
-				method = indentity -> textRep.findAllByIndentityAndDepartmentId(indentity,
-						depRep.findByAccountId(acc.getId()).get(0).getId());
 				break;
 			}
 			break;

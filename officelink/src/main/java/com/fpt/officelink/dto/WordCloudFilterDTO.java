@@ -15,6 +15,8 @@ public class WordCloudFilterDTO {
 	private List<WordDTO> wordList = new ArrayList<WordDTO>();
 	
 	private Date dateCreated;
+	
+	private boolean isTemplate;
 
 	public Integer getId() {
 		return id;
@@ -54,6 +56,14 @@ public class WordCloudFilterDTO {
 
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
 	}
 	
 	

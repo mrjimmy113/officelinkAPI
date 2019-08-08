@@ -80,6 +80,7 @@ public class SurveyController {
 
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<List<SurveyDTO>>(res, status);
@@ -108,7 +109,7 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
@@ -131,7 +132,7 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
@@ -173,7 +174,7 @@ public class SurveyController {
 				status = HttpStatus.CONFLICT;
 
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -216,7 +217,7 @@ public class SurveyController {
 				status = HttpStatus.CONFLICT;
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -231,6 +232,7 @@ public class SurveyController {
 			ser.delete(id);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -267,6 +269,7 @@ public class SurveyController {
 			
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<List<QuestionDTO>>(res, status);
@@ -286,7 +289,7 @@ public class SurveyController {
 				status = HttpStatus.CONFLICT;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<SurveyDTO>(res, status);
@@ -326,7 +329,7 @@ public class SurveyController {
 
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Number>(status.value(), status);
@@ -346,7 +349,7 @@ public class SurveyController {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Number>(status.value(), status);
@@ -370,7 +373,7 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyReportDTO>>(res, status);
@@ -394,7 +397,7 @@ public class SurveyController {
 			res.setObjList(dtoList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<PageSearchDTO<SurveyDTO>>(res, status);
@@ -422,6 +425,7 @@ public class SurveyController {
 			res.setObjList(resultList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 
@@ -437,7 +441,7 @@ public class SurveyController {
 			dto = ser.getAnswerBySurveyId(id);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<List<AnswerDTO>>(dto, status);
@@ -452,6 +456,7 @@ public class SurveyController {
 			ser.updateActiveStatus(id, isActive);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
+			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Void>(status);
