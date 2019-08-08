@@ -89,6 +89,16 @@ public class AccountServiceImpl implements AccountService {
         return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
     }
 
+    @Override
+    public Page<Account> searchAccountNotAssign(String term, Integer workplaceId, Integer roleId,  int pageNum) {
+        if (pageNum > 0) {
+            pageNum = pageNum - 1;
+        }
+        PageRequest pageable = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+        return accountRespository.findAccountNotAssign(term, workplaceId, false , roleId  , pageable);
+    }
+
+
     @Transactional
     @Override
     public boolean addNewAccount(Account account, Integer roleId , String workplaceName) {
@@ -217,7 +227,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void sendInvitation(String[] listEmail) throws JOSEException, ParseException {
     	List<String> tokenList = new ArrayList<String>();
-    	
+
     	for (int i = 0; i < listEmail.length; i++) {
     		System.out.println(getUserContext().getWorkplaceId());
 			tokenList.add(jwtSer.createInviteToken(listEmail[i], getUserContext().getWorkplaceId()));
@@ -306,6 +316,7 @@ public class AccountServiceImpl implements AccountService {
     		Account acc = opAc.get();
     		acc.setLocation(location);
     		acc.setTeams(new HashSet<Team>(teams));
+    		acc.setDateModified(new Date());
     		accountRespository.save(acc);
     	}
     }
@@ -333,7 +344,7 @@ public class AccountServiceImpl implements AccountService {
         if(optionalAccount.isPresent()){
             optionalAccount.get().setFirstname(account.getFirstname());
             optionalAccount.get().setLastname(account.getLastname());
-
+            optionalAccount.get().setDateModified(new Date());
             accountRespository.save(optionalAccount.get());
             return true;
         }
@@ -346,6 +357,7 @@ public class AccountServiceImpl implements AccountService {
         if(optionalAccount.isPresent()){
             if(passwordEncoder().matches(currentPass, optionalAccount.get().getPassword())){
                 optionalAccount.get().setPassword(passwordEncoder().encode(newPass));
+                optionalAccount.get().setDateModified(new Date());
                 accountRespository.save(optionalAccount.get());
                 return true;
             }

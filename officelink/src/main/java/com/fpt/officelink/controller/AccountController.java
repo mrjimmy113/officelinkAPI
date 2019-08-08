@@ -264,6 +264,42 @@ public class AccountController {
         return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
     }
 
+    //search get page with account not assign
+    @Secured({"ROLE_employer","ROLE_system_admin"})
+    @GetMapping(value = "/getAccountNotAssign")
+    public ResponseEntity<PageSearchDTO<AccountDTO>> searchAccountNotAssgin(@RequestParam("term") String term, @RequestParam("page") int page){
+        this.user = getUserContext();
+        HttpStatus status = null;
+
+        PageSearchDTO<AccountDTO> pageSearchDTO = new PageSearchDTO<>();
+
+        try{
+            Page<Account>  pageAccount = service.searchAccountNotAssign(term, user.getWorkplaceId(), 2,  page);
+
+            List<AccountDTO> listAccount = new ArrayList<AccountDTO>();
+
+
+            pageAccount.getContent().forEach(element -> {
+                AccountDTO accountDTO = new AccountDTO();
+
+                BeanUtils.copyProperties(element,accountDTO);
+
+                listAccount.add(accountDTO);
+
+            });
+            pageSearchDTO.setMaxPage(pageAccount.getTotalPages());
+            pageSearchDTO.setObjList(listAccount);
+            status = HttpStatus.OK;
+
+        }catch (Exception ex){
+
+            status = HttpStatus.BAD_REQUEST;
+
+        }
+
+        return new ResponseEntity<PageSearchDTO<AccountDTO>>(pageSearchDTO,status);
+    }
+
 
 
 
@@ -347,8 +383,9 @@ public class AccountController {
                 token =  jwt.createTokenWithEmail(email);
                 service.sendMailResetPassword(listEmail, token);
                 status = HttpStatus.OK;
-            }else {
-                status = HttpStatus.NO_CONTENT;
+            }
+            if(res){
+                status = HttpStatus.NOT_FOUND;
             }
 
         }catch (Exception ex){
