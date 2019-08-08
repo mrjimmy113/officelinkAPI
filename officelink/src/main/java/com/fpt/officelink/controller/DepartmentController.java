@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.DepartmentService;
 
@@ -82,6 +84,15 @@ public class DepartmentController {
 			result.getContent().forEach(element -> {
 				DepartmentDTO dto = new DepartmentDTO();
 				BeanUtils.copyProperties(element, dto);
+				
+				List<TeamDTO> teams = new ArrayList<TeamDTO>();
+				for (Team team : element.getTeams()) {
+					TeamDTO teamDTO = new TeamDTO();
+					BeanUtils.copyProperties(team, teamDTO);
+					teams.add(teamDTO);
+				}
+				
+				dto.setTeams(teams);
 				resultList.add(dto);
 			});
 			//
