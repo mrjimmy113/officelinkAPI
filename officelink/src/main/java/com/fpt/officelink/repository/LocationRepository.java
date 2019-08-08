@@ -50,7 +50,7 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     @Query("SELECT COUNT(l) FROM Location l WHERE l.workplace.id = :id")
     int countByWorkplaceId(@Param("id") Integer id);
     
-    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateModified DESC, l.dateCreated DESC")
+    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateCreated DESC")
     Page<Location> findAllByNameContainingAndIsDeletedAndWorkplaceId(
             @Param("name") String name,
             @Param("isDeleted") Boolean isDeleted,
