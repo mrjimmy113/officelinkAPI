@@ -348,7 +348,7 @@ public class AccountController {
                 service.sendMailResetPassword(listEmail, token);
                 status = HttpStatus.OK;
             }else {
-                status = HttpStatus.CONFLICT;
+                status = HttpStatus.NO_CONTENT;
             }
 
         }catch (Exception ex){
