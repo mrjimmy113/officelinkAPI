@@ -51,7 +51,7 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Optional<Location> searchById(int id) {
-        return locationRep.findById(id);
+        return locationRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
     }
 
 	@Override
@@ -76,11 +76,15 @@ public class LocationServiceImpl implements LocationService {
                 if (loc1.isPresent() || loc2.isPresent()) {
                     return false;
                 } else {
-                    Workplace workplace = new Workplace();
-                    workplace.setId(getUserContext().getWorkplaceId());
-                    location.setWorkplace(workplace);
-                    locationRep.save(location);
-                    return true;
+                    try {
+                        Workplace workplace = new Workplace();
+                        workplace.setId(getUserContext().getWorkplaceId());
+                        location.setWorkplace(workplace);
+                        locationRep.save(location);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }                   
                 }
 	}
 
@@ -100,17 +104,21 @@ public class LocationServiceImpl implements LocationService {
         if (check == false) {
             return false;
         } else {
-            Workplace workplace = new Workplace();
-            workplace.setId(getUserContext().getWorkplaceId());
-            location.setWorkplace(workplace);
-            locationRep.save(location);
-            return true;
+            try {
+                    Workplace workplace = new Workplace();
+                    workplace.setId(getUserContext().getWorkplaceId());
+                    location.setWorkplace(workplace);
+                    locationRep.save(location);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }      
         }
     }
 
 	@Override
 	public boolean removeLocation(int id) {
-		Location loc = locationRep.findById(id).get();
+		Location loc = locationRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId()).get();
 		if (loc != null) {
 			try {
 				loc.setIsDeleted(true);

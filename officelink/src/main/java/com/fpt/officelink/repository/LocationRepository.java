@@ -24,14 +24,9 @@ import com.fpt.officelink.entity.Location;
  */
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Integer> {
-
-    //check address has existed and be deleted
-    List<Location> findByAddressAndIsDeleted(String address, Boolean isDeleted);
     
-    Optional<Location> findByNameContainingAndIsDeleted(String name, boolean isDeleted);
+    Optional<Location> findByIdAndWorkplaceId(int id, int workplaceId);
     
-    Optional<Location> findByAddressContainingAndIsDeleted(String address, boolean isDeleted);
-
     @Query("SELECT t FROM Location t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
     List<Location> findAllByWorkplaceId(
             @Param("workplaceId") Integer workplaceId,
@@ -50,27 +45,27 @@ public interface LocationRepository extends JpaRepository<Location, Integer> {
     @Query("SELECT COUNT(l) FROM Location l WHERE l.workplace.id = :id")
     int countByWorkplaceId(@Param("id") Integer id);
     
-    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateCreated DESC")
+    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateModified DESC, l.dateCreated DESC")
     Page<Location> findAllByNameContainingAndIsDeletedAndWorkplaceId(
             @Param("name") String name,
             @Param("isDeleted") Boolean isDeleted,
             @Param("workplaceId") Integer workplaceId,
             Pageable pageable);
 
-    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateModified DESC, l.dateCreated DESC")
     Page<Location> findAllByAddressContainingAndIsDeletedAndWorkplaceId(
             @Param("address") String address,
             @Param("isDeleted") Boolean isDeleted,
             @Param("workplaceId") Integer workplaceId,
             Pageable pageable);
 
-    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    @Query("Select l from Location l where l.name like %:name% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateModified DESC, l.dateCreated DESC")
     Optional<Location> findByNameContainingAndIsDeletedAndWorkplaceId(
             @Param("name") String name,
             @Param("isDeleted") Boolean isDeleted,
             @Param("workplaceId") Integer workplaceId);
 
-    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId")
+    @Query("Select l from Location l where l.address like %:address% and l.isDeleted = :isDeleted and l.workplace.id = :workplaceId ORDER BY l.dateModified DESC, l.dateCreated DESC")
     Optional<Location> findByAddressContainingAndIsDeletedAndWorkplaceId(
             @Param("address") String address,
             @Param("isDeleted") Boolean isDeleted,

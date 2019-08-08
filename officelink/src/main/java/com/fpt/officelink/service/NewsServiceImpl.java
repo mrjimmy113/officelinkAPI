@@ -61,7 +61,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public Optional<News> searchById(int id) {
-        return newsRep.findById(id);
+        return newsRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
     }
 
     @Override
@@ -98,7 +98,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public boolean removeNews(int id) {
-        News news = newsRep.findById(id).get();
+        News news = newsRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId()).get();
         if (news != null) {
             try {
                 news.setIsDeleted(true);
@@ -176,7 +176,7 @@ public class NewsServiceImpl implements NewsService {
         List<ImageNewsDTO> listNews = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
-        List<News> news = newsRep.findByIsDeleted(false);
+        List<News> news = newsRep.findByIsDeletedAndWorkplaceId(false, getUserContext().getWorkplaceId());
         try {
             c.setTime(sdf.parse(endDate));
             c.add(Calendar.DATE, 1);
