@@ -12,6 +12,8 @@ public class WorkplaceDTO {
 	
 	private Date dateModified;
 	
+	private boolean isDeleted;
+	
 	//Getter setter	
 	public Integer getId() {
 		return id;
@@ -43,6 +45,14 @@ public class WorkplaceDTO {
 
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 }

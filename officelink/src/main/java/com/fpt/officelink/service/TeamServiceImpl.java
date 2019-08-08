@@ -34,7 +34,7 @@ public class TeamServiceImpl implements TeamService {
 		}
 		PageRequest pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 
-		return teamRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
+		return teamRep.searchWithPaging(term, false, workplaceId, pageRequest);
 	}
 
 	@Override
@@ -83,14 +83,4 @@ public class TeamServiceImpl implements TeamService {
 		return teamRep.findAllByWorkplaceId(workplaceId, false);
 	}
 
-	@Override
-	public Team getTeam(int id) {
-		Team team = null;
-		Optional<Team> opTeams = teamRep.findById(id);
-		
-		if(opTeams.isPresent()) {
-			team = opTeams.get();
-		}
-		return team;
-	}
 }

@@ -44,7 +44,7 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 
-		return workpRep.findAllByNameContainingAndIsDeleted(term, false, pageRequest);
+		return workpRep.searchWithPaging(term, pageRequest);
 	}
 
 	@Override
