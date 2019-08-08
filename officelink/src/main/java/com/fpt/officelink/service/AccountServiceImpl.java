@@ -86,7 +86,7 @@ public class AccountServiceImpl implements AccountService {
             pageNum = pageNum - 1;
         }
         PageRequest pageable = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
-        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , true , pageable);
+        return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
     }
 
     @Transactional
@@ -207,10 +207,11 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean checkAccountExisted(String email) {
         Optional<Account> acc = accountRespository.findAccountByEmail( email);
-        if(acc.isPresent()){
-            return false;
+        if(acc.isPresent() && acc.get().isDeleted() == false){
+           return false;
         }
         return true;
+
     }
     
     @Override
@@ -249,26 +250,36 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO getInvitationInfor(String token) throws ParseException {
-    	System.out.println("Hello");
     	AccountDTO dto = new AccountDTO();
-    	dto.setEmail(jwtSer.getEmailFromToken(token));
-    	WorkplaceDTO workplaceDTO = new WorkplaceDTO();
-    	workplaceDTO.setId(jwtSer.getWorkplaceId(token));
-    	dto.setWorkplace(workplaceDTO);    	
-    	return dto;
+    	Optional<Account> accountOptional = accountRespository.findByEmail(jwtSer.getEmailFromToken(token));
+
+            dto.setEmail(jwtSer.getEmailFromToken(token));
+            WorkplaceDTO workplaceDTO = new WorkplaceDTO();
+            workplaceDTO.setId(jwtSer.getWorkplaceId(token));
+            dto.setWorkplace(workplaceDTO);
+            dto.setDeleted(accountOptional.get().isDeleted());
+
+
+        return dto;
+
     }
     
     @Override
     public void acceptInvite(String email, Integer roleId, Integer workplaceId) {
-
-
+        Optional<Account> accountOptional = accountRespository.findByEmail(email);
+        if(accountOptional.isPresent() && accountOptional.get().isDeleted() == true){
+            accountOptional.get().setDeleted(false);
+            accountRespository.save(accountOptional.get());
+        }else{
             Role role = new Role();
             role.setId(roleId);
             Workplace workplace = new Workplace();
             workplace.setId(workplaceId);
             Account account = new Account();
 
+
             account.setWorkplace(workplace);
+            account.setFirstname("");
             account.setRole(role);
             account.setDeleted(false);
             account.setDateCreated(new Date());
@@ -276,8 +287,7 @@ public class AccountServiceImpl implements AccountService {
 
             //account.setPassword(passwordEncoder().encode(entity.getPassword()));
             accountRespository.save(account);
-
-
+        }
 
     }
     
