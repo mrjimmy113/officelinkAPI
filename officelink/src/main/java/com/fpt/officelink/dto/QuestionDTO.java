@@ -1,6 +1,7 @@
 package com.fpt.officelink.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class QuestionDTO {
@@ -19,6 +20,8 @@ public class QuestionDTO {
 	private Integer questionIndex;
 	
 	private boolean required;
+	
+	private Date dateCreated;
 
 	public Integer getId() {
 		return id;
@@ -82,6 +85,14 @@ public class QuestionDTO {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 
 	
