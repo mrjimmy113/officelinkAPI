@@ -51,9 +51,14 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public boolean modifyTeam(Team team) {
-		team.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
-		teamRep.save(team);
-		return true;
+		Optional<Team> opTeam = teamRep.findByNameAndIsDeleted(team.getName(), team.getDepartment().getWorkplace().getId() , false);
+		if (opTeam.isPresent()) {
+			return false;
+		} else {
+			team.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			teamRep.save(team);
+			return true;
+		}
 	}
 
 	@Override

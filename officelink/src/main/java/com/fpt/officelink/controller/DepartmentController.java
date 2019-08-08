@@ -135,8 +135,12 @@ public class DepartmentController {
 			wEntity.setId(user.getWorkplaceId());
 			
 			entity.setWorkplace(wEntity);
-			depService.modifyDepartment(entity);
-			status = HttpStatus.OK;
+			boolean isSucceed = depService.modifyDepartment(entity);
+			if (isSucceed) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

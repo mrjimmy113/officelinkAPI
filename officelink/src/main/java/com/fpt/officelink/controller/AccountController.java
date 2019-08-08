@@ -625,6 +625,18 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
+    @GetMapping("/unassignedFromTeam")
+    public ResponseEntity<Number> unassignedFromTeam(@RequestParam("teamId") int teamId, @RequestParam("accountId") int accountId){
+    	this.user = getUserContext();
+        HttpStatus status = null;
 
+        try{
+            this.service.unassignedFromTeam(teamId, accountId, this.user.getWorkplaceId());
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
 
 }

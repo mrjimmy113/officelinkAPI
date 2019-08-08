@@ -63,9 +63,14 @@ public class DepartmentServiceImpl implements DepartmentService{
 
 	@Override
 	public boolean modifyDepartment(Department dep) {
-		depRep.save(dep);
-		
-		return true;
+		Optional<Department> opDep = depRep.findByNameAndIsDeletedAndWorkplaceId(dep.getName(), false, dep.getWorkplace().getId());
+		if (opDep.isPresent()) {
+			return false;
+		} else {
+			dep.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			depRep.save(dep);
+			return true;
+		}
 	}
 
 	@Override

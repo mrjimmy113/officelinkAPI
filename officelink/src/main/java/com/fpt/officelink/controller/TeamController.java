@@ -177,8 +177,13 @@ public class TeamController {
 			
 			depEntity.setWorkplace(wEntity);
 			teamEntity.setDepartment(depEntity);
-			teamService.modifyTeam(teamEntity);
-			status = HttpStatus.OK;
+			
+			boolean isSucceed = teamService.modifyTeam(teamEntity);
+			if (isSucceed) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
