@@ -39,11 +39,11 @@ public class TeamController {
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
-	
+
 	@Autowired
 	TeamService teamService;
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<TeamDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -61,14 +61,16 @@ public class TeamController {
 				TeamDTO teamDTO = new TeamDTO();
 				BeanUtils.copyProperties(element.getDepartment(), depDTO);
 				BeanUtils.copyProperties(element, teamDTO);
-				
+
 				List<AccountDTO> accounts = new ArrayList<AccountDTO>();
 				for (Account acc : element.getAccounts()) {
-					AccountDTO accDTO = new AccountDTO();
-					BeanUtils.copyProperties(acc, accDTO);
-					accounts.add(accDTO);
+					if (!acc.isDeleted()) {
+						AccountDTO accDTO = new AccountDTO();
+						BeanUtils.copyProperties(acc, accDTO);
+						accounts.add(accDTO);
+					}
 				}
-				
+
 				teamDTO.setAccounts(accounts);
 				teamDTO.setDepartment(depDTO);
 				resultList.add(teamDTO);
@@ -84,8 +86,8 @@ public class TeamController {
 
 		return new ResponseEntity<PageSearchDTO<TeamDTO>>(res, status);
 	}
-	
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("getByWorkplace")
 	public ResponseEntity<List<TeamDTO>> findByWorkplace() {
 		this.user = getUserContext();
@@ -106,7 +108,7 @@ public class TeamController {
 		return new ResponseEntity<List<TeamDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("dep")
 	public ResponseEntity<List<TeamDTO>> findByDepId(@RequestParam("id") Integer id) {
 		HttpStatus status = null;
@@ -129,8 +131,7 @@ public class TeamController {
 		return new ResponseEntity<List<TeamDTO>>(res, status);
 	}
 
-
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody TeamDTO dto) {
 		this.user = getUserContext();
@@ -140,11 +141,11 @@ public class TeamController {
 			Team teamEntity = new Team();
 			Department depEntity = new Department();
 			Workplace wEntity = new Workplace();
-			
+
 			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
 			BeanUtils.copyProperties(dto, teamEntity);
 			wEntity.setId(user.getWorkplaceId());
-			
+
 			depEntity.setWorkplace(wEntity);
 			teamEntity.setDepartment(depEntity);
 			boolean isSucceed = teamService.addNewTeam(teamEntity);
@@ -160,7 +161,7 @@ public class TeamController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody TeamDTO dto) {
 		this.user = getUserContext();
@@ -170,14 +171,14 @@ public class TeamController {
 			Department depEntity = new Department();
 			Team teamEntity = new Team();
 			Workplace wEntity = new Workplace();
-			
+
 			BeanUtils.copyProperties(dto.getDepartment(), depEntity);
 			BeanUtils.copyProperties(dto, teamEntity);
 			wEntity.setId(user.getWorkplaceId());
-			
+
 			depEntity.setWorkplace(wEntity);
 			teamEntity.setDepartment(depEntity);
-			
+
 			boolean isSucceed = teamService.modifyTeam(teamEntity);
 			if (isSucceed) {
 				status = HttpStatus.OK;
@@ -191,7 +192,7 @@ public class TeamController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		this.user = getUserContext();
