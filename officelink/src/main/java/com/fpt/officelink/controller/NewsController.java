@@ -134,6 +134,7 @@ public class NewsController {
                 String path = context.getRealPath("");
                 NewsDTO newsDTO = service.saveImageAndConvertStringToJson(path, file, stringDTO);
                 newsDTO.setDateCreated(Date.from(Instant.now()));
+                newsDTO.setDateModified(Date.from(Instant.now()));
                 BeanUtils.copyProperties(newsDTO, news);
                 if (service.addNews(news)) {
                     status = HttpStatus.CREATED;
