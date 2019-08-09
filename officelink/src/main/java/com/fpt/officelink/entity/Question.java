@@ -55,6 +55,9 @@ public class Question implements Serializable {
 	
 	@Column
 	private Date dateCreated;
+	
+	@Column
+	private Date dateDeleted;
 
 	public Integer getId() {
 		return id;
@@ -126,6 +129,14 @@ public class Question implements Serializable {
 
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
+	}
+
+	public Date getDateDeleted() {
+		return dateDeleted;
+	}
+
+	public void setDateDeleted(Date dateDeleted) {
+		this.dateDeleted = dateDeleted;
 	}
 	
 	

@@ -22,7 +22,7 @@ public interface WordCloudFilterRepository extends JpaRepository<WordCloudFilter
 	List<WordCloudFilter> finAllByWorkplaceIdAndIsDeleted(@Param("id") Integer id,
 			@Param("isDeleted") boolean isDeleted);
 
-	@Query("SELECT w FROM WordCloudFilter w WHERE w.name LIKE %:name% AND w.workplace.id = :id AND w.isDeleted = :isDeleted")
+	@Query("SELECT w FROM WordCloudFilter w WHERE w.name LIKE %:name% AND w.workplace.id = :id AND w.isDeleted = :isDeleted ORDER BY w.dateModified DESC")
 	Page<WordCloudFilter> findAllByNameContainAndWorkplaceIdAndIsDeleted(@Param("name") String name,
 			@Param("id") Integer workplaceId, @Param("isDeleted") boolean isDeleted,Pageable page);
 

@@ -43,7 +43,8 @@ public class QuestionServiceImpl implements QuestionService {
 			}
 			Workplace workplace = new Workplace();
 			workplace.setId(getUserContext().getWorkplaceId());
-			q.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date today = new Date(Calendar.getInstance().getTimeInMillis());
+			q.setDateCreated(today);
 			q.setWorkplace(workplace);
 			q.setType(tmp.get());
 			q.setDeleted(false);
@@ -59,6 +60,8 @@ public class QuestionServiceImpl implements QuestionService {
 		Optional<Question> tmp = quesRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
 		if (tmp.isPresent()) {
 			Question q = tmp.get();
+			Date today = new Date(Calendar.getInstance().getTimeInMillis());
+			q.setDateDeleted(today);
 			q.setDeleted(true);
 			quesRep.save(q);
 		}
@@ -73,7 +76,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Page<Question> searchWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return quesRep.findAllByQuestionContainingAndWorkplaceIdAndIsDeleted(term,getUserContext().getWorkplaceId(), false, pageRequest);
+		return quesRep.findAllByQuestionContainingAndWorkplaceIdAndIsDeletedOrderByDateCreatedDesc(term,getUserContext().getWorkplaceId(), false, pageRequest);
 	}
 
 	@Override

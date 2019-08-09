@@ -117,7 +117,9 @@ public class SurveyServiceImpl implements SurveyService {
 		boolean isAdmin = false;
 		if (opSur.isPresent())
 			return false;
-		survey.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+		Date today = new Date(Calendar.getInstance().getTimeInMillis());
+		survey.setDateCreated(today);
+		survey.setDateModified(today);
 
 		if (getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_system_admin"))) {
 			isAdmin = true;
@@ -158,37 +160,40 @@ public class SurveyServiceImpl implements SurveyService {
 		Optional<Survey> opSur = surveyRep.findByNameAndWorkplaceId(survey.getName(),
 				getUserContext().getWorkplaceId());
 		if (opSur.isPresent()) {
-			Optional<Survey> tmp = surveyRep.findById(survey.getId());
+			Optional<Survey> tmp = surveyRep.findWorkplaceSurveyById(survey.getId(),getUserContext().getWorkplaceId());
 			if (tmp.isPresent()) {
 				if (!tmp.get().getName().equalsIgnoreCase(survey.getName())) {
 					return false;
 				}
 			}
 		}
-		Optional<Survey> opCurSur = surveyRep.findById(survey.getId());
-		Survey curSur = opCurSur.get();
-		curSur.setName(survey.getName());
-		curSur.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
-		surveyRep.save(curSur);
-		surQuestRep.deleteBySurveyId(survey.getId());
-		sqList.forEach(sq -> {
-			Question q = sq.getQuestion();
-			if (q.getId() == null) {
-				for (AnswerOption op : q.getOptions()) {
-					op.setQuestion(q);
+		Optional<Survey> opCurSur = surveyRep.findWorkplaceSurveyById(survey.getId(),getUserContext().getWorkplaceId());
+		if(opCurSur.isPresent()) {
+			Survey curSur = opCurSur.get();
+			curSur.setName(survey.getName());
+			curSur.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			surveyRep.save(curSur);
+			surQuestRep.deleteBySurveyId(survey.getId());
+			sqList.forEach(sq -> {
+				Question q = sq.getQuestion();
+				if (q.getId() == null) {
+					for (AnswerOption op : q.getOptions()) {
+						op.setQuestion(q);
+					}
+					questionRep.save(q);
+				} else {
+					Optional<Question> tmp = questionRep.findById(q.getId());
+					if (tmp.isPresent()) {
+						q = tmp.get();
+					}
 				}
-				questionRep.save(q);
-			} else {
-				Optional<Question> tmp = questionRep.findById(q.getId());
-				if (tmp.isPresent()) {
-					q = tmp.get();
-				}
-			}
-			sq.setQuestion(q);
-			sq.setSurvey(curSur);
-			surQuestRep.save(sq);
-		});
-		return true;
+				sq.setQuestion(q);
+				sq.setSurvey(curSur);
+				surQuestRep.save(sq);
+			});
+			return true;
+		}
+		return false;
 
 	}
 
@@ -203,7 +208,7 @@ public class SurveyServiceImpl implements SurveyService {
 	public Page<Survey> searchReportWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
 		if (getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_employer"))) {
-			return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSent(term,
+			return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSentOrderByDateSendOutDesc(term,
 					getUserContext().getWorkplaceId(), false, true, pageRequest);
 		} else {
 			return surveyRep.findReportableSurvey(term, getUserContext().getWorkplaceId(),
@@ -214,10 +219,11 @@ public class SurveyServiceImpl implements SurveyService {
 
 	@Override
 	public void delete(Integer id) {
-		Optional<Survey> opSurvey = surveyRep.findById(id);
+		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(id, getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey tmpSurvey = opSurvey.get();
 			tmpSurvey.setDeleted(true);
+			tmpSurvey.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 			surveyRep.save(tmpSurvey);
 		}
 	}
@@ -234,7 +240,7 @@ public class SurveyServiceImpl implements SurveyService {
 			Integer id = jwtSer.getSurveyId(token);
 			if (checkIfUserCanTakeSurvey(id))
 				return null;
-			Optional<Survey> survey = surveyRep.findById(id);
+			Optional<Survey> survey = surveyRep.findWorkplaceSurveyById(id,getUserContext().getWorkplaceId());
 			if (survey.isPresent()) {
 				if (checkIfUserTakeSurvey(id) || !survey.get().isActive())
 					return result;
@@ -271,7 +277,7 @@ public class SurveyServiceImpl implements SurveyService {
 	@Transactional(rollbackOn = Exception.class)
 	public boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
 			throws JOSEException {
-		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
+		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(surveyId,getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			if (!survey.isSent()) {
@@ -413,7 +419,7 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public void saveAnswer(SurveyAnswerInforDTO dto) {
 		List<Answer> savedAnswer = new ArrayList<Answer>();
-		Optional<Survey> opSurvey = surveyRep.findById(dto.getSurveyId());
+		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(dto.getSurveyId(),getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey sur = opSurvey.get();
 			sur.setReceivedAnswer(sur.getReceivedAnswer() + 1);
@@ -590,7 +596,7 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public void updateActiveStatus(Integer id, boolean isActive) {
 		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(id, getUserContext().getWorkplaceId());
-		if(opSurvey.isPresent()) {
+		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			survey.setActive(isActive);
 			surveyRep.save(survey);
