@@ -103,8 +103,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean addNewAccount(Account account, Integer roleId , String workplaceName) {
         Optional<Account> acc = accountRespository.findAccountByEmail( account.getEmail());
+        Optional<Workplace> work = workplaceRepository.findByNameAndIsDeleted(workplaceName , false);
         Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if(acc.isPresent()){
+        if(acc.isPresent() || work.isPresent()){
             return false;
         }else{
         	// create workplace
@@ -122,6 +123,7 @@ public class AccountServiceImpl implements AccountService {
             account.setRole(optionalRole.get());
             account.setPassword(passwordEncoder().encode(account.getPassword()));
             account.setDateCreated(new Date());
+            account.setDateModified(new Date());
             accountRespository.save(account);
             return true;
         }
@@ -254,6 +256,7 @@ public class AccountServiceImpl implements AccountService {
     public void resetPassword(String email , String newPassword) {
         Account account = accountRespository.findAllByEmail(email);
         account.setPassword(passwordEncoder().encode(newPassword));
+        account.setDateModified(new Date());
         accountRespository.save(account);
     }
 
@@ -278,7 +281,10 @@ public class AccountServiceImpl implements AccountService {
     public void acceptInvite(String email, Integer roleId, Integer workplaceId) {
         Optional<Account> accountOptional = accountRespository.findByEmail(email);
         if(accountOptional.isPresent() && accountOptional.get().isDeleted() == true){
+
             accountOptional.get().setDeleted(false);
+            accountOptional.get().setDateCreated(new Date());
+            accountOptional.get().setDateModified(new Date());
             accountRespository.save(accountOptional.get());
         }else{
             Role role = new Role();
@@ -293,6 +299,7 @@ public class AccountServiceImpl implements AccountService {
             account.setRole(role);
             account.setDeleted(false);
             account.setDateCreated(new Date());
+            account.setDateModified(new Date());
             account.setEmail(email);
 
             //account.setPassword(passwordEncoder().encode(entity.getPassword()));
