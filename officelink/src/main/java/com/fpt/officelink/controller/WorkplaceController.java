@@ -3,8 +3,6 @@ package com.fpt.officelink.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -111,14 +109,19 @@ public class WorkplaceController {
 	
 	@Secured({"ROLE_system_admin"})
 	@PutMapping
-	public ResponseEntity<Integer> update(	@RequestBody WorkplaceDTO dto){
+	public ResponseEntity<Integer> update(@RequestBody WorkplaceDTO dto){
 		HttpStatus status = null;
 		try {
 			Workplace entity = new Workplace();
 			BeanUtils.copyProperties(dto, entity);
 			
-			workpService.modifyWorkplace(entity);
-			status = HttpStatus.OK;
+			boolean isSucceed = workpService.modifyWorkplace(entity);
+			
+			if (isSucceed) {
+				status = HttpStatus.OK;				
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}

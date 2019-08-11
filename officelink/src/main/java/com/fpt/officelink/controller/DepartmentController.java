@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
+import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
+import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.service.DepartmentService;
 
@@ -39,7 +41,7 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService depService;
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping(value = "/getAll")
 	public ResponseEntity<List<DepartmentDTO>> getAllByWorkplace() {
 		this.user = getUserContext();
@@ -66,7 +68,7 @@ public class DepartmentController {
 		return new ResponseEntity<List<DepartmentDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping
 	public ResponseEntity<PageSearchDTO<DepartmentDTO>> searchGetPage(@RequestParam("term") String term,
 			@RequestParam("page") int page) {
@@ -82,6 +84,17 @@ public class DepartmentController {
 			result.getContent().forEach(element -> {
 				DepartmentDTO dto = new DepartmentDTO();
 				BeanUtils.copyProperties(element, dto);
+
+				List<TeamDTO> teams = new ArrayList<TeamDTO>();
+				for (Team team : element.getTeams()) {
+					if (!team.isDeleted()) {
+						TeamDTO teamDTO = new TeamDTO();
+						BeanUtils.copyProperties(team, teamDTO);
+						teams.add(teamDTO);
+					}
+				}
+
+				dto.setTeams(teams);
 				resultList.add(dto);
 			});
 			//
@@ -95,15 +108,15 @@ public class DepartmentController {
 		return new ResponseEntity<PageSearchDTO<DepartmentDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PostMapping
 	public ResponseEntity<Integer> create(@RequestBody DepartmentDTO dto) {
 		user = getUserContext();
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
-			Workplace wEntity = new Workplace(); 
-			
+			Workplace wEntity = new Workplace();
+
 			BeanUtils.copyProperties(dto, entity);
 			wEntity.setId(user.getWorkplaceId());
 
@@ -122,21 +135,25 @@ public class DepartmentController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@PutMapping
 	public ResponseEntity<Integer> update(@RequestBody DepartmentDTO dto) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
 			Department entity = new Department();
-			Workplace wEntity = new Workplace(); 
-			
+			Workplace wEntity = new Workplace();
+
 			BeanUtils.copyProperties(dto, entity);
 			wEntity.setId(user.getWorkplaceId());
-			
+
 			entity.setWorkplace(wEntity);
-			depService.modifyDepartment(entity);
-			status = HttpStatus.OK;
+			boolean isSucceed = depService.modifyDepartment(entity);
+			if (isSucceed) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.CONFLICT;
+			}
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -144,14 +161,14 @@ public class DepartmentController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@DeleteMapping
 	public ResponseEntity<Integer> delete(@RequestParam("id") int id) {
 		this.user = getUserContext();
 		HttpStatus status = null;
 		try {
 			boolean success = depService.removeDepartment(id, this.user.getWorkplaceId());
-			
+
 			if (success) {
 				status = HttpStatus.OK;
 			} else {
@@ -163,8 +180,8 @@ public class DepartmentController {
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
-	@Secured({"ROLE_employer","ROLE_system_admin"})
+
+	@Secured({ "ROLE_employer", "ROLE_system_admin" })
 	@GetMapping("/byLocation")
 	public ResponseEntity<List<DepartmentDTO>> findByLocationId(@RequestParam("id") int id) {
 		HttpStatus status = null;
@@ -181,7 +198,7 @@ public class DepartmentController {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
-		
-		return new ResponseEntity<List<DepartmentDTO>>(res,status);
+
+		return new ResponseEntity<List<DepartmentDTO>>(res, status);
 	}
 }

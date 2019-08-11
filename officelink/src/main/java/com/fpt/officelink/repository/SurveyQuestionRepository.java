@@ -23,4 +23,7 @@ public interface SurveyQuestionRepository extends JpaRepository<SurveyQuestion, 
 	@Query("SELECT sq FROM SurveyQuestion sq WHERE sq.survey.id = :surId AND sq.question.id = :questId")
 	Optional<SurveyQuestion> findBySurveyIdAndQuestionId(@Param("surId") Integer surId, @Param("questId") Integer questId);
 	
+	@Modifying
+	@Query("DELETE FROM SurveyQuestion sq WHERE sq.question.id = :id AND sq.question.isDeleted = true AND sq.survey.isSent = false")
+	void deleteByQuestionIdAndNotSentSurvey(@Param("id") Integer id);
 }

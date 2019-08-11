@@ -56,7 +56,7 @@ public class ReportController {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/target")
 	public ResponseEntity<SurveySendDetailDTO> getTarget(@RequestParam("id") int surveyId) {
 		SurveySendDetailDTO res = new SurveySendDetailDTO();
@@ -72,7 +72,7 @@ public class ReportController {
 		return new ResponseEntity<SurveySendDetailDTO>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping
 	public ResponseEntity<List<QuestionReportDTO>> getFilterdReport(@RequestParam("surveyId") int surveyId,
 			@RequestParam("locationId") int locationId, @RequestParam("departmentId") int departmentId,
@@ -91,7 +91,7 @@ public class ReportController {
 		return new ResponseEntity<List<QuestionReportDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/getSameSurvey")
 	public ResponseEntity<List<SurveyDTO>> getSurveyHasSameQuestion(@RequestParam("id") int id,
 			@RequestParam("notId") int notId) {
@@ -113,7 +113,7 @@ public class ReportController {
 		return new ResponseEntity<List<SurveyDTO>>(res, status);
 	}
 
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/getCompareQuestion")
 	public ResponseEntity<List<AnswerReportDTO>> getOneQuestionAnswerReportForCompare(
 			@RequestParam("surveyId") int surveyId, @RequestParam("questionId") int questionId,
@@ -138,7 +138,7 @@ public class ReportController {
 		return new ResponseEntity<List<AnswerReportDTO>>(res, status);
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/dashboard")
 	public ResponseEntity<DashBoardDTO> getDashBoard() {
 		DashBoardDTO res = new DashBoardDTO();
@@ -177,7 +177,7 @@ public class ReportController {
 		}
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/getDownloadToken")
 	public ResponseEntity<String> getDownloadToken(@RequestParam("surveyId") Integer surveyId, @RequestParam("questionId") Integer questionId) {
 		String token = null;
@@ -192,7 +192,7 @@ public class ReportController {
 		return new ResponseEntity<String>(token,status);
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@PostMapping("/applyFilter")
 	public ResponseEntity<List<AnswerReportDTO>> applyFilter(@RequestBody ApplyFilterDTO applyInfor) {
 		List<AnswerReportDTO> res = new ArrayList<AnswerReportDTO>();
@@ -207,7 +207,7 @@ public class ReportController {
 		return new ResponseEntity<List<AnswerReportDTO>>(res,status);
 	}
 	
-	@Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping("/detail")
 	public ResponseEntity<SurveyReportDTO> reportDetail(@RequestParam("id") Integer id) {
 		HttpStatus status = null;

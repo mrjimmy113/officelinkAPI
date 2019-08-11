@@ -13,8 +13,6 @@ import com.fpt.officelink.entity.WordCloudFilter;
 public interface WordCloudFilterService {
 	
 	Page<WordCloudFilter> searchWithPagination(String term, int pageNum);
-	
-	void removeFilter(int id);
 
 	Integer addNewFilter(WordCloudFilter filter, List<Word> wordList);
 

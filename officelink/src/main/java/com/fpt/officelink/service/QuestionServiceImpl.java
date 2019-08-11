@@ -1,5 +1,7 @@
 package com.fpt.officelink.service;
 
+import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.TypeQuestion;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.QuestionRepository;
+import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.TypeQuestionRepository;
 
 @Service
@@ -27,6 +30,9 @@ public class QuestionServiceImpl implements QuestionService {
 
 	@Autowired
 	TypeQuestionRepository typeRep;
+	
+	@Autowired
+	SurveyQuestionRepository surQuestRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -41,6 +47,8 @@ public class QuestionServiceImpl implements QuestionService {
 			}
 			Workplace workplace = new Workplace();
 			workplace.setId(getUserContext().getWorkplaceId());
+			Date today = new Date(Calendar.getInstance().getTimeInMillis());
+			q.setDateCreated(today);
 			q.setWorkplace(workplace);
 			q.setType(tmp.get());
 			q.setDeleted(false);
@@ -53,11 +61,14 @@ public class QuestionServiceImpl implements QuestionService {
 
 	@Override
 	public void deleteByFlag(Integer id) {
-		Optional<Question> tmp = quesRep.findById(id);
+		Optional<Question> tmp = quesRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
 		if (tmp.isPresent()) {
 			Question q = tmp.get();
+			Date today = new Date(Calendar.getInstance().getTimeInMillis());
+			q.setDateDeleted(today);
 			q.setDeleted(true);
 			quesRep.save(q);
+			surQuestRep.deleteByQuestionIdAndNotSentSurvey(q.getId());
 		}
 	}
 
@@ -70,7 +81,7 @@ public class QuestionServiceImpl implements QuestionService {
 	@Override
 	public Page<Question> searchWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
-		return quesRep.findAllByQuestionContainingAndWorkplaceIdAndIsDeleted(term,getUserContext().getWorkplaceId(), false, pageRequest);
+		return quesRep.findAllByQuestionContainingAndWorkplaceIdAndIsDeletedOrderByDateCreatedDesc(term,getUserContext().getWorkplaceId(), false, pageRequest);
 	}
 
 	@Override

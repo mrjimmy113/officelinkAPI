@@ -1,5 +1,6 @@
 package com.fpt.officelink.dto;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,10 @@ public class WordCloudFilterDTO {
 	private boolean isExclude;
 
 	private List<WordDTO> wordList = new ArrayList<WordDTO>();
+	
+	private Date dateCreated;
+	
+	private boolean isTemplate;
 
 	public Integer getId() {
 		return id;
@@ -43,6 +48,22 @@ public class WordCloudFilterDTO {
 
 	public void setExclude(boolean isExclude) {
 		this.isExclude = isExclude;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
+	}
+
+	public void setTemplate(boolean isTemplate) {
+		this.isTemplate = isTemplate;
 	}
 	
 	

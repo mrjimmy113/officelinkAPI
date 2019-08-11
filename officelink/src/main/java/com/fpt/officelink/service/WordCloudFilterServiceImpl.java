@@ -52,7 +52,7 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 
 	@Override
 	public void modifyFilter(WordCloudFilter filter, List<Word> wordList) {
-		Optional<WordCloudFilter> opFilter = filterRep.findById(filter.getId());
+		Optional<WordCloudFilter> opFilter = filterRep.findOneById(filter.getId(),getUserContext().getWorkplaceId());
 		if (opFilter.isPresent()) {
 			WordCloudFilter curFilter = opFilter.get();
 			Set<Word> old = new HashSet<Word>();
@@ -71,11 +71,6 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 				}
 			});
 		}
-
-	}
-
-	@Override
-	public void removeFilter(int id) {
 
 	}
 
@@ -109,15 +104,17 @@ public class WordCloudFilterServiceImpl implements WordCloudFilterService {
 
 	@Override
 	public void delete(Integer id) {
-		Optional<WordCloudFilter> opWCF = filterRep.findById(id);
-		WordCloudFilter tmp = opWCF.get();
-		tmp.setDeleted(true);
-		filterRep.save(tmp);
+		Optional<WordCloudFilter> opWCF = filterRep.findOneById(id, getUserContext().getWorkplaceId());
+		if(opWCF.isPresent()) {
+			WordCloudFilter tmp = opWCF.get();
+			tmp.setDeleted(true);
+			filterRep.save(tmp);
+		}
 	}
 
 	@Override
 	public boolean isExisted(String name) {
-		Optional<WordCloudFilter> opWCF = filterRep.findByNameInIgnoreCase(name);
+		Optional<WordCloudFilter> opWCF = filterRep.findByNameInIgnoreCase(name, getUserContext().getWorkplaceId());
 		if (opWCF.isPresent())
 			return true;
 		return false;

@@ -2,6 +2,7 @@ package com.fpt.officelink.service;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
         	// create workplace
         	Workplace workplace = new Workplace();
         	workplace.setName(workplaceName);
-        	workplace.setDateCreated(new Date());
+        	workplace.setDateCreated(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
         	workplaceRepository.save(workplace);
 
 
@@ -372,6 +373,13 @@ public class AccountServiceImpl implements AccountService {
         return false;
     }
 
-
-
+	@Override
+	public void unassignedFromTeam(int teamId, int accountId, int workplaceId) {
+		Account acc = accountRespository.findByIdAndWorkplaceId(accountId, workplaceId);
+		if (acc != null) {
+			acc.getTeams().removeIf(t -> t.getId() == teamId);
+			accountRespository.save(acc);
+		}
+		
+	}
 }

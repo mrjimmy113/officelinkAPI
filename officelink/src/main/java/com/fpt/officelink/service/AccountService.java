@@ -47,7 +47,7 @@ public interface AccountService {
 
 	void resetPassword(String email ,String newPassword);
 
-
+	void unassignedFromTeam(int teamId, int accountId, int workplaceId);
 
 
 

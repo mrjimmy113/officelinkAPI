@@ -135,7 +135,7 @@ public class AccountController {
     }
 
     //get profile
-    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
     @GetMapping(value = "/profile")
     public ResponseEntity<AccountDTO> getProfile(){
         CustomUser user = getUserContext();
@@ -622,7 +622,7 @@ public class AccountController {
 
 
     //change profile
-    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
     @PutMapping("/changeProfile")
     public ResponseEntity<Number> changeProfile(@RequestBody AccountDTO dto){
         HttpStatus status = null;
@@ -642,7 +642,7 @@ public class AccountController {
 
 
     //change password
-    @Secured({"ROLE_employer","ROLE_employee","ROLE_manager","ROLE_system_admin"})
+    @Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
     @PutMapping("/changePassword")
     public ResponseEntity<Number> changePassword(@RequestBody PasswordInfoDTO dto){
         HttpStatus status = null;
@@ -662,6 +662,18 @@ public class AccountController {
         return new ResponseEntity<Number>(status.value(), status);
     }
 
+    @GetMapping("/unassignedFromTeam")
+    public ResponseEntity<Number> unassignedFromTeam(@RequestParam("teamId") int teamId, @RequestParam("accountId") int accountId){
+    	this.user = getUserContext();
+        HttpStatus status = null;
 
+        try{
+            this.service.unassignedFromTeam(teamId, accountId, this.user.getWorkplaceId());
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<Number>(status.value(), status);
+    }
 
 }

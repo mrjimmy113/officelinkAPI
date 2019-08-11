@@ -21,19 +21,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 	
 	@Autowired
 	DepartmentRepository depRep;
-	
-	public Department getDepartment(int depId) {
-		Department result = depRep.getDepartmentWithTeam(depId);
-		if (result == null) {
-			Optional<Department> opDep = depRep.findById(depId);
-			if (opDep.isPresent()) {
-				result = opDep.get();
-			}
-		}
-		
-		return result; 
-	}
-	
+
 	public List<Department> getAllByWorkplace(int workplaceId) {
 		List<Department> result = depRep.findAllByWorkplaceIdAndIsDeleted(workplaceId, false);
 		return result;
@@ -46,7 +34,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 		}
 		Pageable pageRequest = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
 		
-		return depRep.findAllByNameContainingAndIsDeletedAndWorkplaceId(term, false, workplaceId, pageRequest);
+		return depRep.searchWithPaging(term, false, workplaceId, pageRequest);
 	}
 
 	@Override
@@ -55,7 +43,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (opDep.isPresent()) {
 			return false;
 		} else {
-			dep.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date date = new Date(Calendar.getInstance().getTimeInMillis());
+			dep.setDateCreated(date);
+			dep.setDateModified(date);
 			depRep.save(dep);
 			return true;
 		}
@@ -63,9 +53,14 @@ public class DepartmentServiceImpl implements DepartmentService{
 
 	@Override
 	public boolean modifyDepartment(Department dep) {
-		depRep.save(dep);
-		
-		return true;
+		Optional<Department> opDep = depRep.findByNameAndIsDeletedAndWorkplaceId(dep.getName(), false, dep.getWorkplace().getId());
+		if (opDep.isPresent()) {
+			return false;
+		} else {
+			dep.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			depRep.save(dep);
+			return true;
+		}
 	}
 
 	@Override
