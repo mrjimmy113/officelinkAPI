@@ -15,7 +15,7 @@ import com.fpt.officelink.entity.WordCloudFilter;
 @Repository
 public interface WordCloudFilterRepository extends JpaRepository<WordCloudFilter, Integer> {
 
-	@Query("SELECT w FROM WordCloudFilter w WHERE LOWER(w.name) = LOWER(:name) AND w.workplace.id = :workplaceId")
+	@Query("SELECT w FROM WordCloudFilter w WHERE LOWER(w.name) = LOWER(:name) AND w.workplace.id = :workplaceId AND w.isDeleted = false")
 	Optional<WordCloudFilter> findByNameInIgnoreCase(@Param("name")String name, @Param("workplaceId") Integer workplaceId);
 
 	@Query("SELECT w FROM WordCloudFilter w WHERE( w.workplace.id = :id OR w.isTemplate = true) AND w.isDeleted = :isDeleted")

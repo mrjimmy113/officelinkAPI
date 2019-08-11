@@ -26,7 +26,7 @@
   display: inline-block;
   font-size: 16px;
   margin: 4px 2px;
-  cursor: pointer;"  href="${link}">Go OFFICE LINK</a> <br/>
+  cursor: pointer;"  href="${link}">Do Survey</a> <br/>
 
 <span>or Go to ${link}</span>
 
