@@ -17,6 +17,7 @@ import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.TypeQuestion;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.QuestionRepository;
+import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.TypeQuestionRepository;
 
 @Service
@@ -29,6 +30,9 @@ public class QuestionServiceImpl implements QuestionService {
 
 	@Autowired
 	TypeQuestionRepository typeRep;
+	
+	@Autowired
+	SurveyQuestionRepository surQuestRep;
 
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -64,6 +68,7 @@ public class QuestionServiceImpl implements QuestionService {
 			q.setDateDeleted(today);
 			q.setDeleted(true);
 			quesRep.save(q);
+			surQuestRep.deleteByQuestionIdAndNotSentSurvey(q.getId());
 		}
 	}
 
