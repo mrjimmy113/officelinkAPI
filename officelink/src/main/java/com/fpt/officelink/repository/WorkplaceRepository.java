@@ -22,7 +22,7 @@ public interface WorkplaceRepository extends JpaRepository<Workplace, Integer> {
 	//
 	List<Workplace> findAllByIsDeleted(Boolean isDeleted); 
 	
-	@Query("Select w from Workplace w where w.name like %:name% AND w.id != 1 ORDER BY w.dateModified DESC, w.dateCreated DESC")
+	@Query("Select w from Workplace w where w.name like %:name% AND w.id != 1 ORDER BY w.dateModified DESC")
     Page<Workplace> searchWithPaging(
             @Param("name") String name,
             Pageable pageable);

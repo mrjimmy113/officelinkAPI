@@ -43,7 +43,9 @@ public class TeamServiceImpl implements TeamService {
 		if (opTeam.isPresent()) {
 			return false;
 		} else {
-			team.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date date = new Date(Calendar.getInstance().getTimeInMillis());
+			team.setDateCreated(date);
+			team.setDateModified(date);
 			teamRep.save(team);
 			return true;
 		}
