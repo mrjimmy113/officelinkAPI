@@ -86,4 +86,17 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 		return true;
 	}
 
+	@Override
+	public boolean changeActiveStatus(int id, boolean status) {
+		Workplace workp = workpRep.findById(id).get();
+		if (workp == null) {
+			return false;
+		}
+		
+		workp.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+		workp.setDeleted(status);
+		workpRep.save(workp);
+		
+		return true;
+	}
 }
