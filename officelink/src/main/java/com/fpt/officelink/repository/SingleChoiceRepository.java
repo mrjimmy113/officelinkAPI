@@ -17,18 +17,18 @@ public interface SingleChoiceRepository extends JpaRepository<AnswerReport, Inte
 	@Query("SELECT NEW AnswerReport(w.content, COUNT(w)) FROM Answer w WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND w.account.location.id = :locationId GROUP BY w.content")
 	List<AnswerReport> findAllByIndentityAndLocationId(@Param("id") Integer id, @Param("locationId") Integer locationId);
 
-	@Query("SELECT NEW AnswerReport(w.content, COUNT(w)) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND t.department.id = :departmentId GROUP BY w.content")
+	@Query("SELECT NEW AnswerReport(w.content, 1) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND t.department.id = :departmentId GROUP BY w.account.id")
 	List<AnswerReport> findAllByIndentityAndDepartmentId(@Param("id") Integer id,
 			@Param("departmentId") Integer departmentId);
 
 	@Query("SELECT NEW AnswerReport(w.content, COUNT(w)) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND t.id = :teamId GROUP BY w.content")
 	List<AnswerReport> findAllByIndentityAndTeamId(@Param("id") Integer id, @Param("teamId") Integer teamId);
 
-	@Query("SELECT NEW AnswerReport(w.content, COUNT(w)) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND w.account.location.id = :locationId AND t.department.id = :departmentId GROUP BY w.content")
+	@Query("SELECT NEW AnswerReport(w.content, 1) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND w.account.location.id = :locationId AND t.department.id = :departmentId GROUP BY w.account.id")
 	List<AnswerReport> findAllByIndentityAndLocationIdAndDepartmentId(@Param("id") Integer id,
 			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
 
-	@Query("SELECT NEW AnswerReport(w.content, COUNT(w)) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND w.account.location.id = :locationId OR t.department.id = :departmentId GROUP BY w.content")
+	@Query("SELECT NEW AnswerReport(w.content, 1) FROM Answer w JOIN w.account.teams t WHERE w.surveyQuestion.question.type.id = 1 AND w.surveyQuestion.id = :id AND (w.account.location.id = :locationId OR t.department.id = :departmentId) GROUP BY w.account.id")
 	List<AnswerReport> findAllByIndentityAndLocationIdOrDepartmentId(@Param("id") Integer id,
 			@Param("locationId") Integer locationId, @Param("departmentId") Integer departmentId);
 }

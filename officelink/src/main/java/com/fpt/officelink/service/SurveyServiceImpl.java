@@ -238,12 +238,16 @@ public class SurveyServiceImpl implements SurveyService {
 		SurveyDTO result = null;
 		if (jwtSer.validateTakeSurveyToken(token)) {
 			Integer id = jwtSer.getSurveyId(token);
-			if (checkIfUserCanTakeSurvey(id))
+			if (!checkIfUserCanTakeSurvey(id)) {
 				return null;
+			}
+				
 			Optional<Survey> survey = surveyRep.findWorkplaceSurveyById(id,getUserContext().getWorkplaceId());
 			if (survey.isPresent()) {
-				if (checkIfUserTakeSurvey(id) || !survey.get().isActive())
+				if (checkIfUserTakeSurvey(id) || !survey.get().isActive()) {
 					return result;
+				}
+					
 				result = new SurveyDTO();
 				BeanUtils.copyProperties(survey.get(), result);
 				List<SurveyQuestion> questions = surQuestRep.findAllBySurveyId(id);

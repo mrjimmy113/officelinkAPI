@@ -319,18 +319,10 @@ public class ReportServiceImpl implements ReportService {
 		List<QuestionReportDTO> result = new ArrayList<QuestionReportDTO>();
 		if (opSurvey.isPresent()) {
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
-			if (!opSurvey.get().isActive() && opSurvey.get().isSent()) {
-				for (SurveyQuestion sq : sqList) {
-					Function<Integer, List<AnswerReport>> method = getReportFunctionExpire(locationId, departmentId,
-							teamId);
-					result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
-				}
-			} else {
-				for (SurveyQuestion sq : sqList) {
-					Function<Integer, List<AnswerReport>> method = getReportFunction(locationId, departmentId, teamId,
-							sq.getQuestion().getType().getType());
-					result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
-				}
+			for (SurveyQuestion sq : sqList) {
+				Function<Integer, List<AnswerReport>> method = getReportFunction(locationId, departmentId, teamId,
+						sq.getQuestion().getType().getType());
+				result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
 			}
 		}
 		return result;
@@ -341,14 +333,9 @@ public class ReportServiceImpl implements ReportService {
 			int teamId) {
 		List<AnswerReport> result = new ArrayList<AnswerReport>();
 		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
-		if (!surveyQuestion.getSurvey().isActive() && surveyQuestion.getSurvey().isSent()) {
-			result = getReportFunctionExpire(locationId, departmentId, teamId).apply(surveyQuestion.getId());
-		} else {
-			result = getReportFunction(locationId, departmentId, teamId,
-					surveyQuestion.getQuestion().getType().getType()).apply(surveyQuestion.getId());
-		}
-
-		return result;
+		result = getReportFunction(locationId, departmentId, teamId,
+				surveyQuestion.getQuestion().getType().getType()).apply(surveyQuestion.getId());
+		return AnswerReport.filterAnswerReport(result);
 	}
 
 	private Function<Integer, List<AnswerReport>> getReportFunctionExpire(int locationId, int departmentId,
@@ -432,7 +419,7 @@ public class ReportServiceImpl implements ReportService {
 			Function<Integer, List<AnswerReport>> method) {
 		QuestionReportDTO result = new QuestionReportDTO();
 		List<AnswerReport> entities = method.apply(identity);
-
+		entities = AnswerReport.filterAnswerReport(entities);
 		// Change Question to DTO
 		QuestionDTO dto = new QuestionDTO();
 		BeanUtils.copyProperties(q, dto, "type", "options");
