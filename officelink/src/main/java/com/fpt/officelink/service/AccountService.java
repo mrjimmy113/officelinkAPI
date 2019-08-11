@@ -17,6 +17,9 @@ import com.fpt.officelink.entity.Account;
 public interface AccountService {
 
     Page<Account> searchWithPagination(String term, Integer workplaceId , Integer roleId , int pageNum);
+	Page<Account> searchAccountNotAssign(String term, Integer workplaceId , Integer roleId , int pageNum);
+
+
     boolean addNewAccount(Account account, Integer roleId ,  String workplaceName);
     boolean modifyAccount(Account account , Integer roleId , Location address , Workplace workplace);
     boolean updateIsActive(Account account);

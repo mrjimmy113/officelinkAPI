@@ -90,12 +90,23 @@ public class AccountServiceImpl implements AccountService {
         return accountRespository.findAllByFirstnameAndWorkplaceAndRole(term, workplaceId, false , roleId , pageable);
     }
 
+    @Override
+    public Page<Account> searchAccountNotAssign(String term, Integer workplaceId, Integer roleId,  int pageNum) {
+        if (pageNum > 0) {
+            pageNum = pageNum - 1;
+        }
+        PageRequest pageable = PageRequest.of(pageNum, Constants.MAX_PAGE_SIZE);
+        return accountRespository.findAccountNotAssign(term, workplaceId, false , roleId  , pageable);
+    }
+
+
     @Transactional
     @Override
     public boolean addNewAccount(Account account, Integer roleId , String workplaceName) {
         Optional<Account> acc = accountRespository.findAccountByEmail( account.getEmail());
+        Optional<Workplace> work = workplaceRepository.findByNameAndIsDeleted(workplaceName , false);
         Optional<Role> optionalRole = roleRepository.findById(roleId);
-        if(acc.isPresent()){
+        if(acc.isPresent() || work.isPresent()){
             return false;
         }else{
         	// create workplace
@@ -113,6 +124,7 @@ public class AccountServiceImpl implements AccountService {
             account.setRole(optionalRole.get());
             account.setPassword(passwordEncoder().encode(account.getPassword()));
             account.setDateCreated(new Date());
+            account.setDateModified(new Date());
             accountRespository.save(account);
             return true;
         }
@@ -218,7 +230,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void sendInvitation(String[] listEmail) throws JOSEException, ParseException {
     	List<String> tokenList = new ArrayList<String>();
-    	
+
     	for (int i = 0; i < listEmail.length; i++) {
     		System.out.println(getUserContext().getWorkplaceId());
 			tokenList.add(jwtSer.createInviteToken(listEmail[i], getUserContext().getWorkplaceId()));
@@ -245,6 +257,7 @@ public class AccountServiceImpl implements AccountService {
     public void resetPassword(String email , String newPassword) {
         Account account = accountRespository.findAllByEmail(email);
         account.setPassword(passwordEncoder().encode(newPassword));
+        account.setDateModified(new Date());
         accountRespository.save(account);
     }
 
@@ -269,7 +282,10 @@ public class AccountServiceImpl implements AccountService {
     public void acceptInvite(String email, Integer roleId, Integer workplaceId) {
         Optional<Account> accountOptional = accountRespository.findByEmail(email);
         if(accountOptional.isPresent() && accountOptional.get().isDeleted() == true){
+
             accountOptional.get().setDeleted(false);
+            accountOptional.get().setDateCreated(new Date());
+            accountOptional.get().setDateModified(new Date());
             accountRespository.save(accountOptional.get());
         }else{
             Role role = new Role();
@@ -284,6 +300,7 @@ public class AccountServiceImpl implements AccountService {
             account.setRole(role);
             account.setDeleted(false);
             account.setDateCreated(new Date());
+            account.setDateModified(new Date());
             account.setEmail(email);
 
             //account.setPassword(passwordEncoder().encode(entity.getPassword()));
@@ -307,6 +324,7 @@ public class AccountServiceImpl implements AccountService {
     		Account acc = opAc.get();
     		acc.setLocation(location);
     		acc.setTeams(new HashSet<Team>(teams));
+    		acc.setDateModified(new Date());
     		accountRespository.save(acc);
     	}
     }
@@ -334,7 +352,7 @@ public class AccountServiceImpl implements AccountService {
         if(optionalAccount.isPresent()){
             optionalAccount.get().setFirstname(account.getFirstname());
             optionalAccount.get().setLastname(account.getLastname());
-
+            optionalAccount.get().setDateModified(new Date());
             accountRespository.save(optionalAccount.get());
             return true;
         }
@@ -347,6 +365,7 @@ public class AccountServiceImpl implements AccountService {
         if(optionalAccount.isPresent()){
             if(passwordEncoder().matches(currentPass, optionalAccount.get().getPassword())){
                 optionalAccount.get().setPassword(passwordEncoder().encode(newPass));
+                optionalAccount.get().setDateModified(new Date());
                 accountRespository.save(optionalAccount.get());
                 return true;
             }
