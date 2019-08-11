@@ -163,6 +163,7 @@ public class LocationController {
         try {
             Location location = new Location();
             dto.setDateCreated(Date.from(Instant.now()));
+            dto.setDateModified(Date.from(Instant.now()));
             BeanUtils.copyProperties(dto, location);
             if (service.addLocation(location)) {
                 status = HttpStatus.CREATED;

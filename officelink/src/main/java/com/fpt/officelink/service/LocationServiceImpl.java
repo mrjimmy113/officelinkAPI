@@ -5,6 +5,7 @@
  */
 package com.fpt.officelink.service;
 
+import com.fpt.officelink.entity.Account;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +24,7 @@ import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
+import java.util.Set;
 
 /**
  *
@@ -51,7 +53,7 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Optional<Location> searchById(int id) {
-        return locationRep.findById(id);
+        return locationRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
     }
 
 	@Override
@@ -76,11 +78,15 @@ public class LocationServiceImpl implements LocationService {
                 if (loc1.isPresent() || loc2.isPresent()) {
                     return false;
                 } else {
-                    Workplace workplace = new Workplace();
-                    workplace.setId(getUserContext().getWorkplaceId());
-                    location.setWorkplace(workplace);
-                    locationRep.save(location);
-                    return true;
+                    try {
+                        Workplace workplace = new Workplace();
+                        workplace.setId(getUserContext().getWorkplaceId());
+                        location.setWorkplace(workplace);
+                        locationRep.save(location);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }                   
                 }
 	}
 
@@ -100,18 +106,23 @@ public class LocationServiceImpl implements LocationService {
         if (check == false) {
             return false;
         } else {
-            Workplace workplace = new Workplace();
-            workplace.setId(getUserContext().getWorkplaceId());
-            location.setWorkplace(workplace);
-            locationRep.save(location);
-            return true;
+            try {
+                    Workplace workplace = new Workplace();
+                    workplace.setId(getUserContext().getWorkplaceId());
+                    location.setWorkplace(workplace);
+                    locationRep.save(location);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }      
         }
     }
 
 	@Override
 	public boolean removeLocation(int id) {
-		Location loc = locationRep.findById(id).get();
-		if (loc != null) {
+		Location loc = locationRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId()).get();
+                Set<Account> acc = loc.getAccounts();
+		if (loc != null && acc.isEmpty()) {
 			try {
 				loc.setIsDeleted(true);
 				loc.setDateDeleted(Date.from(Instant.now()));
@@ -120,8 +131,10 @@ public class LocationServiceImpl implements LocationService {
 			} catch (Exception e) {
 				return false;
 			}
-		}
-		return true;
+		} else if (acc != null) {
+                    return false;
+                }
+                return true;
 	}
 
 	@Override

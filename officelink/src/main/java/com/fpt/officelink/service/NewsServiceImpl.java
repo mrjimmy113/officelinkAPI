@@ -51,31 +51,31 @@ public class NewsServiceImpl implements NewsService {
 
     @Autowired
     NewsRepository newsRep;
-    
+
     @Autowired
     ServletContext context;
-    
+
     private CustomUser getUserContext() {
-		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	}
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     @Override
     public Optional<News> searchById(int id) {
-        return newsRep.findById(id);
+        return newsRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId());
     }
 
     @Override
     public Page<News> searchByTitleWithPagination(String term, int pageNum) {
         Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-        return newsRep.findAllByTitleContainingAndIsDeleted(term, false, pageRequest);
+        return newsRep.findAllByTitleContainingAndIsDeleted(term, false, getUserContext().getWorkplaceId(), pageRequest);
     }
 
     @Override
     public boolean addNews(News news) {
         try {
-        	Workplace workplace = new Workplace();
-        	workplace.setId(getUserContext().getWorkplaceId());
-        	news.setWorkplace(workplace);
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            news.setWorkplace(workplace);
             newsRep.save(news);
             return true;
         } catch (Exception e) {
@@ -86,7 +86,10 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public boolean editNews(News news) {
         try {
-        	
+            Workplace workplace = new Workplace();
+            workplace.setId(getUserContext().getWorkplaceId());
+            news.setWorkplace(workplace);
+            newsRep.save(news);
             return true;
         } catch (Exception e) {
             return false;
@@ -95,7 +98,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public boolean removeNews(int id) {
-        News news = newsRep.findById(id).get();
+        News news = newsRep.findByIdAndWorkplaceId(id, getUserContext().getWorkplaceId()).get();
         if (news != null) {
             try {
                 news.setIsDeleted(true);
@@ -173,11 +176,11 @@ public class NewsServiceImpl implements NewsService {
         List<ImageNewsDTO> listNews = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar c = Calendar.getInstance();
-        List<News> news = newsRep.findByIsDeleted(false);
+        List<News> news = newsRep.findByIsDeletedAndWorkplaceId(false, getUserContext().getWorkplaceId());
         try {
             c.setTime(sdf.parse(endDate));
             c.add(Calendar.DATE, 1);
-            news = newsRep.findNewstByDateCreated(sdf.parse(startDate), c.getTime());
+            news = newsRep.findNewstByDateCreated(sdf.parse(startDate), c.getTime(), getUserContext().getWorkplaceId());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,14 +199,14 @@ public class NewsServiceImpl implements NewsService {
         });
         return listNews;
     }
-    
+
     @Override
     public PageSearchDTO<ImageNewsDTO> getLastestNewsList(int pageNum) {
-    	PageSearchDTO<ImageNewsDTO> result = new PageSearchDTO<ImageNewsDTO>();
-    	List<ImageNewsDTO> listNews = new ArrayList<>();
-    	Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
-    	Page<News> news = newsRep.findLastestNews(getUserContext().getWorkplaceId(),pageRequest);
-    	news.getContent().forEach(element -> {
+        PageSearchDTO<ImageNewsDTO> result = new PageSearchDTO<ImageNewsDTO>();
+        List<ImageNewsDTO> listNews = new ArrayList<>();
+        Pageable pageRequest = PageRequest.of(pageNum, MAXPAGESIZE);
+        Page<News> news = newsRep.findLastestNews(getUserContext().getWorkplaceId(), pageRequest);
+        news.getContent().forEach(element -> {
             try {
                 ImageNewsDTO dto = new ImageNewsDTO();
                 BeanUtils.copyProperties(element, dto);
@@ -216,8 +219,8 @@ public class NewsServiceImpl implements NewsService {
                 e.printStackTrace();
             }
         });
-    	result.setMaxPage(news.getTotalPages());
-    	result.setObjList(listNews);
-    	return result;
+        result.setMaxPage(news.getTotalPages());
+        result.setObjList(listNews);
+        return result;
     }
 }
