@@ -1,7 +1,8 @@
 package com.fpt.officelink.service;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +81,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		targets = filterDuplicate(targets);
 		targetRep.saveAll(targets);
 
-		config.setDateCreated(new Date());
+		Date date = new Date(Calendar.getInstance().getTimeInMillis());
+		
+		config.setDateCreated(date);
+		config.setDateModified(date);
 		configRep.save(config);
 
 		// update schedule
@@ -92,7 +96,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Transactional
 	@Override
 	public boolean modifyConfig(Configuration config, List<SurveySendTarget> targets) {
-		config.setDateModified(new Date());
+		config.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		configRep.save(config);
 
 		targetRep.deleteBySurveyId(config.getSurvey().getId());
@@ -111,7 +115,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			return false;
 		}
 
-		config.setDateModified(new Date());
+		config.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		config.setDeleted(true);
 		configRep.save(config);
 		// update schedule
@@ -207,7 +211,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		Configuration config = configRep.findById(id).get();
 
 		config.setActive(isActive);
-		config.setDateModified(new Date());
+		config.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
 		configRep.save(config);
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());

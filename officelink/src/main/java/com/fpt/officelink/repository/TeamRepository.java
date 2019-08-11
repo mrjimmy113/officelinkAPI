@@ -15,7 +15,7 @@ import com.fpt.officelink.entity.Team;
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Integer>{
 	
-	@Query("SELECT t FROM Team t WHERE t.name LIKE %:name% AND t.isDeleted = :isDeleted AND t.department.workplace.id = :workplaceId ORDER BY t.dateModified DESC, t.dateCreated DESC")
+	@Query("SELECT t FROM Team t WHERE t.name LIKE %:name% AND t.isDeleted = :isDeleted AND t.department.workplace.id = :workplaceId ORDER BY t.dateModified DESC")
 	Page<Team> searchWithPaging(
 			@Param("name") String name,
 			@Param("isDeleted") boolean isDeleted,

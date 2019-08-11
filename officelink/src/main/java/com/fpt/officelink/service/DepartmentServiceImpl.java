@@ -43,7 +43,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 		if (opDep.isPresent()) {
 			return false;
 		} else {
-			dep.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date date = new Date(Calendar.getInstance().getTimeInMillis());
+			dep.setDateCreated(date);
+			dep.setDateModified(date);
 			depRep.save(dep);
 			return true;
 		}

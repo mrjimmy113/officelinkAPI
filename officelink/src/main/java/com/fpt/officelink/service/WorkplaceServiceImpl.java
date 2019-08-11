@@ -53,7 +53,9 @@ public class WorkplaceServiceImpl implements WorkplaceService {
 		if (opDep.isPresent()) {
 			return false;
 		} else {
-			workp.setDateCreated(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date date = new Date(Calendar.getInstance().getTimeInMillis());
+			workp.setDateCreated(date);
+			workp.setDateModified(date);
 			workpRep.save(workp);
 			return true;
 		}

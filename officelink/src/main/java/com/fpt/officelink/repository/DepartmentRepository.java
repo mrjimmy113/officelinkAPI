@@ -43,7 +43,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 	@Query(value= "SELECT d FROM Department d WHERE d.id = :id AND d.workplace.id = :workplaceId")
     Department findByIdAndWorkplaceId(@Param("id") Integer id, @Param("workplaceId") Integer workplaceId) ;
 	
-    @Query("Select d from Department d where d.name like %:name% and d.isDeleted = :isDeleted and d.workplace.id = :workplaceId ORDER BY d.dateModified DESC, d.dateCreated DESC")
+    @Query("Select d from Department d where d.name like %:name% and d.isDeleted = :isDeleted and d.workplace.id = :workplaceId ORDER BY d.dateModified DESC")
     Page<Department> searchWithPaging(
             @Param("name") String name,
             @Param("isDeleted") Boolean isDeleted,
