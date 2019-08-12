@@ -32,7 +32,7 @@ public class SystemTaskExecutor {
 	public void sentRoutineSurvey(Configuration config) {
 		try {
 
-//			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
+			surveyService.sendRoutineSurvey(config.getSurvey().getId(), config.getDuration());
 
 			String msg = String.format("Successfully sent scheduled survey for %s, survey name: %s, time sent: %s",
 					config.getWorkplace().getName(), config.getSurvey().getName(), new java.util.Date().toString());
