@@ -158,7 +158,7 @@ public class ReportController {
 		Optional<SurveyQuestion> opSurQuest = reportSer.getDownloadDetail(token);
 		if(opSurQuest.isPresent()) {
 			SurveyQuestion surQuest = opSurQuest.get();
-			rep.setHeader("Content-Disposition", "attachment; filename="+surQuest.getSurvey().getName()+".docx");
+			rep.setHeader("Content-Disposition", "attachment; filename="+surQuest.getSurvey().getName()+".txt");
 			PrintWriter pw = rep.getWriter();
 			pw.println("Question: " + surQuest.getQuestion().getQuestion());
 			List<AnswerOption> options = surQuest.getQuestion().getOptions();
@@ -173,7 +173,7 @@ public class ReportController {
 			}
 			pw.flush();
 			pw.close();
-			
+			                    
 		}
 	}
 	
