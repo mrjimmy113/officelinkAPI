@@ -2,6 +2,7 @@ package com.fpt.officelink.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 			@Param("isDeleted") Boolean isDeleted);
 	
 	@Query("SELECT t FROM Team t WHERE t.department.id = :id AND t.isDeleted = false")
-	List<Team> findAllByDepartmentId(@Param("id") Integer id);
+	Set<Team> findAllByDepartmentId(@Param("id") Integer id);
 	
 	@Query("SELECT t FROM Team t WHERE t.isDeleted = :isDeleted AND t.department.workplace.id = :workplaceId")
 	List<Team> findAllByWorkplaceId(
@@ -43,10 +44,10 @@ public interface TeamRepository extends JpaRepository<Team, Integer>{
 	List<Team> findAllByIsDeleted(Boolean isDeleted);
 
 	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :id AND t.isDeleted = false")
-	List<Team> findAllByLocationId(@Param("id") Integer id);
+	Set<Team> findAllByLocationId(@Param("id") Integer id);
 	
 	@Query("SELECT t FROM Team t JOIN t.accounts a WHERE a.location.id = :locationId AND t.department.id = :depId AND t.isDeleted = false")
-	List<Team> findAllByLocationIdAndDepartmentId(@Param("locationId") Integer locationId,@Param("depId") Integer depId);
+	Set<Team> findAllByLocationIdAndDepartmentId(@Param("locationId") Integer locationId,@Param("depId") Integer depId);
 
 	@Query("SELECT COUNT(t) FROM Team t WHERE t.department.workplace.id = :id AND t.isDeleted = false")
 	int countByWorkplaceId(@Param("id") Integer id);

@@ -155,7 +155,7 @@ public class ReportServiceImpl implements ReportService {
 						departments.add(target.getDepartment());
 						teams.addAll(teamRep.findAllByLocationIdAndDepartmentId(target.getLocation().getId(),
 								target.getDepartment().getId()));
-					} else if (target.getDepartment() != null && target.getLocation() != null
+					} else if (target.getDepartment() != null
 							&& target.getTeam() != null) {
 						teams.add(target.getTeam());
 					}
