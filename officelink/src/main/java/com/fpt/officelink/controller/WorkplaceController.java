@@ -142,4 +142,18 @@ public class WorkplaceController {
 		
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
+	
+	@Secured({"ROLE_system_admin"})
+	@GetMapping("/status")
+	public ResponseEntity<Integer> changeActiveStatus(@RequestParam("id") int id, @RequestParam("active") boolean active){
+		HttpStatus status = null;
+		try {
+			workpService.changeActiveStatus(id, active);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<Integer>(status.value(), status);
+	}
 }

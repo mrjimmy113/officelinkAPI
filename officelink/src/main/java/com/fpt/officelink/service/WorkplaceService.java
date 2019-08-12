@@ -19,4 +19,6 @@ public interface WorkplaceService {
 	boolean modifyWorkplace(Workplace workp);
 	
 	boolean removeWorkplace(int id);
+	
+	boolean changeActiveStatus(int id, boolean status);
 }
