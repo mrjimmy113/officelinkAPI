@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.sql.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public List<Team> getTeamByDepartmentId(Integer id) {
-		return teamRep.findAllByDepartmentId(id);
+		return new ArrayList<Team>(teamRep.findAllByDepartmentId(id));
 	}
 
 
