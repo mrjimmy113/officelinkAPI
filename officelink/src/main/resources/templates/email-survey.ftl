@@ -13,7 +13,8 @@
 </head>
 <body style="margin: 0; padding: 0;">
 
-<h2 style="align-content: center; color: darkturquoise">OFFICE LINK</h2><br/>
+<img src="http://webshop.officelink.no/htdocs/images/logo.png" alt="" width="500px" height="200px"/>
+<br/>
 
 <span>Hello!</span><br/>
 <span>You have received a request to take a survey, please click the button to process</span><br/>
@@ -28,7 +29,6 @@
   margin: 4px 2px;
   cursor: pointer;"  href="${link}">Do Survey</a> <br/>
 
-<span>or Go to ${link}</span>
 
 
 

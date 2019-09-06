@@ -18,17 +18,6 @@ public class Account implements Serializable {
     @Column
     private boolean isDeleted;
 
-//    @Column
-//    private String address;
-//
-//    public String getAddress() {
-//        return address;
-//    }
-//
-//    public void setAddress(String address) {
-//        this.address = address;
-//    }
-
     @ManyToOne
     @JoinColumn(name = "workplace_id", nullable = false)
     private Workplace workplace;

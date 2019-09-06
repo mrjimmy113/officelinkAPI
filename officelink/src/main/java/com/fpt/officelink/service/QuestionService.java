@@ -4,14 +4,13 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.fpt.officelink.entity.Category;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.entity.TypeQuestion;
 
 public interface QuestionService {
 
 	List<TypeQuestion> getAllType();
-
-	void addNewQuestion(Question q, Integer typeId);
 
 	Page<Question> searchWithPagination(String term, int pageNum);
 
@@ -20,5 +19,9 @@ public interface QuestionService {
 	Page<Question> searchWithTermAndType(String term, Integer type, int pageNum);
 
 	Page<Question> searchWithPaginationSystemWorkplace(String term, int page);
+
+	List<Category> getAllCategory();
+
+	void addNewQuestion(Question q, Integer typeId, Integer categoryId);
 
 }

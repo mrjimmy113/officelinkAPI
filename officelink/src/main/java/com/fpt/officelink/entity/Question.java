@@ -58,6 +58,10 @@ public class Question implements Serializable {
 	
 	@Column
 	private Date dateDeleted;
+	
+	@ManyToOne
+	@JoinColumn(name = "category_id")
+	private Category category;
 
 	public Integer getId() {
 		return id;
@@ -138,6 +142,15 @@ public class Question implements Serializable {
 	public void setDateDeleted(Date dateDeleted) {
 		this.dateDeleted = dateDeleted;
 	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+	
 	
 	
 

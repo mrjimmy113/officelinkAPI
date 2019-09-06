@@ -324,10 +324,14 @@ public class SurveyController {
 				targets.add(targetEntity);
 
 			});
-			ser.sendOutSurvey(target.getSurveyId(), configService.filterDuplicate(targets), target.getDuration(),
+			boolean result = ser.sendOutSurvey(target.getSurveyId(), configService.filterDuplicate(targets), target.getDuration(),
 					getUserContext().getWorkplaceId());
-
-			status = HttpStatus.OK;
+			if(result) {
+				status = HttpStatus.OK;
+			}else {
+				status = HttpStatus.ACCEPTED;
+			}
+			
 		} catch (Exception e) {
 			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;

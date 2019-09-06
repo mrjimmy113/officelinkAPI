@@ -284,6 +284,34 @@ public class SurveyServiceImpl implements SurveyService {
 		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(surveyId,getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
+			Set<Account> sendList = new HashSet<Account>();
+			for (SurveySendTarget target : targets) {
+				target.setSurvey(survey);
+				if (target.isNeed()) {
+					if (target.getDepartment() == null && target.getLocation() == null
+							&& target.getTeam() == null) {
+						sendList.addAll(accRep.findAllEmail(workplaceId, false));
+					} else if (target.getDepartment() != null && target.getLocation() == null
+							&& target.getTeam() == null) {
+						sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(),
+								workplaceId, false));
+					} else if (target.getDepartment() == null && target.getLocation() != null
+							&& target.getTeam() == null) {
+						sendList.addAll(
+								accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
+					} else if (target.getDepartment() != null && target.getLocation() != null
+							&& target.getTeam() == null) {
+						sendList.addAll(
+								accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
+										target.getDepartment().getId(), workplaceId, false));
+					} else if (target.getDepartment() != null && target.getTeam() != null) {
+						sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
+					}
+				}
+			}
+			if (sendList.size() == 0) {
+				return false;
+			}	
 			if (!survey.isSent()) {
 				survey.setActive(true);
 				survey.setSent(true);
@@ -292,33 +320,7 @@ public class SurveyServiceImpl implements SurveyService {
 				survey.setDateSendOut(date);
 				c.add(Calendar.DATE, duration);
 				survey.setDateStop(new Date(c.getTimeInMillis()));
-				Set<Account> sendList = new HashSet<Account>();
-				for (SurveySendTarget target : targets) {
-					target.setSurvey(survey);
-					if (target.isNeed()) {
-						if (target.getDepartment() == null && target.getLocation() == null
-								&& target.getTeam() == null) {
-							sendList.addAll(accRep.findAllEmail(workplaceId, false));
-						} else if (target.getDepartment() != null && target.getLocation() == null
-								&& target.getTeam() == null) {
-							sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(),
-									workplaceId, false));
-						} else if (target.getDepartment() == null && target.getLocation() != null
-								&& target.getTeam() == null) {
-							sendList.addAll(
-									accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
-						} else if (target.getDepartment() != null && target.getLocation() != null
-								&& target.getTeam() == null) {
-							sendList.addAll(
-									accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
-											target.getDepartment().getId(), workplaceId, false));
-						} else if (target.getDepartment() != null && target.getTeam() != null) {
-							sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
-						}
-					}
-				}
-				if (sendList.size() == 0)
-					return false;
+				
 				survey.setSentOut(sendList.size());
 				surveyRep.save(survey);
 				targetRep.saveAll(targets);

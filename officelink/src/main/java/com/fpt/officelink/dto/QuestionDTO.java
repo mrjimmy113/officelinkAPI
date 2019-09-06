@@ -22,6 +22,8 @@ public class QuestionDTO {
 	private boolean required;
 	
 	private Date dateCreated;
+	
+	private CategoryDTO category;
 
 	public Integer getId() {
 		return id;
@@ -95,10 +97,11 @@ public class QuestionDTO {
 		this.dateCreated = dateCreated;
 	}
 
-	
-	
-	
-	
-	
-	
+	public CategoryDTO getCategory() {
+		return category;
+	}
+
+	public void setCategory(CategoryDTO category) {
+		this.category = category;
+	}
 }

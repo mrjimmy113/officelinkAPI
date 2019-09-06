@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.CategoryDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.Category;
 import com.fpt.officelink.entity.Question;
 import com.fpt.officelink.service.QuestionService;
 
@@ -121,7 +123,7 @@ public class QuestionController {
 				options.add(tmp);
 			});
 			q.setOptions(options);
-			qSer.addNewQuestion(q, dto.getType().getId());
+			qSer.addNewQuestion(q, dto.getType().getId(), dto.getCategory().getId());
 			status = HttpStatus.CREATED;
 		} catch (Exception e) {
 			status = HttpStatus.BAD_REQUEST;
@@ -197,6 +199,25 @@ public class QuestionController {
 		}
 
  		return new ResponseEntity<PageSearchDTO<QuestionDTO>>(res, status);
+	}
+	
+	@Secured({"ROLE_employer","ROLE_system_admin"})
+	@GetMapping("/category")
+	public ResponseEntity<List<CategoryDTO>> getAllCategory() {
+		HttpStatus status = null;
+		List<CategoryDTO> res = new ArrayList<CategoryDTO>();
+		try {
+			List<Category> categories = qSer.getAllCategory();
+			for (Category category : categories) {
+				CategoryDTO dto = new CategoryDTO();
+				BeanUtils.copyProperties(category, dto);
+				res.add(dto);
+			}
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<CategoryDTO>>(res,status);
 	}
 
 }
