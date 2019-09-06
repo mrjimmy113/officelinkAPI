@@ -3,12 +3,10 @@ package com.fpt.officelink.entity;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +45,10 @@ public class Answer implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	private Account account;
+	
+	@ManyToOne
+	@JoinColumn(name = "assign_id")
+	private AssignmentHistory assignmentHistory;
 
 	public Integer getId() {
 		return id;
@@ -106,8 +108,12 @@ public class Answer implements Serializable {
 		this.multiple = multiple;
 	}
 
-	
-	
-	
+	public AssignmentHistory getAssignmentHistory() {
+		return assignmentHistory;
+	}
+
+	public void setAssignmentHistory(AssignmentHistory assignmentHistory) {
+		this.assignmentHistory = assignmentHistory;
+	}
 
 }

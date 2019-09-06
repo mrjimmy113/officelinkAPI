@@ -165,7 +165,6 @@ public class AccountController {
     @Secured({"ROLE_employer","ROLE_system_admin"})
     @GetMapping(value = "/getAccountAssign")
     public ResponseEntity<AccountDTO> getAccountAssign(@RequestParam("id") Integer id){
-        CustomUser user = getUserContext();
         HttpStatus httpStatus = null;
         AccountDTO dto = new AccountDTO();
 
@@ -349,7 +348,6 @@ public class AccountController {
                 String emailTo = dto.getEmail();
 
                 listEmail.add(emailTo);
-                Integer role_id = dto.getRole_id();
 
                 token = jwt.createTokenWithAccount(dto);
                 model.put("link", angularPath+"/confirm/" + token);
@@ -372,9 +370,7 @@ public class AccountController {
     @PostMapping(value = "/sendMailReset")
     public ResponseEntity<Number> sendMailResetPassword(@RequestBody String email){
         HttpStatus status = null;
-        AccountDTO dto = new AccountDTO();
         String token = null;
-        Map<String, Object> model = new HashMap<>();
         List<String> listEmail = new ArrayList<>();
         try{
             boolean res = service.checkAccountExisted(email);
@@ -564,7 +560,6 @@ public class AccountController {
     @Secured({"ROLE_employer","ROLE_system_admin"})
     @PostMapping("/checkEmailExisted")
     public ResponseEntity<Number> checkEmailExisted(@RequestBody String email) {
-        CustomUser user = getUserContext();
         HttpStatus status = null;
         try {
 

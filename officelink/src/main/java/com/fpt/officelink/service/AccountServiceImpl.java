@@ -25,6 +25,7 @@ import com.fpt.officelink.dto.AccountDTO;
 import com.fpt.officelink.dto.AuthDTO;
 import com.fpt.officelink.dto.WorkplaceDTO;
 import com.fpt.officelink.entity.Account;
+import com.fpt.officelink.entity.AssignmentHistory;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Location;
 import com.fpt.officelink.entity.Role;
@@ -32,6 +33,7 @@ import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
+import com.fpt.officelink.repository.AssignmentHistoryRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.RoleRepository;
 import com.fpt.officelink.repository.WorkplaceRepository;
@@ -40,8 +42,6 @@ import com.nimbusds.jose.JOSEException;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-
-    private static final int PAGEMAXSIZE = 9;
     
     @Value("${angular.path}")
 	private String angularPath;
@@ -66,6 +66,9 @@ public class AccountServiceImpl implements AccountService {
     
     @Autowired
     MailService mailService;
+    
+    @Autowired
+    AssignmentHistoryRepository historyRep;
 
 
     public PasswordEncoder passwordEncoder(){
@@ -311,6 +314,7 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     public void assignMember(int locationId, int[] teamIdList, int accountId) {
+    	AssignmentHistory assignmentHistory = new AssignmentHistory();
     	Location location = new Location();
     	location.setId(locationId);
     	List<Team> teams = new ArrayList<Team>();
@@ -325,7 +329,18 @@ public class AccountServiceImpl implements AccountService {
     		acc.setLocation(location);
     		acc.setTeams(new HashSet<Team>(teams));
     		acc.setDateModified(new Date());
+    		
+    		assignmentHistory.setAccount(acc);
+    		assignmentHistory.setLocation(location);
+    		assignmentHistory.setTeams(new HashSet<Team>(teams));
+    		assignmentHistory.setDateCreated(new java.sql.Date(System.currentTimeMillis()));
+    		historyRep.save(assignmentHistory);
+    		
+    		acc.setCurrentAssign(assignmentHistory);
     		accountRespository.save(acc);
+    		
+    		
+    		
     	}
     }
 

@@ -1,11 +1,23 @@
 package com.fpt.officelink.entity;
 
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Account implements Serializable {
@@ -46,14 +58,10 @@ public class Account implements Serializable {
 
     @Column
     private boolean isActivated;
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    
+    @OneToOne
+    @JoinColumn(name = "assign_id")
+    private AssignmentHistory currentAssign; 
 
     @ManyToMany
 	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
@@ -62,7 +70,14 @@ public class Account implements Serializable {
     
     @OneToMany(mappedBy = "account")
     private Set<Answer> answers = new HashSet<Answer>();
+    
+    public Role getRole() {
+        return role;
+    }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public boolean isDeleted() {
         return isDeleted;
@@ -167,6 +182,16 @@ public class Account implements Serializable {
 
 	public void setAnswers(Set<Answer> answers) {
 		this.answers = answers;
+	}
+	
+	
+
+	public AssignmentHistory getCurrentAssign() {
+		return currentAssign;
+	}
+
+	public void setCurrentAssign(AssignmentHistory currentAssign) {
+		this.currentAssign = currentAssign;
 	}
 
 	@Override
