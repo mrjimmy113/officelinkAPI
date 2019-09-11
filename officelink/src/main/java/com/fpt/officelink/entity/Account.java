@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -68,8 +67,6 @@ public class Account implements Serializable {
 			@JoinColumn(name = "team_id") })
 	private Set<Team> teams = new HashSet<Team>();
     
-    @OneToMany(mappedBy = "account")
-    private Set<Answer> answers = new HashSet<Answer>();
     
     public Role getRole() {
         return role;
@@ -175,16 +172,6 @@ public class Account implements Serializable {
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
     }
-
-	public Set<Answer> getAnswers() {
-		return answers;
-	}
-
-	public void setAnswers(Set<Answer> answers) {
-		this.answers = answers;
-	}
-	
-	
 
 	public AssignmentHistory getCurrentAssign() {
 		return currentAssign;

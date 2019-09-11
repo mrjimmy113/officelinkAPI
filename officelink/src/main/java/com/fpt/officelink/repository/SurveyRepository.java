@@ -41,7 +41,7 @@ public interface SurveyRepository extends JpaRepository<Survey, Integer> {
 	@Query("SELECT s FROM Survey s WHERE s.name LIKE %:term% AND s.workplace.id = :id OR s.isTemplate = true AND s.isDeleted = false AND s.templateId = null ORDER BY s.dateModified")
 	Page<Survey> findAllTemplateSurvey(@Param("term") String term, @Param("id") Integer workplaceId, Pageable pageable);
 
-	@Query("SELECT sq.survey FROM SurveyQuestion sq LEFT JOIN sq.answers a WHERE sq.survey.name LIKE %:term% AND a.account.email = :email AND sq.survey.workplace.id = :workplaceId AND sq.survey.isSent = true GROUP BY sq.survey.id ORDER BY sq.survey.dateSendOut")
+	@Query("SELECT sq.survey FROM SurveyQuestion sq LEFT JOIN sq.answers a WHERE sq.survey.name LIKE %:term% AND a.assignmentHistory.account.email = :email AND sq.survey.workplace.id = :workplaceId AND sq.survey.isSent = true GROUP BY sq.survey.id ORDER BY sq.survey.dateSendOut")
 	Page<Survey> findReportableSurvey(@Param("term") String term, @Param("workplaceId") Integer workplaceId,
 			@Param("email") String email, Pageable pageable);
 

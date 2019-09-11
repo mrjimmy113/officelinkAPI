@@ -1,13 +1,15 @@
 insert into type_question value(1,"SINGLE");
 insert into type_question value(2,"MULTIPLE");
 insert into type_question value(3,"TEXT");
+insert into type_question value(4,"RATE");
+insert into type_question value(5,"VAS");
 
 INSERT INTO role VALUES (1, "employer"), (2, "employee"), (3, "system_admin");
 
 INSERT INTO workplace VALUES (1,NULL,NULL,'\0',"Office Link System Dummie");
 
 /*Pass System admin 123456*/
-INSERT INTO account VALUES (1,NULL,NULL,"officelink@gmail.com","Office Link System Dummie",1,0,"","$2a$10$tiD920g0y5mgxnG1/QPvaO/63Ct1HotA/4Lq1dzIxi1zXR5y4yzfu",NULL,3,1);
+INSERT INTO account VALUES (1,NULL,NULL,"officelink@gmail.com","Office Link System Dummie",1,0,"","$2a$10$tiD920g0y5mgxnG1/QPvaO/63Ct1HotA/4Lq1dzIxi1zXR5y4yzfu",NULL,NULL,3,1);
 
 INSERT INTO configuration VALUES (1,NULL,NULL,0, b'1','\0',"0 5 0 * * *",NULL,1);
 

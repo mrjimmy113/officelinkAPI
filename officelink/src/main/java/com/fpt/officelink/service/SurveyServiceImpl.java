@@ -433,8 +433,13 @@ public class SurveyServiceImpl implements SurveyService {
 			Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
 			dto.getAnswers().forEach(a -> {
 				Answer entity = new Answer();
-				entity.setAccount(acc);
+				entity.setAssignmentHistory(acc.getCurrentAssign());
 				entity.setContent(a.getContent());
+				entity.setPoint(a.getPoint());
+				if(entity.getPoint() == 0) {
+					//Sentiment Analysis
+					entity.setPoint(5);
+				}
 				SurveyQuestion sq = new SurveyQuestion();
 				sq.setId(a.getQuestionIdentity());
 				entity.setSurveyQuestion(sq);

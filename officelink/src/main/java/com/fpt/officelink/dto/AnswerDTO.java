@@ -6,6 +6,7 @@ public class AnswerDTO {
 	private Integer accountId;
 	private Integer questionIdentity;
 	private String questionType;
+	private float point;
 	public Integer getId() {
 		return id;
 	}
@@ -35,6 +36,12 @@ public class AnswerDTO {
 	}
 	public void setQuestionType(String questionType) {
 		this.questionType = questionType;
+	}
+	public float getPoint() {
+		return point;
+	}
+	public void setPoint(float point) {
+		this.point = point;
 	}
 	
 	

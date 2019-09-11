@@ -43,12 +43,11 @@ public class Answer implements Serializable {
 	private List<MultipleAnswer> multiple;
 	
 	@ManyToOne
-	@JoinColumn(name = "account_id")
-	private Account account;
-	
-	@ManyToOne
 	@JoinColumn(name = "assign_id")
 	private AssignmentHistory assignmentHistory;
+	
+	@Column
+	private float point;
 
 	public Integer getId() {
 		return id;
@@ -83,15 +82,6 @@ public class Answer implements Serializable {
 	}
 
 
-
-	public Account getAccount() {
-		return account;
-	}
-
-	public void setAccount(Account account) {
-		this.account = account;
-	}
-
 	public List<WordCloud> getWordClouds() {
 		return wordClouds;
 	}
@@ -115,5 +105,15 @@ public class Answer implements Serializable {
 	public void setAssignmentHistory(AssignmentHistory assignmentHistory) {
 		this.assignmentHistory = assignmentHistory;
 	}
+
+	public float getPoint() {
+		return point;
+	}
+
+	public void setPoint(float point) {
+		this.point = point;
+	}
+	
+	
 
 }

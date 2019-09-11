@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fpt.officelink.dto.AnswerDTO;
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.CategoryDTO;
 import com.fpt.officelink.dto.ConfigurationDTO;
 import com.fpt.officelink.dto.PageSearchDTO;
 import com.fpt.officelink.dto.QuestionDTO;
@@ -31,6 +32,7 @@ import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.AnswerOption;
+import com.fpt.officelink.entity.Category;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
@@ -151,7 +153,7 @@ public class SurveyController {
 				SurveyQuestion tmpSQ = new SurveyQuestion();
 				tmpSQ.setQuestionIndex(q.getQuestionIndex());
 				List<AnswerOption> options = new ArrayList<AnswerOption>();
-				if (q.getOptions() != null) {
+				if (q.getOptions() != null && !q.getOptions().isEmpty()) {
 					q.getOptions().forEach(o -> {
 						AnswerOption tmpOp = new AnswerOption();
 						BeanUtils.copyProperties(o, tmpOp);
@@ -162,6 +164,8 @@ public class SurveyController {
 				tmpQ.setOptions(options);
 				TypeQuestion tmpType = new TypeQuestion();
 				BeanUtils.copyProperties(q.getType(), tmpType);
+				Category tmpCate = new Category();
+				BeanUtils.copyProperties(q.getCategory(), tmpCate);
 				tmpQ.setType(tmpType);
 				tmpSQ.setQuestion(tmpQ);
 				tmpSQ.setRequired(q.isRequired());
@@ -174,6 +178,7 @@ public class SurveyController {
 				status = HttpStatus.CONFLICT;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.warning(e.getMessage());
 			status = HttpStatus.BAD_REQUEST;
 		}
@@ -262,6 +267,9 @@ public class SurveyController {
 				dto.setOptions(opList);
 				TypeQuestionDTO typeDto = new TypeQuestionDTO();
 				BeanUtils.copyProperties(e.getType(), typeDto);
+				CategoryDTO cateDto = new CategoryDTO();
+				BeanUtils.copyProperties(e.getCategory(), cateDto);
+				dto.setCategory(cateDto);
 				dto.setType(typeDto);
 				dto.setRequired(r.isRequired());
 				res.add(dto);
