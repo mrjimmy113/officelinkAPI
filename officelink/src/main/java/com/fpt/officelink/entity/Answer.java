@@ -48,6 +48,19 @@ public class Answer implements Serializable {
 	
 	@Column
 	private float point;
+	
+	
+	
+
+	public Answer() {
+		super();
+	}
+
+	public Answer(Integer id, String content, float point) {
+		this.id = id;
+		this.content = content;
+		this.point = point;
+	}
 
 	public Integer getId() {
 		return id;

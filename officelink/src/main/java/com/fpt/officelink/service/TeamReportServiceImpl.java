@@ -94,20 +94,20 @@ public class TeamReportServiceImpl implements TeamReportService {
 					// get team's answer of survey question
 					
 					// get team's answer report
-					switch (sQuestion.getQuestion().getType().getType()) {
-					case MULTIPLE:
-						arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-						break;
-					case SINGLE:
-						arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-						break;
-					case TEXT:
-						arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
-						break;
-					}
+//					switch (sQuestion.getQuestion().getType().getType()) {
+//					case MULTIPLE:
+//						arList = multiRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+//						break;
+//					case SINGLE:
+//						arList = singleRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+//						break;
+//					case TEXT:
+//						arList = textRep.findAllByIndentityAndTeamId(sQuestion.getId(), team.getId());
+//						break;
+//					}
 					
 					// Save report
-					questionReport.addAnswerReport(arList);
+//					questionReport.addAnswerReport(arList);
 					teamQuestionReportRep.save(questionReport);
 				}
 			}

@@ -5,6 +5,8 @@ import java.util.List;
 public class QuestionReportDTO {
 	private QuestionDTO question;
 	
+	private float avgPoint;
+	
 	private List<AnswerReportDTO> answers;
 
 	public QuestionDTO getQuestion() {
@@ -22,6 +24,16 @@ public class QuestionReportDTO {
 	public void setAnswers(List<AnswerReportDTO> answers) {
 		this.answers = answers;
 	}
+
+	public float getAvgPoint() {
+		return avgPoint;
+	}
+
+	public void setAvgPoint(float avgPoint) {
+		this.avgPoint = avgPoint;
+	}
+	
+	
 	
 	
 }

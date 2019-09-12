@@ -21,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerOptionDTO;
-import com.fpt.officelink.dto.AnswerReportDTO;
 import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.ImageNewsDTO;
@@ -51,7 +50,10 @@ import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.LocationRepository;
 import com.fpt.officelink.repository.MultipleAnswerRepository;
 import com.fpt.officelink.repository.NewsRepository;
+import com.fpt.officelink.repository.PointRepository;
+import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SingleChoiceRepository;
+import com.fpt.officelink.repository.SingleChoiceRepository.TmpReport;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
@@ -106,7 +108,13 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired
 	AnswerReportRepository answerReportRep;
+	
+	@Autowired
+	PointRepository pointRep;
 
+	@Autowired
+	QuestionRepository questRep;
+	
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
@@ -320,8 +328,7 @@ public class ReportServiceImpl implements ReportService {
 		if (opSurvey.isPresent()) {
 			List<SurveyQuestion> sqList = surQuestRep.findAllBySurveyId(surveyId);
 			for (SurveyQuestion sq : sqList) {
-				Function<Integer, List<AnswerReport>> method = getReportFunction(locationId, departmentId, teamId,
-						sq.getQuestion().getType().getType());
+				Function<Integer, Float> method = getPointFunction(locationId, departmentId, teamId);
 				result.add(getQuestionDTO(sq.getId(), sq.getQuestion(), method));
 			}
 		}
@@ -335,47 +342,10 @@ public class ReportServiceImpl implements ReportService {
 		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
 		result = getReportFunction(locationId, departmentId, teamId,
 				surveyQuestion.getQuestion().getType().getType()).apply(surveyQuestion.getId());
-		return AnswerReport.filterAnswerReport(result);
+//		return AnswerReport.filterAnswerReport(result);
+		return result;
 	}
 
-	private Function<Integer, List<AnswerReport>> getReportFunctionExpire(int locationId, int departmentId,
-			int teamId) {
-		Function<Integer, List<AnswerReport>> method = null;
-		if (locationId == 0 && departmentId == 0 && teamId == 0) {
-			method = getReportAllFunctionExpire();
-			System.out.println("ALL");
-		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
-			method = identity -> answerReportRep.findAllByIdentityAndLocationId(identity, locationId);
-			System.out.println("Location");
-		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
-			method = identity -> answerReportRep.findAllByIdentityAndDepartmentId(identity, departmentId);
-			System.out.println("Department");
-		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = identity -> answerReportRep.findAllByIdentityAndLocationIdAndDepartmentId(identity, locationId,
-					departmentId);
-			System.out.println("Location - Department");
-		} else if (teamId != 0) {
-			method = identity -> answerReportRep.findAllByIdentityAndTeamId(identity, teamId);
-			System.out.println("Team");
-		}
-		return method;
-	}
-
-	private Function<Integer, List<AnswerReport>> getReportAllFunctionExpire() {
-		Function<Integer, List<AnswerReport>> method = null;
-		Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
-		switch (acc.getRole().getRole()) {
-		case "employer":
-			method = indentity -> answerReportRep.findAllByIdentity(indentity);
-			break;
-
-		case "employee":
-			method = indentity -> answerReportRep.findAllByIdentityAndLocationIdOrDepartmentId(indentity,
-					acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
-			break;
-		}
-		return method;
-	}
 
 	private Function<Integer, List<AnswerReport>> getReportAllFunction(TypeEnum type) {
 		Function<Integer, List<AnswerReport>> method = null;
@@ -383,6 +353,8 @@ public class ReportServiceImpl implements ReportService {
 		switch (acc.getRole().getRole()) {
 		case "employer":
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
 				method = indentity -> singleRep.findAllByIndentity(indentity);
 				break;
@@ -397,9 +369,11 @@ public class ReportServiceImpl implements ReportService {
 
 		case "employee":
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
-				method = indentity -> singleRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
-						acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
+				method = indentity -> tmpToEntity(singleRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
+						acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId()));
 				break;
 			case MULTIPLE:
 				method = indentity -> multiRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
@@ -416,11 +390,9 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	private QuestionReportDTO getQuestionDTO(Integer identity, Question q,
-			Function<Integer, List<AnswerReport>> method) {
+			Function<Integer, Float> method) {
 		QuestionReportDTO result = new QuestionReportDTO();
-		List<AnswerReport> entities = method.apply(identity);
-		entities = AnswerReport.filterAnswerReport(entities);
-		// Change Question to DTO
+		result.setAvgPoint(method.apply(identity));
 		QuestionDTO dto = new QuestionDTO();
 		BeanUtils.copyProperties(q, dto, "type", "options");
 		List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
@@ -434,15 +406,7 @@ public class ReportServiceImpl implements ReportService {
 		BeanUtils.copyProperties(q.getType(), typeDto);
 		dto.setType(typeDto);
 
-		// Change AnswerReport to DTO
-		List<AnswerReportDTO> answerReportDtos = new ArrayList<AnswerReportDTO>();
-		for (AnswerReport entity : entities) {
-			AnswerReportDTO answerReportDto = new AnswerReportDTO();
-			BeanUtils.copyProperties(entity, answerReportDto);
-			answerReportDtos.add(answerReportDto);
-		}
 		result.setQuestion(dto);
-		result.setAnswers(answerReportDtos);
 		return result;
 	}
 
@@ -454,6 +418,8 @@ public class ReportServiceImpl implements ReportService {
 			System.out.println("ALL");
 		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
 				method = indentity -> singleRep.findAllByIndentityAndLocationId(indentity, locationId);
 				break;
@@ -467,8 +433,10 @@ public class ReportServiceImpl implements ReportService {
 			System.out.println("Location");
 		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
-				method = indentity -> singleRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
+				method = indentity -> tmpToEntity(singleRep.findAllByIndentityAndDepartmentId(indentity, departmentId));
 				break;
 			case MULTIPLE:
 				method = indentity -> multiRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
@@ -477,12 +445,15 @@ public class ReportServiceImpl implements ReportService {
 				method = indentity -> textRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
 				break;
 			}
+			
 			System.out.println("Department");
 		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
-				method = indentity -> singleRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
-						departmentId);
+				method = indentity -> tmpToEntity(singleRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
+						departmentId));
 				break;
 			case MULTIPLE:
 				method = indentity -> multiRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
@@ -496,6 +467,8 @@ public class ReportServiceImpl implements ReportService {
 			System.out.println("Location - Department");
 		} else if (teamId != 0) {
 			switch (type) {
+			case RATE:
+			case VAS:
 			case SINGLE:
 				method = indentity -> singleRep.findAllByIndentityAndTeamId(indentity, teamId);
 				break;
@@ -509,6 +482,53 @@ public class ReportServiceImpl implements ReportService {
 			System.out.println("Team");
 		}
 		return method;
+	}
+	
+	private Function<Integer, Float> getPointFunction(int locationId, int departmentId, int teamId) {
+		Function<Integer, Float> method = null;
+		if (locationId == 0 && departmentId == 0 && teamId == 0) {
+			method = getAllPoint();
+			System.out.println("ALL");
+		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
+			method = identity -> pointRep.findAllByIndentityAndLocationId(identity, locationId);
+			System.out.println("Location");
+		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
+			method = identity -> pointRep.findAllByIndentityAndDepartmentId(identity, departmentId);
+			System.out.println("Department");
+		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
+			method = identity -> pointRep.findAllByIndentityAndLocationIdAndDepartmentId(identity, locationId, departmentId);
+			System.out.println("Location - Department");
+		} else if (teamId != 0) {
+			method = identity -> pointRep.findAllByIndentityAndTeamId(identity, teamId);
+			System.out.println("Team");
+		}
+		return method;
+	}
+	
+	private Function<Integer, Float> getAllPoint() {
+		Function<Integer, Float> method = null;
+		Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
+		switch (acc.getRole().getRole()) {
+		case "employer":
+			method = indentity -> pointRep.findAllByIndentity(indentity);
+			break;
+		case "employee":
+			method = indentity -> pointRep.findAllByIndentityAndLocationIdOrDepartmentId(indentity,
+					acc.getLocation().getId(), depRep.findByAccountId(acc.getId()).get(0).getId());
+			break;
+		}
+		return method;
+	}
+
+	public List<AnswerReport> tmpToEntity(List<TmpReport> tmpReport) {
+		List<AnswerReport> report = new ArrayList<AnswerReport>();
+		for (TmpReport t : tmpReport) {
+			AnswerReport r = new AnswerReport();
+			r.setTerm(t.getTerm());
+			r.setWeight((int)t.getWeight());
+			report.add(r);
+		}
+		return report;
 	}
 
 }
