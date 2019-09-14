@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
+import com.fpt.officelink.dto.CategoryReportDTO;
 import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
@@ -28,5 +29,7 @@ public interface ReportService {
 	List<QuestionReportDTO> getFilteredReport(int surveyId, int locationId, int departmentId, int teamId);
 
 	List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId, int teamId);
+
+	List<CategoryReportDTO> getFilteredCateReport(int surveyId, int locationId, int departmentId, int teamId);
 
 }

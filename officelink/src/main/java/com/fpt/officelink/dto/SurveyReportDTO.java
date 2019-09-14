@@ -10,7 +10,7 @@ public class SurveyReportDTO {
 	private Date dateStop;
 	private int receivedAnswer;
 	private int sentOut;
-	private List<QuestionReportDTO> questions;
+	private List<CategoryReportDTO> categories;
 	private List<SendTargetDTO> sendTargets;
 
 	public String getName() {
@@ -21,15 +21,13 @@ public class SurveyReportDTO {
 		this.name = name;
 	}
 
-	public List<QuestionReportDTO> getQuestions() {
-		return questions;
+	public List<CategoryReportDTO> getCategories() {
+		return categories;
 	}
 
-	public void setQuestions(List<QuestionReportDTO> questions) {
-		this.questions = questions;
+	public void setCategories(List<CategoryReportDTO> categories) {
+		this.categories = categories;
 	}
-
-
 
 	public Date getDateSendOut() {
 		return dateSendOut;

@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fpt.officelink.dto.AnswerOptionDTO;
+import com.fpt.officelink.dto.CategoryDTO;
+import com.fpt.officelink.dto.CategoryReportDTO;
 import com.fpt.officelink.dto.DashBoardDTO;
 import com.fpt.officelink.dto.DepartmentDTO;
 import com.fpt.officelink.dto.ImageNewsDTO;
@@ -34,6 +36,7 @@ import com.fpt.officelink.dto.TeamDTO;
 import com.fpt.officelink.dto.TypeQuestionDTO;
 import com.fpt.officelink.entity.Account;
 import com.fpt.officelink.entity.AnswerReport;
+import com.fpt.officelink.entity.Category;
 import com.fpt.officelink.entity.CustomUser;
 import com.fpt.officelink.entity.Department;
 import com.fpt.officelink.entity.Location;
@@ -108,13 +111,13 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired
 	AnswerReportRepository answerReportRep;
-	
+
 	@Autowired
 	PointRepository pointRep;
 
 	@Autowired
 	QuestionRepository questRep;
-	
+
 	private CustomUser getUserContext() {
 		return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
@@ -125,9 +128,9 @@ public class ReportServiceImpl implements ReportService {
 		Survey survey = surRep.findById(surveyId).get();
 		List<SurveySendTarget> targets = null;
 		if (survey.getTemplateId() != null) {
-			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(),true);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(survey.getTemplateId(), true);
 		} else {
-			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId,true);
+			targets = targetRep.findAllBySurveyIdAndIsNeed(surveyId, true);
 		}
 		Set<Location> locations = new HashSet<Location>();
 		Set<Department> departments = new HashSet<Department>();
@@ -163,8 +166,7 @@ public class ReportServiceImpl implements ReportService {
 						departments.add(target.getDepartment());
 						teams.addAll(teamRep.findAllByLocationIdAndDepartmentId(target.getLocation().getId(),
 								target.getDepartment().getId()));
-					} else if (target.getDepartment() != null
-							&& target.getTeam() != null) {
+					} else if (target.getDepartment() != null && target.getTeam() != null) {
 						teams.add(target.getTeam());
 					}
 
@@ -262,10 +264,9 @@ public class ReportServiceImpl implements ReportService {
 			dto.setByte_image(data);
 			result.setNews(dto);
 		}
-		if(surRep.countSendOutSurvey(id) > 0) {
+		if (surRep.countSendOutSurvey(id) > 0) {
 			result.setEndTutorial(true);
 		}
-		
 
 		return result;
 	}
@@ -317,6 +318,7 @@ public class ReportServiceImpl implements ReportService {
 			}
 			result.setSendTargets(sendSurveyDTOs);
 		}
+		result.setCategories(getFilteredCateReport(id, 0, 0, 0));
 
 		return result;
 	}
@@ -334,18 +336,26 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return result;
 	}
-
+	
 	@Override
-	public List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
-			int teamId) {
-		List<AnswerReport> result = new ArrayList<AnswerReport>();
-		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
-		result = getReportFunction(locationId, departmentId, teamId,
-				surveyQuestion.getQuestion().getType().getType()).apply(surveyQuestion.getId());
-//		return AnswerReport.filterAnswerReport(result);
+	public List<CategoryReportDTO> getFilteredCateReport(int surveyId, int locationId, int departmentId, int teamId) {
+		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
+		List<CategoryReportDTO> result = new ArrayList<CategoryReportDTO>();
+		if (opSurvey.isPresent()) {
+			result = getCateReport(surveyId, locationId, departmentId, teamId);
+		}
 		return result;
 	}
 
+	@Override
+ 	public List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
+			int teamId) {
+		List<AnswerReport> result = new ArrayList<AnswerReport>();
+		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
+		result = getReportFunction(locationId, departmentId, teamId, surveyQuestion.getQuestion().getType().getType())
+				.apply(surveyQuestion.getId());
+		return result;
+	}
 
 	private Function<Integer, List<AnswerReport>> getReportAllFunction(TypeEnum type) {
 		Function<Integer, List<AnswerReport>> method = null;
@@ -389,9 +399,9 @@ public class ReportServiceImpl implements ReportService {
 		return method;
 	}
 
-	private QuestionReportDTO getQuestionDTO(Integer identity, Question q,
-			Function<Integer, Float> method) {
+	private QuestionReportDTO getQuestionDTO(Integer identity, Question q, Function<Integer, Float> method) {
 		QuestionReportDTO result = new QuestionReportDTO();
+		result.setIdentity(identity);
 		result.setAvgPoint(method.apply(identity));
 		QuestionDTO dto = new QuestionDTO();
 		BeanUtils.copyProperties(q, dto, "type", "options");
@@ -405,7 +415,11 @@ public class ReportServiceImpl implements ReportService {
 		TypeQuestionDTO typeDto = new TypeQuestionDTO();
 		BeanUtils.copyProperties(q.getType(), typeDto);
 		dto.setType(typeDto);
-
+		
+		CategoryDTO cateDto = new CategoryDTO();
+		BeanUtils.copyProperties(q.getCategory(), cateDto);
+		dto.setCategory(cateDto);
+		
 		result.setQuestion(dto);
 		return result;
 	}
@@ -445,15 +459,15 @@ public class ReportServiceImpl implements ReportService {
 				method = indentity -> textRep.findAllByIndentityAndDepartmentId(indentity, departmentId);
 				break;
 			}
-			
+
 			System.out.println("Department");
 		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
 			switch (type) {
 			case RATE:
 			case VAS:
 			case SINGLE:
-				method = indentity -> tmpToEntity(singleRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
-						departmentId));
+				method = indentity -> tmpToEntity(
+						singleRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId, departmentId));
 				break;
 			case MULTIPLE:
 				method = indentity -> multiRep.findAllByIndentityAndLocationIdAndDepartmentId(indentity, locationId,
@@ -483,7 +497,7 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return method;
 	}
-	
+
 	private Function<Integer, Float> getPointFunction(int locationId, int departmentId, int teamId) {
 		Function<Integer, Float> method = null;
 		if (locationId == 0 && departmentId == 0 && teamId == 0) {
@@ -496,7 +510,8 @@ public class ReportServiceImpl implements ReportService {
 			method = identity -> pointRep.findAllByIndentityAndDepartmentId(identity, departmentId);
 			System.out.println("Department");
 		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
-			method = identity -> pointRep.findAllByIndentityAndLocationIdAndDepartmentId(identity, locationId, departmentId);
+			method = identity -> pointRep.findAllByIndentityAndLocationIdAndDepartmentId(identity, locationId,
+					departmentId);
 			System.out.println("Location - Department");
 		} else if (teamId != 0) {
 			method = identity -> pointRep.findAllByIndentityAndTeamId(identity, teamId);
@@ -504,7 +519,34 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return method;
 	}
-	
+
+	private List<CategoryReportDTO> getCateReport(int surveyId, int locationId, int departmentId,
+			int teamId) {
+		List<CategoryReportDTO> result = new ArrayList<CategoryReportDTO>();
+		List<SurveyQuestion> questions = surQuestRep.findAllBySurveyId(surveyId);
+		for (SurveyQuestion surveyQuestion : questions) {
+			boolean newCate = true;
+			Category tmp = surveyQuestion.getQuestion().getCategory();
+			for (CategoryReportDTO categoryReportDTO : result) {
+				if (categoryReportDTO.getId() == tmp.getId()) {
+					categoryReportDTO.getQuestions().add(getQuestionDTO(surveyQuestion.getId(),
+							surveyQuestion.getQuestion(), getPointFunction(locationId, departmentId, teamId)));
+					newCate = false;
+					break;
+				}
+			}
+			if(newCate) {
+				CategoryReportDTO newOne = new CategoryReportDTO();
+				BeanUtils.copyProperties(tmp, newOne);
+				newOne.getQuestions().add(getQuestionDTO(surveyQuestion.getId(),
+						surveyQuestion.getQuestion(), getPointFunction(locationId, departmentId, teamId)));
+				result.add(newOne);
+			}
+		}
+
+		return result;
+	}
+
 	private Function<Integer, Float> getAllPoint() {
 		Function<Integer, Float> method = null;
 		Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
@@ -525,7 +567,7 @@ public class ReportServiceImpl implements ReportService {
 		for (TmpReport t : tmpReport) {
 			AnswerReport r = new AnswerReport();
 			r.setTerm(t.getTerm());
-			r.setWeight((int)t.getWeight());
+			r.setWeight((int) t.getWeight());
 			report.add(r);
 		}
 		return report;

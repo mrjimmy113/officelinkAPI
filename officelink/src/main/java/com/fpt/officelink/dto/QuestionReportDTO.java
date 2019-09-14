@@ -7,6 +7,8 @@ public class QuestionReportDTO {
 	
 	private float avgPoint;
 	
+	private Integer identity;
+	
 	private List<AnswerReportDTO> answers;
 
 	public QuestionDTO getQuestion() {
@@ -32,6 +34,16 @@ public class QuestionReportDTO {
 	public void setAvgPoint(float avgPoint) {
 		this.avgPoint = avgPoint;
 	}
+
+	public Integer getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(Integer identity) {
+		this.identity = identity;
+	}
+	
+	
 	
 	
 	
