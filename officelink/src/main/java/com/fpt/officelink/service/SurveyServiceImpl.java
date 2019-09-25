@@ -1,5 +1,6 @@
 package com.fpt.officelink.service;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -42,17 +43,17 @@ import com.fpt.officelink.entity.SurveySendTarget;
 import com.fpt.officelink.entity.Team;
 import com.fpt.officelink.entity.Workplace;
 import com.fpt.officelink.enumaration.TypeEnum;
+import com.fpt.officelink.google.NatureLanguageModule;
 import com.fpt.officelink.mail.service.MailService;
 import com.fpt.officelink.repository.AccountRespository;
 import com.fpt.officelink.repository.AnswerOptionRepository;
 import com.fpt.officelink.repository.AnswerRepository;
+import com.fpt.officelink.repository.AssignmentHistoryRepository;
 import com.fpt.officelink.repository.DepartmentRepository;
 import com.fpt.officelink.repository.QuestionRepository;
 import com.fpt.officelink.repository.SurveyQuestionRepository;
 import com.fpt.officelink.repository.SurveyRepository;
 import com.fpt.officelink.repository.SurveySendTargetRepository;
-import com.fpt.officelink.repository.TeamQuestionReportRepository;
-import com.fpt.officelink.repository.WordCloudRepository;
 import com.nimbusds.jose.JOSEException;
 
 @Service
@@ -94,10 +95,7 @@ public class SurveyServiceImpl implements SurveyService {
 	DepartmentRepository depRep;
 
 	@Autowired
-	TeamQuestionReportRepository teamQuestReportRep;
-
-	@Autowired
-	WordCloudRepository a;
+	AssignmentHistoryRepository historyRep;
 
 	@Value("${angular.path}")
 	private String angularPath;
@@ -139,6 +137,7 @@ public class SurveyServiceImpl implements SurveyService {
 				for (AnswerOption op : q.getOptions()) {
 					op.setQuestion(q);
 				}
+				q.setDateCreated(today);
 				questionRep.save(q);
 			} else {
 				Optional<Question> tmp = questionRep.findById(q.getId());
@@ -171,7 +170,8 @@ public class SurveyServiceImpl implements SurveyService {
 		if(opCurSur.isPresent()) {
 			Survey curSur = opCurSur.get();
 			curSur.setName(survey.getName());
-			curSur.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+			Date today = new Date(Calendar.getInstance().getTimeInMillis());
+			curSur.setDateModified(today);
 			surveyRep.save(curSur);
 			surQuestRep.deleteBySurveyId(survey.getId());
 			sqList.forEach(sq -> {
@@ -180,6 +180,7 @@ public class SurveyServiceImpl implements SurveyService {
 					for (AnswerOption op : q.getOptions()) {
 						op.setQuestion(q);
 					}
+					q.setDateCreated(today);
 					questionRep.save(q);
 				} else {
 					Optional<Question> tmp = questionRep.findById(q.getId());
@@ -433,12 +434,17 @@ public class SurveyServiceImpl implements SurveyService {
 			Account acc = accRep.findByEmail(getUserContext().getUsername()).get();
 			dto.getAnswers().forEach(a -> {
 				Answer entity = new Answer();
-				entity.setAssignmentHistory(acc.getCurrentAssign());
+				entity.setAssignmentHistory(historyRep.findFirstByAccountIdOrderByDateCreatedDesc(acc.getId()).get());
 				entity.setContent(a.getContent());
-				entity.setPoint(a.getPoint());
-				if(entity.getPoint() == 0) {
+				if(a.getPoint() == null) {
 					//Sentiment Analysis
-					entity.setPoint(5);
+					try {
+						entity.setPoint(NatureLanguageModule.analyzeSentiment(entity.getContent()));
+					} catch (IOException e) {
+						entity.setPoint(5);
+					}
+				}else {
+					entity.setPoint(a.getPoint());
 				}
 				SurveyQuestion sq = new SurveyQuestion();
 				sq.setId(a.getQuestionIdentity());
@@ -459,7 +465,12 @@ public class SurveyServiceImpl implements SurveyService {
 				}
 				savedAnswer.add(entity);
 			});
-			answerRep.saveAll(savedAnswer);
+			if(checkIfUserTakeSurvey(dto.getSurveyId())) {
+				return;
+			}else {
+				answerRep.saveAll(savedAnswer);
+			}
+			
 		}
 	}
 

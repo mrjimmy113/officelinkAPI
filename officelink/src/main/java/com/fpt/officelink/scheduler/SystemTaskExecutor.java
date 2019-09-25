@@ -11,11 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.fpt.officelink.controller.SurveyController;
 import com.fpt.officelink.entity.Configuration;
 import com.fpt.officelink.entity.Survey;
 import com.fpt.officelink.service.SurveyService;
-import com.fpt.officelink.service.TeamReportService;
 
 @Service
 public class SystemTaskExecutor {
@@ -25,8 +23,6 @@ public class SystemTaskExecutor {
 	@Autowired
 	private SurveyService surveyService;
 
-	@Autowired
-	private TeamReportService teamReportService;
 
 	@Async
 	public void sentRoutineSurvey(Configuration config) {
@@ -67,7 +63,6 @@ public class SystemTaskExecutor {
 			
 			// generate team report for survey
 			try {
-				isSuccess = teamReportService.generateTeamQuestionReport(survey.getId()).get();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

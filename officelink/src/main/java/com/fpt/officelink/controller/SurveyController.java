@@ -167,6 +167,7 @@ public class SurveyController {
 				Category tmpCate = new Category();
 				BeanUtils.copyProperties(q.getCategory(), tmpCate);
 				tmpQ.setType(tmpType);
+				tmpQ.setCategory(tmpCate);
 				tmpSQ.setQuestion(tmpQ);
 				tmpSQ.setRequired(q.isRequired());
 				sqList.add(tmpSQ);

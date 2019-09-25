@@ -67,6 +67,9 @@ import com.nimbusds.jose.JOSEException;
 @Service
 public class ReportServiceImpl implements ReportService {
 
+	private static final int NUMBEROFACCOUNT = 5;
+	
+	
 	@Autowired
 	AccountRespository accRep;
 
@@ -336,9 +339,12 @@ public class ReportServiceImpl implements ReportService {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public List<CategoryReportDTO> getFilteredCateReport(int surveyId, int locationId, int departmentId, int teamId) {
+		if(getNumberOfSent(locationId, departmentId, teamId) < NUMBEROFACCOUNT) {
+			return null;
+		}
 		Optional<Survey> opSurvey = surveyRep.findById(surveyId);
 		List<CategoryReportDTO> result = new ArrayList<CategoryReportDTO>();
 		if (opSurvey.isPresent()) {
@@ -348,7 +354,7 @@ public class ReportServiceImpl implements ReportService {
 	}
 
 	@Override
- 	public List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
+	public List<AnswerReport> getAnswerReport(int surveyId, int questionId, int locationId, int departmentId,
 			int teamId) {
 		List<AnswerReport> result = new ArrayList<AnswerReport>();
 		SurveyQuestion surveyQuestion = surQuestRep.findBySurveyIdAndQuestionId(surveyId, questionId).get();
@@ -402,7 +408,12 @@ public class ReportServiceImpl implements ReportService {
 	private QuestionReportDTO getQuestionDTO(Integer identity, Question q, Function<Integer, Float> method) {
 		QuestionReportDTO result = new QuestionReportDTO();
 		result.setIdentity(identity);
-		result.setAvgPoint(method.apply(identity));
+		Float point = method.apply(identity);
+		if (point == null) {
+			result.setAvgPoint(-1);
+		} else {
+			result.setAvgPoint(point);
+		}
 		QuestionDTO dto = new QuestionDTO();
 		BeanUtils.copyProperties(q, dto, "type", "options");
 		List<AnswerOptionDTO> opList = new ArrayList<AnswerOptionDTO>();
@@ -415,11 +426,11 @@ public class ReportServiceImpl implements ReportService {
 		TypeQuestionDTO typeDto = new TypeQuestionDTO();
 		BeanUtils.copyProperties(q.getType(), typeDto);
 		dto.setType(typeDto);
-		
+
 		CategoryDTO cateDto = new CategoryDTO();
 		BeanUtils.copyProperties(q.getCategory(), cateDto);
 		dto.setCategory(cateDto);
-		
+
 		result.setQuestion(dto);
 		return result;
 	}
@@ -520,8 +531,7 @@ public class ReportServiceImpl implements ReportService {
 		return method;
 	}
 
-	private List<CategoryReportDTO> getCateReport(int surveyId, int locationId, int departmentId,
-			int teamId) {
+	private List<CategoryReportDTO> getCateReport(int surveyId, int locationId, int departmentId, int teamId) {
 		List<CategoryReportDTO> result = new ArrayList<CategoryReportDTO>();
 		List<SurveyQuestion> questions = surQuestRep.findAllBySurveyId(surveyId);
 		for (SurveyQuestion surveyQuestion : questions) {
@@ -535,11 +545,11 @@ public class ReportServiceImpl implements ReportService {
 					break;
 				}
 			}
-			if(newCate) {
+			if (newCate) {
 				CategoryReportDTO newOne = new CategoryReportDTO();
 				BeanUtils.copyProperties(tmp, newOne);
-				newOne.getQuestions().add(getQuestionDTO(surveyQuestion.getId(),
-						surveyQuestion.getQuestion(), getPointFunction(locationId, departmentId, teamId)));
+				newOne.getQuestions().add(getQuestionDTO(surveyQuestion.getId(), surveyQuestion.getQuestion(),
+						getPointFunction(locationId, departmentId, teamId)));
 				result.add(newOne);
 			}
 		}
@@ -562,7 +572,7 @@ public class ReportServiceImpl implements ReportService {
 		return method;
 	}
 
-	public List<AnswerReport> tmpToEntity(List<TmpReport> tmpReport) {
+	private List<AnswerReport> tmpToEntity(List<TmpReport> tmpReport) {
 		List<AnswerReport> report = new ArrayList<AnswerReport>();
 		for (TmpReport t : tmpReport) {
 			AnswerReport r = new AnswerReport();
@@ -571,6 +581,25 @@ public class ReportServiceImpl implements ReportService {
 			report.add(r);
 		}
 		return report;
+	}
+
+	private int getNumberOfSent(int locationId, int departmentId, int teamId) {
+
+		int numberOfAccount = 0;
+
+		if (locationId == 0 && departmentId == 0 && teamId == 0) {
+			numberOfAccount = accRep.findAllEmail(getUserContext().getWorkplaceId(), false).size();
+		} else if (locationId != 0 && departmentId == 0 && teamId == 0) {
+			numberOfAccount = accRep.findAllEmailByLocationId(locationId, getUserContext().getWorkplaceId(), false).size();
+		} else if (locationId == 0 && departmentId != 0 && teamId == 0) {
+			numberOfAccount = accRep.findAllEmailByDepartmentId(departmentId, getUserContext().getWorkplaceId(), false).size();
+		} else if (locationId != 0 && departmentId != 0 && teamId == 0) {
+			numberOfAccount = accRep.findAllEmailByLocationIdAndDepartmentId(departmentId, locationId, getUserContext().getWorkplaceId(), false).size();
+		} else if (teamId != 0) {
+			numberOfAccount = accRep.findAllEmailByTeamId(teamId, getUserContext().getWorkplaceId(), false).size();
+		}
+
+		return numberOfAccount;
 	}
 
 }

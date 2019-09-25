@@ -1,22 +1,14 @@
 package com.fpt.officelink.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 @Entity
-public class AnswerReport implements Serializable {
+public class AnswerReport  {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +20,6 @@ public class AnswerReport implements Serializable {
 	@Column
 	private int weight;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "teamQuestionReport_id")
-	private TeamQuestionReport teamQuestionReport;
 
 	public AnswerReport() {
 		super();
@@ -81,12 +70,5 @@ public class AnswerReport implements Serializable {
 		this.term = term;
 	}
 
-	public TeamQuestionReport getTeamQuestionReport() {
-		return teamQuestionReport;
-	}
-
-	public void setTeamQuestionReport(TeamQuestionReport questionReport) {
-		this.teamQuestionReport = questionReport;
-	}
 
 }

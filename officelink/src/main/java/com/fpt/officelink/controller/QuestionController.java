@@ -58,6 +58,9 @@ public class QuestionController {
 				dto.setOptions(opList);
 				TypeQuestionDTO typeDto = new TypeQuestionDTO();
 				BeanUtils.copyProperties(e.getType(), typeDto);
+				CategoryDTO cateDto = new CategoryDTO();
+				BeanUtils.copyProperties(e.getCategory(), cateDto);
+				dto.setCategory(cateDto);
 				dto.setType(typeDto);
 				dtoList.add(dto);
 			});
@@ -95,6 +98,9 @@ public class QuestionController {
 				dto.setOptions(opList);
 				TypeQuestionDTO typeDto = new TypeQuestionDTO();
 				BeanUtils.copyProperties(e.getType(), typeDto);
+				CategoryDTO cateDto = new CategoryDTO();
+				BeanUtils.copyProperties(e.getCategory(), cateDto);
+				dto.setCategory(cateDto);
 				dto.setType(typeDto);
 				dtoList.add(dto);
 			});
@@ -166,13 +172,13 @@ public class QuestionController {
 	
 	@Secured({"ROLE_employer","ROLE_system_admin"})
 	@GetMapping("/chooseList")
-	public ResponseEntity<PageSearchDTO<QuestionDTO>> getChooseQuestionList(@RequestParam("term") String term, @RequestParam("page") int page){
+	public ResponseEntity<PageSearchDTO<QuestionDTO>> getChooseQuestionList(@RequestParam("term") String term,@RequestParam("type") int typeId,@RequestParam("cate") int categoryId, @RequestParam("page") int page){
 		HttpStatus status = null;
 		PageSearchDTO<QuestionDTO> res = new PageSearchDTO<QuestionDTO>();
 
  		try {
 
- 			Page<Question> result = qSer.searchWithPaginationSystemWorkplace(term, page);
+ 			Page<Question> result = qSer.searchWithCondition(term, typeId, categoryId, page);
 			//Convert to DTO
 			List<QuestionDTO> dtoList = new ArrayList<QuestionDTO>();
 			result.getContent().forEach(e ->  {
@@ -187,6 +193,9 @@ public class QuestionController {
 				dto.setOptions(opList);
 				TypeQuestionDTO typeDto = new TypeQuestionDTO();
 				BeanUtils.copyProperties(e.getType(), typeDto);
+				CategoryDTO cateDto = new CategoryDTO();
+				BeanUtils.copyProperties(e.getCategory(), cateDto);
+				dto.setCategory(cateDto);
 				dto.setType(typeDto);
 				dtoList.add(dto);
 			});
@@ -194,7 +203,7 @@ public class QuestionController {
 			res.setObjList(dtoList);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
-
+			e.printStackTrace();
  			status = HttpStatus.BAD_REQUEST;
 		}
 

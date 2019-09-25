@@ -57,10 +57,6 @@ public class Account implements Serializable {
 
     @Column
     private boolean isActivated;
-    
-    @OneToOne
-    @JoinColumn(name = "assign_id")
-    private AssignmentHistory currentAssign; 
 
     @ManyToMany
 	@JoinTable(name = "account_team", joinColumns = { @JoinColumn(name = "account_id") }, inverseJoinColumns = {
@@ -172,14 +168,6 @@ public class Account implements Serializable {
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
     }
-
-	public AssignmentHistory getCurrentAssign() {
-		return currentAssign;
-	}
-
-	public void setCurrentAssign(AssignmentHistory currentAssign) {
-		this.currentAssign = currentAssign;
-	}
 
 	@Override
 	public int hashCode() {

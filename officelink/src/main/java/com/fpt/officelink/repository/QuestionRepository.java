@@ -19,6 +19,12 @@ public interface QuestionRepository extends JpaRepository<Question, Integer>{
 	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :id AND q.workplace.id = :workplaceId OR q.isTemplate = true AND q.isDeleted = false ORDER BY q.dateCreated DESC")
 	Page<Question> findAllTemplateWithType(@Param("term") String term,@Param("id") Integer id, @Param("workplaceId") Integer workplaceId,Pageable pageable);
 	
+	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.category.id = :id AND q.workplace.id = :workplaceId OR q.isTemplate = true AND q.isDeleted = false ORDER BY q.dateCreated DESC")
+	Page<Question> findAllTemplateWithCategory(@Param("term") String term,@Param("id") Integer id, @Param("workplaceId") Integer workplaceId,Pageable pageable);
+	
+	@Query("SELECT q from Question q WHERE q.question LIKE %:term% AND q.type.id = :type AND q.category.id = :cate AND q.workplace.id = :workplaceId OR q.isTemplate = true AND q.isDeleted = false ORDER BY q.dateCreated DESC")
+	Page<Question> findAllTemplateWithTypeAndCategory(@Param("term") String term,@Param("type") Integer typeId,@Param("cate") Integer categoryId, @Param("workplaceId") Integer workplaceId,Pageable pageable);
+	
 	@Query("SELECT q from Question q "
 			+ "JOIN SurveyQuestion s "
 			+ "ON q.id = s.question.id "

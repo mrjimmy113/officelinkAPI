@@ -108,5 +108,18 @@ public class QuestionServiceImpl implements QuestionService {
 	public List<Category> getAllCategory() {
 		return cateRep.findAll();
 	}
+	
+	@Override
+	public Page<Question> searchWithCondition(String term, int typeId, int categoryId, int pageNum) {
+		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
+		if(typeId != 0 && categoryId != 0) {
+			return quesRep.findAllTemplateWithTypeAndCategory(term, typeId, categoryId, getUserContext().getWorkplaceId(), pageRequest);
+		}else if(typeId != 0 && categoryId == 0) {
+			return quesRep.findAllTemplateWithType(term, typeId, getUserContext().getWorkplaceId(), pageRequest);
+		}else if(typeId == 0 && categoryId != 0) {
+			return quesRep.findAllTemplateWithCategory(term, categoryId, getUserContext().getWorkplaceId(), pageRequest);
+		}
+		return quesRep.findAllTemplate(term, getUserContext().getWorkplaceId(), pageRequest);
+	}
 
 }

@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.officelink.dto.AnswerReportDTO;
+import com.fpt.officelink.dto.CategoryReportDTO;
 import com.fpt.officelink.dto.DashBoardDTO;
-import com.fpt.officelink.dto.QuestionReportDTO;
 import com.fpt.officelink.dto.SurveyDTO;
 import com.fpt.officelink.dto.SurveyReportDTO;
 import com.fpt.officelink.dto.SurveySendDetailDTO;
@@ -74,21 +74,21 @@ public class ReportController {
 
 	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})
 	@GetMapping
-	public ResponseEntity<List<QuestionReportDTO>> getFilterdReport(@RequestParam("surveyId") int surveyId,
+	public ResponseEntity<List<CategoryReportDTO>> getFilterdReport(@RequestParam("surveyId") int surveyId,
 			@RequestParam("locationId") int locationId, @RequestParam("departmentId") int departmentId,
 			@RequestParam("teamId") int teamId) {
 
-		List<QuestionReportDTO> res = new ArrayList<QuestionReportDTO>();
+		List<CategoryReportDTO> res = new ArrayList<CategoryReportDTO>();
 		HttpStatus status = null;
 		try {
-			res = reportSer.getFilteredReport(surveyId, locationId, departmentId, teamId);
+			res = reportSer.getFilteredCateReport(surveyId, locationId, departmentId, teamId);
 			status = HttpStatus.OK;
 		} catch (Exception e) {
 			e.printStackTrace();
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return new ResponseEntity<List<QuestionReportDTO>>(res, status);
+		return new ResponseEntity<List<CategoryReportDTO>>(res, status);
 	}
 
 	@Secured({"ROLE_employer","ROLE_employee","ROLE_system_admin"})

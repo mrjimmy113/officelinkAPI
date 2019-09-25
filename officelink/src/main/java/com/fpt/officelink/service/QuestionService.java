@@ -24,4 +24,6 @@ public interface QuestionService {
 
 	void addNewQuestion(Question q, Integer typeId, Integer categoryId);
 
+	Page<Question> searchWithCondition(String term, int typeId, int categoryId, int pageNum);
+
 }

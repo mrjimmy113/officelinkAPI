@@ -53,6 +53,9 @@ public class Workplace implements Serializable {
 
     @OneToMany(mappedBy = "workplace")
     private Set<News> news;
+    
+    @OneToMany(mappedBy = "workplace")
+    private Set<WordCloudFilter> filters;
 
     //Getter setter
     public int getId() {
@@ -142,5 +145,15 @@ public class Workplace implements Serializable {
     public void setNews(Set<News> news) {
         this.news = news;
     }
+
+	public Set<WordCloudFilter> getFilters() {
+		return filters;
+	}
+
+	public void setFilters(Set<WordCloudFilter> filters) {
+		this.filters = filters;
+	}
+    
+    
 
 }

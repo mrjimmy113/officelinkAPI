@@ -2,6 +2,8 @@ package com.fpt.officelink.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -45,19 +47,19 @@ public interface AccountRespository extends CrudRepository<Account, Integer> {
 	Optional<Account> findByEmailAndPassword(String email, String password);
 	
 	@Query("SELECT a FROM Account a WHERE a.workplace.id = :workId AND a.isDeleted = :isDeleted AND a.teams IS NOT EMPTY AND a.location IS NOT NULL")
-	List<Account> findAllEmail(@Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted); 
+	Set<Account> findAllEmail(@Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted); 
 
 	@Query("SELECT a FROM Account a WHERE a.location.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
-	List<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
+	Set<Account> findAllEmailByLocationId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 
 	@Query("SELECT a FROM Account a JOIN a.teams t WHERE t.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
-	List<Account> findAllEmailByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
+	Set<Account> findAllEmailByTeamId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 	
 	@Query("SELECT a FROM Account a JOIN a.teams t WHERE t.department.id = :id AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
-	List<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
+	Set<Account> findAllEmailByDepartmentId(@Param("id") Integer id, @Param("workId") Integer workId, @Param("isDeleted") boolean isDeleted);
 	
 	@Query("SELECT a FROM Account a JOIN a.teams t WHERE t.department.id = :depId AND a.location.id = :loId AND a.workplace.id = :workId AND a.isDeleted = :isDeleted")
-	List<Account> findAllEmailByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("isDeleted") boolean isDelete);
+	Set<Account> findAllEmailByLocationIdAndDepartmentId(@Param("depId") Integer depId, @Param("loId") Integer loId, @Param("workId") Integer workId, @Param("isDeleted") boolean isDelete);
     @Query("SELECT t FROM Account t WHERE t.isDeleted = :isDeleted AND t.workplace.id = :workplaceId")
     List<Account> findAllByWorkplaceId(
             @Param("workplaceId") Integer workplaceId,
