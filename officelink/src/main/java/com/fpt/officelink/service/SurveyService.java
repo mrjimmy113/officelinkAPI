@@ -60,4 +60,6 @@ public interface SurveyService {
     List<AnswerDTO> getAnswerBySurveyId(int surveyId);
 
 	void updateActiveStatus(Integer id, boolean isActive);
+
+	boolean reSendSurvey(int surveyId) throws JOSEException;
 }

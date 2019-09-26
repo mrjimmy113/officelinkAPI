@@ -59,19 +59,7 @@ public class SystemTaskExecutor {
 		List<Survey> successSurveys = new ArrayList<Survey>();
 
 		for (Survey survey : surveys) {
-			boolean isSuccess = false;
-			
-			// generate team report for survey
-			try {
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-
-			// update active status if report is generated successfully
-			if (isSuccess) {
-				successSurveys.add(surveyService.updateStatus(survey));
-			}
+			surveyService.updateStatus(survey);
 		}
 
 		log.log(Level.INFO, "Report generated");

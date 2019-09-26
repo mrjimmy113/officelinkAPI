@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -237,7 +238,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void sendMailResetPassword(List<String> listEmail, String token) {
 		Map<String, Object> model = new HashMap<>();
-		model.put("link", "http://localhost:4200/change-password/" + token);
+		model.put("link", angularPath + "/change-password/" + token);
 		mailService.sendMail(listEmail.toArray(new String[listEmail.size()]), "reset-password-temp.ftl", model);
 
 	}
@@ -387,6 +388,43 @@ public class AccountServiceImpl implements AccountService {
 			Account acc = opAc.get();
 			if (acc.isActivated())
 				return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean reSendConfirmEmail(String email) {
+		Optional<Account> opAc = accountRespository.findByEmail(email);
+		if(opAc.isPresent()) {
+			if(opAc.get().isActivated()) return false;
+			String token = null;
+			List<String> listEmail = new ArrayList<>();
+			Map<String, Object> model = new HashMap<>();
+			listEmail.add(email);
+			AccountDTO dto = new AccountDTO();
+			BeanUtils.copyProperties(opAc.get(), dto);
+			dto.setDateCreated(null);
+			dto.setDateModified(null);
+			WorkplaceDTO workplaceDto = new WorkplaceDTO();
+			workplaceDto.setName(opAc.get().getWorkplace().getName());
+			dto.setWorkplace(workplaceDto);
+			token = jwtSer.createTokenWithAccount(dto);
+			model.put("link", angularPath + "/confirm/" + token);
+			mailService.sendMail(listEmail.toArray(new String[listEmail.size()]), "email-temp.ftl", model);
+			return true;
+		}
+		
+		return false;
+		
+	}
+	
+	@Override
+	public boolean activeAccount(String email) {
+		Optional<Account> opAc = accountRespository.findByEmail(email);
+		if(opAc.isPresent()) {
+			opAc.get().setActivated(true);
+			accountRespository.save(opAc.get());
+			return true;
 		}
 		return false;
 	}

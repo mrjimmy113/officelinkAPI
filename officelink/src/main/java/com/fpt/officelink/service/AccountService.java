@@ -49,6 +49,8 @@ public interface AccountService {
 
 	void unassignedFromTeam(int teamId, int accountId, int workplaceId);
 	boolean isActiveAccount(String email);
+	boolean reSendConfirmEmail(String email);
+	boolean activeAccount(String email);
 
 
 

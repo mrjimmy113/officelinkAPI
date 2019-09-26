@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.transaction.Transactional;
 
@@ -568,6 +569,7 @@ public class SurveyServiceImpl implements SurveyService {
 		for (Answer tmp : answerList) {
 			AnswerDTO dto = new AnswerDTO();
 			BeanUtils.copyProperties(tmp, dto);
+			dto.setQuestionIdentity(tmp.getSurveyQuestion().getId());
 			answerDTO.add(dto);
 		}
 		return answerDTO;
@@ -623,5 +625,55 @@ public class SurveyServiceImpl implements SurveyService {
 			survey.setActive(isActive);
 			surveyRep.save(survey);
 		}
+	}
+	
+	@Override
+	public boolean reSendSurvey(int surveyId) throws JOSEException {
+		Optional<Survey> surOptional = surveyRep.findById(surveyId);
+		if(surOptional.isPresent()) {
+			Survey survey = surOptional.get();
+			if(!survey.isActive()) return false;
+			int surveyTargetId;
+			if(survey.getTemplateId() != null) {
+				surveyTargetId = survey.getTemplateId();
+			}else {
+				surveyTargetId = survey.getId();
+			}
+			List<SurveySendTarget> targets = targetRep.findAllBySurveyIdAndIsNeed(surveyTargetId, true);
+			int workplaceId = getUserContext().getWorkplaceId();
+			// Find Target
+			Set<Account> sendList = new HashSet<Account>();
+			for (SurveySendTarget target : targets) {
+				if (target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmail(workplaceId, false));
+				} else if (target.getDepartment() != null && target.getLocation() == null && target.getTeam() == null) {
+					sendList.addAll(
+							accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
+				} else if (target.getDepartment() == null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
+				} else if (target.getDepartment() != null && target.getLocation() != null && target.getTeam() == null) {
+					sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
+							target.getDepartment().getId(), workplaceId, false));
+				} else if (target.getDepartment() != null && target.getTeam() != null) {
+					sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
+				}
+
+			}
+			List<String> emails = new ArrayList<String>();
+			for (Account account : sendList) {
+				if (account.getRole().getRole().equals("employer"))
+					continue;
+				emails.add(account.getEmail());
+			}
+			long diffInMillies = Math.abs(System.currentTimeMillis() - survey.getDateStop().getTime());
+		    long duration = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(survey.getId(), (int)duration));
+			mailSer.sendMail(emails.toArray(new String[emails.size()]), "email-survey.ftl", model);
+			return true;
+		}
+		
+		return false;
+		
 	}
 }

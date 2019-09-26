@@ -112,6 +112,7 @@ public class AccountController {
 
 		HttpStatus status = null;
 		AccountDTO accountDTO = new AccountDTO();
+
 		try {
 			accountDTO = jwt.getAccountByToken(accountToken);
 			boolean ifExist = service.isActiveAccount(accountDTO.getEmail());
@@ -192,12 +193,13 @@ public class AccountController {
 		return new ResponseEntity<AccountDTO>(dto, httpStatus);
 	}
 
+	//Hàm loằn này bỏ rồi
 	@GetMapping(value = "/getAccountByEmail")
 	public ResponseEntity<AccountDTO> getAccountByEmail(@RequestParam("emailToken") String emailToken) {
 		HttpStatus status = null;
 		Account account = null;
 		AccountDTO accountDTO = new AccountDTO();
-
+		System.out.println("Chay");
 		try {
 			if(!jwt.validateTokenEmail(emailToken)) {
 				status = HttpStatus.GONE;
@@ -205,7 +207,11 @@ public class AccountController {
 				String email = jwt.getEmailFromToken(emailToken);
 				if(!service.isActiveAccount(email)) {
 					account = service.getAccountByEmail(email).get();
-					BeanUtils.copyProperties(account, accountDTO);
+					accountDTO.setId(account.getId());
+					accountDTO.setEmail(account.getEmail());
+					accountDTO.setFirstname(account.getFirstname());
+					accountDTO.setLastname(accountDTO.getLastname());
+					WorkplaceDTO workDto = new WorkplaceDTO();
 					status = HttpStatus.OK;
 				}else {
 					status = HttpStatus.CONFLICT;
@@ -381,7 +387,7 @@ public class AccountController {
 
 			Account entity = new Account();
 			BeanUtils.copyProperties(accountDTO, entity);
-			boolean res = service.updateIsActive(entity);
+			boolean res = service.activeAccount(entity.getEmail());
 
 			if (res) {
 
@@ -639,6 +645,23 @@ public class AccountController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		return new ResponseEntity<Number>(status.value(), status);
+	}
+	
+	@GetMapping("/resendConfirm")
+	public ResponseEntity<Void> reSendConfirmEmail(@RequestParam("email") String email) {
+		HttpStatus status = null;
+		try {
+			if(service.reSendConfirmEmail(email)) {
+				status = HttpStatus.OK;
+			}else {
+				status = HttpStatus.CONFLICT;
+			}
+			
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return new ResponseEntity<Void>(status);
 	}
 
 }

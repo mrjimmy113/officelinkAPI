@@ -474,4 +474,21 @@ public class SurveyController {
 		}
 		return new ResponseEntity<Void>(status);
 	}
+	
+	@Secured("ROLE_employer")
+	@GetMapping("/resend")
+	public ResponseEntity<Void> resendEmail(@RequestParam("id") int surveyId) {
+		HttpStatus status = null;
+		try {
+			if(ser.reSendSurvey(surveyId)) {
+				status = HttpStatus.OK;
+			}else {
+				status = HttpStatus.CONFLICT;
+			}
+			
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Void>(status);
+	}
 }
