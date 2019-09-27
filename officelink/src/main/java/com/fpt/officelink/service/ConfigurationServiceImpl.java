@@ -76,7 +76,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		if(opSur.isPresent()) {
 			Survey tmp = opSur.get();
 			tmp.setSent(true);
+			tmp.setActive(true);
 			surRep.save(tmp);
+			System.out.println("CLLLLL" + tmp.isSent() + " - " + tmp.isActive());
+			
 		}
 		targets = filterDuplicate(targets);
 		targetRep.saveAll(targets);
@@ -209,9 +212,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public void updateActiveStatus(int id, boolean isActive) {
 		Configuration config = configRep.findById(id).get();
-
+		Survey survey = config.getSurvey();
+		survey.setActive(isActive);
 		config.setActive(isActive);
 		config.setDateModified(new Date(Calendar.getInstance().getTimeInMillis()));
+		surRep.save(survey);
 		configRep.save(config);
 		// update schedule
 		schedService.configureTasks(new ScheduledTaskRegistrar());

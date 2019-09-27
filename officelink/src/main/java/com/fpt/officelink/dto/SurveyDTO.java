@@ -26,6 +26,8 @@ public class SurveyDTO {
 	
 	private Date dateCreated;
 	
+	private Date dateStop;
+	
 	private List<QuestionDTO> questions = new ArrayList<QuestionDTO>();
 	
 
@@ -108,6 +110,16 @@ public class SurveyDTO {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+
+	public Date getDateStop() {
+		return dateStop;
+	}
+
+	public void setDateStop(Date dateStop) {
+		this.dateStop = dateStop;
+	}
+	
+	
 	
 	
 }

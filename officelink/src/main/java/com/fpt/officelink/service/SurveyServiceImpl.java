@@ -160,15 +160,16 @@ public class SurveyServiceImpl implements SurveyService {
 		Optional<Survey> opSur = surveyRep.findByNameAndWorkplaceId(survey.getName(),
 				getUserContext().getWorkplaceId());
 		if (opSur.isPresent()) {
-			Optional<Survey> tmp = surveyRep.findWorkplaceSurveyById(survey.getId(),getUserContext().getWorkplaceId());
+			Optional<Survey> tmp = surveyRep.findWorkplaceSurveyById(survey.getId(), getUserContext().getWorkplaceId());
 			if (tmp.isPresent()) {
 				if (!tmp.get().getName().equalsIgnoreCase(survey.getName())) {
 					return false;
 				}
 			}
 		}
-		Optional<Survey> opCurSur = surveyRep.findWorkplaceSurveyById(survey.getId(),getUserContext().getWorkplaceId());
-		if(opCurSur.isPresent()) {
+		Optional<Survey> opCurSur = surveyRep.findWorkplaceSurveyById(survey.getId(),
+				getUserContext().getWorkplaceId());
+		if (opCurSur.isPresent()) {
 			Survey curSur = opCurSur.get();
 			curSur.setName(survey.getName());
 			Date today = new Date(Calendar.getInstance().getTimeInMillis());
@@ -210,8 +211,7 @@ public class SurveyServiceImpl implements SurveyService {
 	public Page<Survey> searchReportWithPagination(String term, int pageNum) {
 		PageRequest pageRequest = PageRequest.of(pageNum, PAGEMAXSIZE);
 		if (getUserContext().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_employer"))) {
-			return surveyRep.findAllByNameContainingAndWorkplaceIdAndIsDeletedAndIsSentOrderByDateSendOutDesc(term,
-					getUserContext().getWorkplaceId(), false, true, pageRequest);
+			return surveyRep.findSurveyReport(term, getUserContext().getWorkplaceId(), pageRequest);
 		} else {
 			return surveyRep.findReportableSurvey(term, getUserContext().getWorkplaceId(),
 					getUserContext().getUsername(), pageRequest);
@@ -243,13 +243,13 @@ public class SurveyServiceImpl implements SurveyService {
 			if (!checkIfUserCanTakeSurvey(id)) {
 				return null;
 			}
-				
-			Optional<Survey> survey = surveyRep.findWorkplaceSurveyById(id,getUserContext().getWorkplaceId());
+
+			Optional<Survey> survey = surveyRep.findWorkplaceSurveyById(id, getUserContext().getWorkplaceId());
 			if (survey.isPresent()) {
 				if (checkIfUserTakeSurvey(id) || !survey.get().isActive()) {
 					return result;
 				}
-					
+
 				result = new SurveyDTO();
 				BeanUtils.copyProperties(survey.get(), result);
 				List<SurveyQuestion> questions = surQuestRep.findAllBySurveyId(id);
@@ -283,29 +283,27 @@ public class SurveyServiceImpl implements SurveyService {
 	@Transactional(rollbackOn = Exception.class)
 	public boolean sendOutSurvey(Integer surveyId, List<SurveySendTarget> targets, int duration, int workplaceId)
 			throws JOSEException {
-		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(surveyId,getUserContext().getWorkplaceId());
+		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(surveyId, getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey survey = opSurvey.get();
 			Set<Account> sendList = new HashSet<Account>();
 			for (SurveySendTarget target : targets) {
 				target.setSurvey(survey);
 				if (target.isNeed()) {
-					if (target.getDepartment() == null && target.getLocation() == null
-							&& target.getTeam() == null) {
+					if (target.getDepartment() == null && target.getLocation() == null && target.getTeam() == null) {
 						sendList.addAll(accRep.findAllEmail(workplaceId, false));
 					} else if (target.getDepartment() != null && target.getLocation() == null
 							&& target.getTeam() == null) {
-						sendList.addAll(accRep.findAllEmailByDepartmentId(target.getDepartment().getId(),
-								workplaceId, false));
+						sendList.addAll(
+								accRep.findAllEmailByDepartmentId(target.getDepartment().getId(), workplaceId, false));
 					} else if (target.getDepartment() == null && target.getLocation() != null
 							&& target.getTeam() == null) {
 						sendList.addAll(
 								accRep.findAllEmailByLocationId(target.getLocation().getId(), workplaceId, false));
 					} else if (target.getDepartment() != null && target.getLocation() != null
 							&& target.getTeam() == null) {
-						sendList.addAll(
-								accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
-										target.getDepartment().getId(), workplaceId, false));
+						sendList.addAll(accRep.findAllEmailByLocationIdAndDepartmentId(target.getDepartment().getId(),
+								target.getDepartment().getId(), workplaceId, false));
 					} else if (target.getDepartment() != null && target.getTeam() != null) {
 						sendList.addAll(accRep.findAllEmailByTeamId(target.getTeam().getId(), workplaceId, false));
 					}
@@ -313,7 +311,7 @@ public class SurveyServiceImpl implements SurveyService {
 			}
 			if (sendList.size() == 0) {
 				return false;
-			}	
+			}
 			if (!survey.isSent()) {
 				survey.setActive(true);
 				survey.setSent(true);
@@ -322,7 +320,7 @@ public class SurveyServiceImpl implements SurveyService {
 				survey.setDateSendOut(date);
 				c.add(Calendar.DATE, duration);
 				survey.setDateStop(new Date(c.getTimeInMillis()));
-				
+
 				survey.setSentOut(sendList.size());
 				surveyRep.save(survey);
 				targetRep.saveAll(targets);
@@ -427,7 +425,8 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public void saveAnswer(SurveyAnswerInforDTO dto) {
 		List<Answer> savedAnswer = new ArrayList<Answer>();
-		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(dto.getSurveyId(),getUserContext().getWorkplaceId());
+		Optional<Survey> opSurvey = surveyRep.findWorkplaceSurveyById(dto.getSurveyId(),
+				getUserContext().getWorkplaceId());
 		if (opSurvey.isPresent()) {
 			Survey sur = opSurvey.get();
 			sur.setReceivedAnswer(sur.getReceivedAnswer() + 1);
@@ -437,14 +436,14 @@ public class SurveyServiceImpl implements SurveyService {
 				Answer entity = new Answer();
 				entity.setAssignmentHistory(historyRep.findFirstByAccountIdOrderByDateCreatedDesc(acc.getId()).get());
 				entity.setContent(a.getContent());
-				if(a.getPoint() == null) {
-					//Sentiment Analysis
+				if (a.getPoint() == null) {
+					// Sentiment Analysis
 					try {
 						entity.setPoint(NatureLanguageModule.analyzeSentiment(entity.getContent()));
 					} catch (IOException e) {
 						entity.setPoint(5);
 					}
-				}else {
+				} else {
 					entity.setPoint(a.getPoint());
 				}
 				SurveyQuestion sq = new SurveyQuestion();
@@ -466,12 +465,12 @@ public class SurveyServiceImpl implements SurveyService {
 				}
 				savedAnswer.add(entity);
 			});
-			if(checkIfUserTakeSurvey(dto.getSurveyId())) {
+			if (checkIfUserTakeSurvey(dto.getSurveyId())) {
 				return;
-			}else {
+			} else {
 				answerRep.saveAll(savedAnswer);
 			}
-			
+
 		}
 	}
 
@@ -626,17 +625,18 @@ public class SurveyServiceImpl implements SurveyService {
 			surveyRep.save(survey);
 		}
 	}
-	
+
 	@Override
 	public boolean reSendSurvey(int surveyId) throws JOSEException {
 		Optional<Survey> surOptional = surveyRep.findById(surveyId);
-		if(surOptional.isPresent()) {
+		if (surOptional.isPresent()) {
 			Survey survey = surOptional.get();
-			if(!survey.isActive()) return false;
+			if (!survey.isActive())
+				return false;
 			int surveyTargetId;
-			if(survey.getTemplateId() != null) {
+			if (survey.getTemplateId() != null) {
 				surveyTargetId = survey.getTemplateId();
-			}else {
+			} else {
 				surveyTargetId = survey.getId();
 			}
 			List<SurveySendTarget> targets = targetRep.findAllBySurveyIdAndIsNeed(surveyTargetId, true);
@@ -666,14 +666,14 @@ public class SurveyServiceImpl implements SurveyService {
 				emails.add(account.getEmail());
 			}
 			long diffInMillies = Math.abs(System.currentTimeMillis() - survey.getDateStop().getTime());
-		    long duration = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+			long duration = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(survey.getId(), (int)duration));
+			model.put("link", angularPath + "/take/" + jwtSer.createSurveyToken(survey.getId(), (int) duration));
 			mailSer.sendMail(emails.toArray(new String[emails.size()]), "email-survey.ftl", model);
 			return true;
 		}
-		
+
 		return false;
-		
+
 	}
 }
